@@ -20,5 +20,27 @@
    git remote add origin https://github.com/va43n/eltex-v42-2026
    git status # nothing to commit, working tree clean
    git push -u origin main
+   scp Desktop/module1_part1.pdf eltex-v42@217.71.138.1:/home/eltex-v42 # Отчет из первой части первой практики, сначала нужно перенести на общий сервер
+   scp module1_part1.pdf root@172.16.9.216:/root/eltex-v42-2026 # Затем на виртуальную машину
    scp eltex-v42* root@172.16.9.216:/root/eltex-v42-2026
    scp practice* root@172.16.9.216:/root/eltex-v42-2026
+   mv eltex-v42_part* module1/task1
+   mv module1_part1.pdf module1/task1
+   mv practice2_eltex-v42_part* module1/task2
+   git add .
+   git status
+   git commit -m "task1 done and task2 almost done"
+   git push
+10) mkdir eltex-v42-2026_clone && cd eltex-v42-2026_clone
+    git clone https://github.com/va43n/eltex-v42-2026.git
+11) echo "Старт - 06.07.2026" >> README.md
+    git add .
+    git commit -m "Minor change in README.md"
+    git push origin main
+
+    # eltex-v42-2026_clone
+    git fetch
+    git log origin/main # Последний коммит: Minor change in README.md
+    git diff main origin/main # Показана недостающая строка в README.md в main по сравнению с origin/main
+    git merge
+12) # Все файлы были скопированы
