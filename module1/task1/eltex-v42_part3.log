@@ -1,0 +1,20 @@
+1) cd ~
+2) mkdir -p D1/D2/D3
+3) touch D1/D2/file.txt
+4) echo "Some text for file.txt" >> D1/D2/file.txt
+5) cd D1/D2/D3
+   ln -s ../file.txt s_link
+   ln ../file.txt h_link
+6) cd D1/D2/D3
+   cat s_link # Some text for file.txt
+   cat h_link # Some text for file.txt 
+7) mv D1/D2/file.txt D1/
+8) cat s_link # Не работает, так как ссылается по относительному пути, который был изменен;
+   cat h_link # Some text for file.txt - Работает, так как ссылается не на сам файл, а на inode этого файла.
+9) rm -rf D1/D2
+10) find / -type f -size +20M 2>/dev/null > eltex-v42_part3_gt20M.log
+11-12) find ~ -type f -mtime -1
+13) which find
+14) file /usr/bin/find # /usr/bin/find: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=5545a6c7162d325fbe5ffabcbfe4e5521b66ce70, for GNU/Linux 3.2.0, stripped
+15) file /boot/initrd.img* # /boot/initrd.img-6.1.0-44-amd64: ASCII cpio archive (SVR4 with no CRC)
+                           # /boot/initrd.img-6.1.0-50-amd64: ASCII cpio archive (SVR4 with no CRC)

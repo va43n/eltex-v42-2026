@@ -1,0 +1,83 @@
+1) ssh-keygen
+2) ssh-copy-id root@172.16.9.216
+3) cat .ssh/id_rsa.pub # Открытый ключ на сервере
+   ls -l .ssh/id_rsa.pub # 644
+   ssh root@172.16.9.216
+   cat .ssh/authorized_keys # Содержимое совпадает с содержимым на сервере 1
+   ls -l .ssh/authorized_keys # 600
+4) useradd -m -s /bin/bash user1
+   passwd user1
+5) adduser user2
+   adduser user3
+6) usermod -s /usr/sbin/nologin user3
+   su - user3 # This account is currently not available.
+   su -s /bin/bash user3 # Удалось переключиться на user3
+   exit
+7) group_add my_users
+   usermod -aG my_users user1; usermod -aG my_users user2; usermod -aG my_users user3
+9) mkdir /opt/share
+   chgrp -R my_users /opt/share
+   chmod 2770 /opt/share
+10) su - user1
+    umask 004 # Добавлено в .bashrc
+11) touch /opt/share/user1_1 # user1
+    touch /opt/share/user1_2 # user1
+    touch /opt/share/user2_1 # user2
+    touch /opt/share/user3_1 # user3
+    touch /opt/share/user3_2 # user3
+
+    rm /opt/share/user2_1 # user1 - файл удален
+    rm /opt/share/user3_1 # user2 - файл удален
+    rm /opt/share/user3_2 # user2 - файл удален
+    rm /opt/share/user1_1 # user3 - файл удален
+    rm /opt/share/user1_2 # user3 - файл удален
+12) chmod +t /opt/share # root
+    touch /opt/share/user1_1 # user1
+    touch /opt/share/user1_2 # user1
+    touch /opt/share/user2_1 # user2
+    touch /opt/share/user3_1 # user3
+    touch /opt/share/user3_2 # user3
+
+    rm /opt/share/user2_1 # user1 - rm: cannot remove '/opt/share/user2_1': Operation not permitted
+    rm /opt/share/user3_1 # user2 - rm: cannot remove '/opt/share/user3_1': Operation not permitted
+    rm /opt/share/user3_2 # user2 - rm: cannot remove '/opt/share/user3_2': Operation not permitted
+    rm /opt/share/user1_1 # user3 - rm: cannot remove '/opt/share/user1_1': Operation not permitted
+    rm /opt/share/user1_2 # user3 - rm: cannot remove '/opt/share/user1_2': Operation not permitted
+13) # user1
+    which dmesg # /usr/bin/dmesg
+    visudo # Добавлена строка user1 ALL=(ALL) /usr/bin/dmesg в конфигурацию
+
+    # user2
+    vi /opt/share/dmesg_user2.sh # В файл записана строка /usr/bin/dmesg "$@"
+    chown user2:user2 /opt/share/dmesg_user2.sh
+    chmod 4544 /opt/share/dmesg_user2.sh
+14) for i in {1..3}; do chage -M 10 "user$i"; done
+15) vi /etc/motd # Иван Яшков
+16) rsync -av /etc/ /root/etc_backup/
+17) tar -cf etc_backup.tar /root/etc_backup/ # Без сжатия, 14M
+    tar -czf etc_backup.tar.gz /root/etc_backup/ # gzip, 1.7M
+    
+    apt update
+    apt install bzip2
+    tar -cjf etc_backup.tar.bz2 /root/etc_backup/ # bzip2, 1.4M
+
+    apt install p7zip-full p7zip-rar
+    7z a etc_backup.7z etc_backup.tar # 7zip, 1.2M
+18) echo `date` >> /etc/motd
+    rsync -av --delete /etc/ /root/etc_backup/
+
+    mkdir temp_dr
+    tar -xzf etc_backup.tar.gz -C temp_dr
+    cp /etc/motd temp_dr/root/etc_backup/
+    rm -rf etc_backup.tar.gz
+    tar -czf etc_backup.tar.gz temp_dr/root/
+    rm -rf temp_dr
+19) tar -tjf etc_backup.tar.bz2 | wc -l # 3486
+    find /root/etc_backup | wc -l # 3486
+
+    cat /etc/motd # Иван Яшков
+                  # Thu Jul  9 01:46:41 PM UTC 2026
+    tar -xjf etc_backup.tar.bz2 -O root/etc_backup/motd # Иван Яшков
+20) mkdir /root/etc_backup_gzip /root/etc_backup_7zip
+    tar -xzf etc_backup.tar.gz -C /root/etc_backup_gzip/
+    7z x etc_backup.7z -o/root/etc_backup_7zip/

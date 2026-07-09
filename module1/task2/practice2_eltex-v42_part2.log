@@ -1,0 +1,10 @@
+1) BOOT_TIME=`journalctl -b -o short-iso | head -1 | cut -d' ' -f1`
+   BOOT_TIME_20=$(date -d "@$(( $(date -d "$BOOT_TIME" +%s) + 20 ))" +"%Y-%m-%dT%H:%M:%S")
+   journalctl -b -o short-iso --since "$BOOT_TIME" --until "$BOOT_TIME_20"
+2) find / -name "auth.log" # /var/log/auth.log
+   awk '{$1=$2=$4=""; print $0}' /var/log/auth.log | sed 's/\[[0-9]*\]//' | sor 
+3) awk '{$1=$2=$4=""; print $0}' /var/log/auth.log | sed 's/\[[0-9]*\]//' | sort | uniq -c
+4) grep '/usr/sbin/nologin$' /etc/passwd | sort -t ":" -k3,3nr | while IFS=: read -r user c2 uid gid c5 c6 shell; do groups=$(awk -F: -v u="$user" '$1 == u {next} {if ($4 ~ "(^|,)" u "(,|$)") {a[i++]=$1}} END {for(j=0;j<i;j++) printf "%s%s%s ", (j==0?"groups: ":""), a[j], (j<i-1?",":"")}' /etc/group); echo "$uid, $user, $groups"; done 
+5) dmesg | grep -i kernel 
+6) cat /var/log/kern.log | wc -l
+7) sed -E '/^(Upgrade|Install|Reinstall)/d' /var/log/apt/history.log | sed -z 's/\n\n/\x00/g; s/\n/; /g; s/\x00/\n/g' | sed -E 's/(Start-Date: [^;]+); (Commandline: [^;]+);/\2; \1;/' 

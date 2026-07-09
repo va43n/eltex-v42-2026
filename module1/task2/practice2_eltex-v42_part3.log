@@ -1,0 +1,24 @@
+1) # Аккаунт создан
+2) git config --global user.name "va43n"
+   git config --global user.email "va43nplay@gmail.com"
+   git config --global init.defaultBranch main
+3) apt update
+   apt install git gh
+4) ssh-keygen -t ed25519 -f ~/.ssh/eltex-v42
+5) gh auth login 
+6) gh auth setup-git --hostname github.com
+7) gh auth status # Logged in to github.com account va43n (/root/.config/gh/hosts.yml)
+                  # Active account: true
+                  # Git operations protocol: ssh
+8) gh repo create --public eltex-v42-2026 
+9) mkdir eltex-v42-2026 && cd eltex-v42-2026
+   echo "# Задания школы Eltex 2026, v42" >> README.md
+   git init
+   git add README.md
+   git commit -m "first commit"
+   git branch -M main
+   git remote add origin https://github.com/va43n/eltex-v42-2026
+   git status # nothing to commit, working tree clean
+   git push -u origin main
+   scp eltex-v42* root@172.16.9.216:/root/eltex-v42-2026
+   scp practice* root@172.16.9.216:/root/eltex-v42-2026
