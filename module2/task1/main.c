@@ -36,11 +36,10 @@ int main() {
 
   print_phone_book(head);
 
-  phone_book_push_back(head, full_name, job_place, job_position, phone_numbers,
+  phone_book_add(head, full_name, job_place, job_position, phone_numbers,
                        phone_numbers_n, socials, socials_n, other);
-  for (size_t i = 0; i < phone_numbers_n; i++)
-        free(phone_numbers[i]);
-    free(phone_numbers);
+  for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]);
+  free(phone_numbers);
   free(socials);
 
   print_phone_book(head);
@@ -61,12 +60,11 @@ int main() {
 
   socials2 = (socials_t*)malloc(sizeof(socials_t) * socials_n2);
 
-  phone_book_push_back(head, full_name2, job_place2, job_position2,
+  phone_book_add(head, full_name2, job_place2, job_position2,
                        phone_numbers2, phone_numbers_n2, socials2, socials_n2,
                        other2);
-  for (size_t i = 0; i < phone_numbers_n2; i++)
-        free(phone_numbers2[i]);
-    free(phone_numbers2);
+  for (size_t i = 0; i < phone_numbers_n2; i++) free(phone_numbers2[i]);
+  free(phone_numbers2);
   free(socials2);
 
   print_phone_book(head);
@@ -84,14 +82,22 @@ int main() {
 
   socials3 = (socials_t*)malloc(sizeof(socials_t) * socials_n3);
 
-  phone_book_push_back(head, full_name3, job_place3, job_position3,
+  phone_book_add(head, full_name3, job_place3, job_position3,
                        phone_numbers3, phone_numbers_n3, socials3, socials_n3,
                        other3);
-  for (size_t i = 0; i < phone_numbers_n3; i++)
-        free(phone_numbers3[i]);
-    free(phone_numbers3);
+  for (size_t i = 0; i < phone_numbers_n3; i++) free(phone_numbers3[i]);
+  free(phone_numbers3);
   free(socials3);
 
+  print_phone_book(head);
+
+  remove_phone_book(head, 2);
+  print_phone_book(head);
+
+  remove_phone_book(head, 0);
+  print_phone_book(head);
+
+  remove_phone_book(head, 1);
   print_phone_book(head);
 
   free_phone_book(head);

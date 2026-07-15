@@ -8,7 +8,7 @@ ifeq ($(shell uname),Linux)
     CHECK_LIBS += -lsubunit
 endif
 
-SRC = phone_book.c
+SRC = phone_book.c phone_book_additional.c
 OBJ = $(SRC:.c=.o)
 LIB_NAME = phone_book.a
 

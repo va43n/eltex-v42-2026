@@ -10,15 +10,10 @@ phone_book* create_phone_book() {
 void free_phone_book(phone_book* head) {
   if (head == NULL) return;
 
-  phone_book *ptr = head;
+  phone_book* ptr = head;
 
   while (ptr != NULL) {
-    if (ptr->phone_numbers != NULL) {
-        for (size_t i = 0; i < ptr->phone_numbers_n; i++)
-            free(ptr->phone_numbers[i]);
-        free(ptr->phone_numbers);
-    }
-    if (ptr->socials != NULL) free(ptr->socials);
+    free_one_page(ptr);
 
     phone_book* temp = ptr;
     ptr = ptr->next;
@@ -26,71 +21,53 @@ void free_phone_book(phone_book* head) {
   }
 }
 
-void phone_book_push_back(phone_book* head, char full_name[], char job_place[],
-                          char job_position[], char** phone_numbers,
-                          size_t phone_numbers_n, socials_t* socials,
-                          size_t socials_n, char other[]) {
-  phone_book* ptr = head;
+int phone_book_add(phone_book* head, char full_name[], char job_place[],
+                         char job_position[], char** phone_numbers,
+                         size_t phone_numbers_n, socials_t* socials,
+                         size_t socials_n, char other[]) {
+  phone_book* pb = (phone_book*)malloc(sizeof(phone_book));
+  pb->index = get_unique_index(head);
 
-  while (ptr->next != NULL) {
-    ptr = ptr->next;
+  if (set_full_name(pb, full_name) && set_job_place(pb, job_place) &&
+      set_job_position(pb, job_position) &&
+      set_phone_numbers(pb, phone_numbers, phone_numbers_n) &&
+      set_socials(pb, socials, socials_n) && set_other(pb, other)) {
+    pb->next = head->next;
+    head->next = pb;
+    return 1;
   }
 
-  phone_book* new_record = (phone_book*)malloc(sizeof(phone_book));
-  new_record->index = find_unique_index(head);
-  strcpy(new_record->full_name, full_name);
-  strcpy(new_record->job_place, job_place);
-  strcpy(new_record->job_position, job_position);
+  free_one_page(pb);
 
-  new_record->phone_numbers_n = phone_numbers_n;
-  new_record->phone_numbers = (char**)malloc(sizeof(char*) * phone_numbers_n);
-  for (size_t i = 0; i < phone_numbers_n; i++) {
-    new_record->phone_numbers[i] =
-        (char*)malloc(sizeof(char) * (strlen(phone_numbers[i]) + 1));
-    strcpy(new_record->phone_numbers[i], phone_numbers[i]);
-  }
-
-  new_record->socials_n = socials_n;
-  new_record->socials = (socials_t*)malloc(sizeof(socials_t) * socials_n);
-  for (size_t i = 0; i < socials_n; i++) {
-    new_record->socials[i] = socials[i];
-  }
-
-  strcpy(new_record->other, other);
-
-  new_record->next = NULL;
-
-  ptr->next = new_record;
+  return 0;
 }
 
-size_t find_unique_index(phone_book* head) {
-    phone_book *ptr = head->next;
-    size_t start_index = 0;
+int remove_phone_book(phone_book* head, size_t index) {
+  phone_book *ptr = head->next, *prev = head;
 
-    while (ptr != NULL) {
-        if (ptr->index > start_index + 1) {
-            start_index = ptr->index;
-            break;
-        }
+  while (ptr != NULL) {
+    if (ptr->index == index) {
+      prev->next = ptr->next;
+      ptr->next = NULL;
+      free_one_page(ptr);
+      free(ptr);
 
-        start_index = ptr->index;
-        ptr = ptr->next;
+      return 1;
     }
+    ptr = ptr->next;
+    prev = prev->next;
+  }
 
-    return start_index + 1;
+  return 0;
 }
-
-// void remove_phone_book(phone_book *head, size_t index) {
-//     //
-//     //
-// }
 
 void print_phone_book(phone_book* head) {
+  printf("===============================\n");
   printf("My phone book! \n");
   phone_book* ptr = head->next;
   size_t counter = 0;
   while (ptr != NULL) {
-    printf("---%ld--------------------------\n", ++counter);
+    printf("\n---%ld--------------------------\n", ++counter);
     printf("Unique index: %ld\n", ptr->index);
     printf("Full name: %s\n", ptr->full_name);
     printf("Job place: %s\n", ptr->job_place);
@@ -111,7 +88,7 @@ void print_phone_book(phone_book* head) {
            ptr->other);
 
     ptr = ptr->next;
-    printf("---%ld--------------------------\n\n", counter);
+    printf("---%ld--------------------------\n", counter);
   }
-  printf("\n");
+  printf("===============================\n\n");
 }
