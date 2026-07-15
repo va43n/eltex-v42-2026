@@ -1,0 +1,12 @@
+*.o
+*.out
+*.a
+*.gcno
+*.gcda
+*.info
+.vscode
+man_test_exe
+tests_exe
+report
+
+
