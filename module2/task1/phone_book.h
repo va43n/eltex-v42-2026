@@ -45,14 +45,14 @@ phone_book* phone_book_get_page(phone_book* head, size_t index);
 int phone_book_print(phone_book* head);
 int phone_book_print_page(phone_book* page);
 
-int set_full_name(phone_book* pb, char full_name[]);
-int set_job_place(phone_book* pb, char job_place[]);
-int set_job_position(phone_book* pb, char job_position[]);
-int set_phone_numbers(phone_book* pb, char** phone_numbers,
+int phone_book_set_full_name(phone_book* pb, char full_name[]);
+int phone_book_set_job_place(phone_book* pb, char job_place[]);
+int phone_book_set_job_position(phone_book* pb, char job_position[]);
+int phone_book_set_phone_numbers(phone_book* pb, char** phone_numbers,
                       size_t phone_numbers_n);
-int set_socials(phone_book* pb, socials_t* socials, size_t socials_n);
-int set_other(phone_book* pb, char other[]);
+int phone_book_set_socials(phone_book* pb, socials_t* socials, size_t socials_n);
+int phone_book_set_other(phone_book* pb, char other[]);
 
-void free_one_page(phone_book* pb);
-
-size_t get_unique_index(phone_book* head);
+void _free_one_page(phone_book* pb);
+size_t _get_unique_index(phone_book* head);
+int _check_phone_number(char* pn);

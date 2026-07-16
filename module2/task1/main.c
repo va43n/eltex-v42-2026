@@ -38,6 +38,8 @@ int main() {
 
   phone_book_add_page(head, full_name, job_place, job_position, phone_numbers,
                       phone_numbers_n, socials, socials_n, other);
+  
+  phone_book_print_page(phone_book_get_page(head, 1));
   for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]);
   free(phone_numbers);
   free(socials);
