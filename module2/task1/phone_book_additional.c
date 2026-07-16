@@ -17,16 +17,31 @@ int set_job_position(phone_book* pb, char job_position[]) {
   return 1;
 }
 
-// int check_phone_number(char* pn) {
+int check_phone_number(char* pn) {
+  regex_t regex;
+  int reti;
 
-// }
+  reti = regcomp(&regex, "^\\+?[0-9]+$", REG_EXTENDED);
+  if (reti) {
+    return 0;
+  }
+
+  reti = regexec(&regex, pn, 0, NULL, 0);
+
+  regfree(&regex);
+
+  return !reti;
+}
 
 int set_phone_numbers(phone_book* pb, char** phone_numbers,
                       size_t phone_numbers_n) {
   pb->phone_numbers_n = phone_numbers_n;
   pb->phone_numbers = (char**)malloc(sizeof(char*) * phone_numbers_n);
   for (size_t i = 0; i < phone_numbers_n; i++) {
-    // if (check_phone_number(phone_numbers[i]))
+    if (!check_phone_number(phone_numbers[i])) {
+      pb->phone_numbers_n = i;
+      return 0;
+    }
     pb->phone_numbers[i] =
         (char*)malloc(sizeof(char) * (strlen(phone_numbers[i]) + 1));
     strcpy(pb->phone_numbers[i], phone_numbers[i]);

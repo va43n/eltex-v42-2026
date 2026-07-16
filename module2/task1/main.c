@@ -7,7 +7,7 @@ int main() {
   char job_place[] = "Eltex";
   char job_position[] = "Any";
   char** phone_numbers;
-  char n1[] = "+7-777-555-77-11", n2[] = "8-123-456-78-90";
+  char n1[] = "+77775557711", n2[] = "81234567890";
   size_t phone_numbers_n = 2;
   socials_t* socials;
   char sn1[] = "Telegram", sn2[] = "VK", sn3[] = "MAX", sn4[] = "OK";
@@ -48,7 +48,7 @@ int main() {
   char job_place2[] = "";
   char job_position2[] = "";
   char** phone_numbers2;
-  char n21[] = "+7-777-555-77-11";
+  char n21[] = "+77775557711";
   size_t phone_numbers_n2 = 1;
   socials_t* socials2;
   size_t socials_n2 = 0;

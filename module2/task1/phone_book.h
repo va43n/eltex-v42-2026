@@ -1,3 +1,4 @@
+#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +29,9 @@ int phone_book_add(phone_book* head, char full_name[], char job_place[],
                          size_t phone_numbers_n, socials_t* socials,
                          size_t socials_n, char other[]);
 int remove_phone_book(phone_book* head, size_t index);
+
+// size_t find_page_by_full_name(phone_book* head, char full_name[]);
+// size_t find_page_by_phone_number(phone_book* head, char phone_number[]);
 
 void print_phone_book(phone_book* head);
 
