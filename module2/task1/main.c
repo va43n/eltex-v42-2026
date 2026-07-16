@@ -7,7 +7,7 @@ int main() {
   char job_place[] = "Eltex";
   char job_position[] = "Any";
   char** phone_numbers;
-  char n1[] = "+77775557711", n2[] = "8-123-456-78-90";
+  char n1[] = "+77775557711", n2[] = "8-123-456-78-90", n0[] = "100-20-22";
   size_t phone_numbers_n = 2;
   socials_t* socials;
   char sn1[] = "Telegram", sn2[] = "VK", sn3[] = "MAX", sn4[] = "OK";
@@ -38,13 +38,29 @@ int main() {
 
   phone_book_add_page(head, full_name, job_place, job_position, phone_numbers,
                       phone_numbers_n, socials, socials_n, other);
+
+  phone_book_print(head);
   
   phone_book_print_page(phone_book_get_page(head, 1));
+
   for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]);
   free(phone_numbers);
   free(socials);
 
-  phone_book_print(head);
+  phone_numbers = (char**)malloc(sizeof(char*) * (phone_numbers_n + 1));
+  phone_numbers[0] = (char*)malloc(sizeof(char) * (strlen(n0) + 1));
+  strcpy(phone_numbers[0], n0);
+  phone_numbers[1] = (char*)malloc(sizeof(char) * (strlen(n1) + 1));
+  strcpy(phone_numbers[1], n1);
+  phone_numbers[2] = (char*)malloc(sizeof(char) * (strlen(n2) + 1));
+  strcpy(phone_numbers[2], n2);
+
+  phone_book_set_full_name(phone_book_get_page(head, 1), "Ivan Yashkov");
+  phone_book_set_phone_numbers(phone_book_get_page(head, 1), phone_numbers, phone_numbers_n + 1);
+  phone_book_print_page(phone_book_get_page(head, 1));
+
+  for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]);
+  free(phone_numbers);
 
   char full_name2[] = "Ivanov Ivan Ivanovich";
   char job_place2[] = "";
