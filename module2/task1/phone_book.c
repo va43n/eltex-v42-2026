@@ -246,33 +246,49 @@ int phone_book_save(phone_book* head, char file_name[]) {
   if (file == NULL) {
     return ERROR;
   }
-
-  fprintf(file, "phone_book\n");
   phone_book* ptr = head->next;
-
+  phone_book** all_pages = NULL;
+  size_t n = 0;
   while (ptr != NULL) {
-    fprintf(file, "---\n");
+    n++;
+    phone_book** temp = (phone_book**)realloc(all_pages, n * sizeof(phone_book*));
+    if (temp == NULL) {
+      free(all_pages);
+      fclose(file);
+      return ERROR;
+    }
 
-    fprintf(file, "%ld\n", ptr->index);
-    fprintf(file, "%s\n", ptr->full_name);
-    fprintf(file, "%s\n", ptr->job_place);
-    fprintf(file, "%s\n", ptr->job_position);
+    all_pages = temp;
+    all_pages[n - 1] = ptr;
 
-    fprintf(file, "numbers:\n");
-    fprintf(file, "%ld\n", ptr->phone_numbers_n);
-    for (size_t i = 0; i < ptr->phone_numbers_n; i++)
-      fprintf(file, "%s\n", ptr->phone_numbers[i]);
-    
-    fprintf(file, "socials:\n");
-    fprintf(file, "%ld\n", ptr->socials_n);
-    for (size_t i = 0; i < ptr->socials_n; i++)
-      fprintf(file, "%s\n%s\n", ptr->socials[i].social_network_name, ptr->socials[i].social_network_url);
-
-    fprintf(file, "%s\n", ptr->other);
-
-    fprintf(file, "---\n");
     ptr = ptr->next;
   }
+
+  fprintf(file, "phone_book\n");
+  for (size_t i = n; i > 0; i--) {
+    fprintf(file, "---\n");
+
+    fprintf(file, "%ld\n", all_pages[i - 1]->index);
+    fprintf(file, "%s\n", all_pages[i - 1]->full_name);
+    fprintf(file, "%s\n", all_pages[i - 1]->job_place);
+    fprintf(file, "%s\n", all_pages[i - 1]->job_position);
+
+    fprintf(file, "numbers:\n");
+    fprintf(file, "%ld\n", all_pages[i - 1]->phone_numbers_n);
+    for (size_t j = 0; j < all_pages[i - 1]->phone_numbers_n; j++)
+      fprintf(file, "%s\n", all_pages[i - 1]->phone_numbers[j]);
+    
+    fprintf(file, "socials:\n");
+    fprintf(file, "%ld\n", all_pages[i - 1]->socials_n);
+    for (size_t j = 0; j < all_pages[i - 1]->socials_n; j++)
+      fprintf(file, "%s\n%s\n", all_pages[i - 1]->socials[j].social_network_name, all_pages[i - 1]->socials[j].social_network_url);
+
+    fprintf(file, "%s\n", all_pages[i - 1]->other);
+
+    fprintf(file, "---\n");
+  }
+
+  free(all_pages);
 
   fclose(file);
 
