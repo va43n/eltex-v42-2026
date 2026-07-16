@@ -1,13 +1,13 @@
 #include "phone_book.h"
 
 int main() {
-  phone_book* head = create_phone_book();
+  phone_book* head = phone_book_create();
 
   char full_name[] = "Yashkov Ivan Vitalevich";
   char job_place[] = "Eltex";
   char job_position[] = "Any";
   char** phone_numbers;
-  char n1[] = "+77775557711", n2[] = "81234567890";
+  char n1[] = "+77775557711", n2[] = "8-123-456-78-90";
   size_t phone_numbers_n = 2;
   socials_t* socials;
   char sn1[] = "Telegram", sn2[] = "VK", sn3[] = "MAX", sn4[] = "OK";
@@ -34,15 +34,15 @@ int main() {
   strcpy(socials[3].social_network_name, sn4);
   strcpy(socials[3].social_network_url, su4);
 
-  print_phone_book(head);
+  phone_book_print(head);
 
-  phone_book_add(head, full_name, job_place, job_position, phone_numbers,
-                       phone_numbers_n, socials, socials_n, other);
+  phone_book_add_page(head, full_name, job_place, job_position, phone_numbers,
+                      phone_numbers_n, socials, socials_n, other);
   for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]);
   free(phone_numbers);
   free(socials);
 
-  print_phone_book(head);
+  phone_book_print(head);
 
   char full_name2[] = "Ivanov Ivan Ivanovich";
   char job_place2[] = "";
@@ -60,14 +60,14 @@ int main() {
 
   socials2 = (socials_t*)malloc(sizeof(socials_t) * socials_n2);
 
-  phone_book_add(head, full_name2, job_place2, job_position2,
-                       phone_numbers2, phone_numbers_n2, socials2, socials_n2,
-                       other2);
+  phone_book_add_page(head, full_name2, job_place2, job_position2,
+                      phone_numbers2, phone_numbers_n2, socials2, socials_n2,
+                      other2);
   for (size_t i = 0; i < phone_numbers_n2; i++) free(phone_numbers2[i]);
   free(phone_numbers2);
   free(socials2);
 
-  print_phone_book(head);
+  phone_book_print(head);
 
   char full_name3[] = "???";
   char job_place3[] = "";
@@ -82,25 +82,48 @@ int main() {
 
   socials3 = (socials_t*)malloc(sizeof(socials_t) * socials_n3);
 
-  phone_book_add(head, full_name3, job_place3, job_position3,
-                       phone_numbers3, phone_numbers_n3, socials3, socials_n3,
-                       other3);
+  phone_book_add_page(head, full_name3, job_place3, job_position3,
+                      phone_numbers3, phone_numbers_n3, socials3, socials_n3,
+                      other3);
   for (size_t i = 0; i < phone_numbers_n3; i++) free(phone_numbers3[i]);
   free(phone_numbers3);
   free(socials3);
 
-  print_phone_book(head);
+  phone_book_print(head);
 
-  remove_phone_book(head, 2);
-  print_phone_book(head);
+  printf("%ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld\n",
+         phone_book_find_page_by_full_name(head, "Ivanov Ivan Ivanovich"),
+         phone_book_find_page_by_full_name(head, "Ivanovich"),
+         phone_book_find_page_by_full_name(head, "ivanov ivan ivanovich"),
+         phone_book_find_page_by_full_name(head, "ich"),
+         phone_book_find_page_by_full_name(head, "ich$"),
+         phone_book_find_page_by_full_name(head, "Denis"),
+         phone_book_find_page_by_full_name(head, ""),
+         phone_book_find_page_by_full_name(head, "123"));
 
-  remove_phone_book(head, 0);
-  print_phone_book(head);
+  printf("%ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld\n",
+         phone_book_find_page_by_phone_number(head, "\\+77775557711"),
+         phone_book_find_page_by_phone_number(head, "77775557711"),
+         phone_book_find_page_by_phone_number(head, "555"),
+         phone_book_find_page_by_phone_number(head, "5"),
+         phone_book_find_page_by_phone_number(head, "1$"),
+         phone_book_find_page_by_phone_number(head, "Denis"),
+         phone_book_find_page_by_phone_number(head, ""),
+         phone_book_find_page_by_phone_number(head, "123"));
 
-  remove_phone_book(head, 1);
-  print_phone_book(head);
+  phone_book_print_page(phone_book_get_page(head, phone_book_find_page_by_full_name(head, "Denis")));
+  phone_book_print_page(phone_book_get_page(head, phone_book_find_page_by_full_name(head, "ich")));
 
-  free_phone_book(head);
+  phone_book_remove_page(head, 2);
+  phone_book_print(head);
+
+  phone_book_remove_page(head, 0);
+  phone_book_print(head);
+
+  phone_book_remove_page(head, 1);
+  phone_book_print(head);
+
+  phone_book_free(head);
 
   return 0;
 }
