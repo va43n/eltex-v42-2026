@@ -56,17 +56,14 @@ clean:
 			*.gcno \
 			*.gcda \
 			*.info \
-			report
-
-rebuild: clean all
+			report \
+			*.o
 
 .PHONY: all \
+		manual_testing \
 		clean \
 		test \
 		gcov_report \
 		format \
 		check_styles \
-		valgrind \
-		leaks
-
-
+		valgrind

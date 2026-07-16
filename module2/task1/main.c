@@ -2,6 +2,7 @@
 
 int main() {
   phone_book* head = phone_book_create();
+  phone_book_save(head, "empty.o");
 
   char full_name[] = "Yashkov Ivan Vitalevich";
   char job_place[] = "Eltex";
@@ -109,6 +110,16 @@ int main() {
 
   phone_book_print(head);
 
+  phone_book_save(head, "full.o");
+
+  printf("%d %d %d %d\n", phone_book_compare_pages(head->next->next, head->next->next), phone_book_compare_pages(head->next, head->next), phone_book_compare_pages(head->next->next->next, head->next->next->next), phone_book_compare_pages(head->next->next, head->next->next->next));
+  printf("%d %d %d\n", phone_book_compare(head, head), phone_book_compare(head->next, head->next), phone_book_compare(head, head->next));
+
+  phone_book* head2 = phone_book_load("full.o");
+  printf("compare %d\n", phone_book_compare(head, head2));
+  phone_book_print(head2);
+  phone_book_free(head2);
+
   printf("%ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld\n",
          phone_book_find_page_by_full_name(head, "Ivanov Ivan Ivanovich"),
          phone_book_find_page_by_full_name(head, "Ivanovich"),
@@ -140,6 +151,8 @@ int main() {
 
   phone_book_remove_page(head, 1);
   phone_book_print(head);
+
+  phone_book_save(head, "almost_empty.o");
 
   phone_book_free(head);
 

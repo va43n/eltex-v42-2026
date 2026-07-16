@@ -215,7 +215,7 @@ int phone_book_print(phone_book* head) {
 int phone_book_print_page(phone_book* page) {
   if (page == NULL) return ERROR;
 
-  printf("\n--------------------------------\n");
+  printf("\n-------------------------------\n");
   printf("Unique index: %ld\n", page->index);
   printf("Full name: %s\n", page->full_name);
   printf("Job place: %s\n", page->job_place);
@@ -235,7 +235,254 @@ int phone_book_print_page(phone_book* page) {
   printf("Other information:%s%s\n", strlen(page->other) == 0 ? "" : "\n",
          page->other);
 
-  printf("--------------------------------\n");
+  printf("-------------------------------\n");
 
   return SUCCESS;
+}
+
+int phone_book_save(phone_book* head, char file_name[]) {
+  FILE *file = fopen(file_name, "w");
+
+  if (file == NULL) {
+    return ERROR;
+  }
+
+  fprintf(file, "phone_book\n");
+  phone_book* ptr = head->next;
+
+  while (ptr != NULL) {
+    fprintf(file, "---\n");
+
+    fprintf(file, "%ld\n", ptr->index);
+    fprintf(file, "%s\n", ptr->full_name);
+    fprintf(file, "%s\n", ptr->job_place);
+    fprintf(file, "%s\n", ptr->job_position);
+
+    fprintf(file, "numbers:\n");
+    fprintf(file, "%ld\n", ptr->phone_numbers_n);
+    for (size_t i = 0; i < ptr->phone_numbers_n; i++)
+      fprintf(file, "%s\n", ptr->phone_numbers[i]);
+    
+    fprintf(file, "socials:\n");
+    fprintf(file, "%ld\n", ptr->socials_n);
+    for (size_t i = 0; i < ptr->socials_n; i++)
+      fprintf(file, "%s\n%s\n", ptr->socials[i].social_network_name, ptr->socials[i].social_network_url);
+
+    fprintf(file, "%s\n", ptr->other);
+
+    fprintf(file, "---\n");
+    ptr = ptr->next;
+  }
+
+  fclose(file);
+
+  return SUCCESS;
+}
+
+#define LOAD_ERROR_1(file) \
+do { \
+  printf("error1\n"); \
+  fclose(file); \
+  return NULL; \
+} while(0)
+
+#define LOAD_ERROR_2(file, head) \
+do { \
+  fclose(file); \
+  printf("error2\n"); \
+  phone_book_free(head); \
+  return NULL; \
+} while(0)
+
+#define LOAD_ERROR_3(file, head, phone_numbers, i) \
+do { \
+  fclose(file); \
+  printf("error3\n"); \
+  phone_book_free(head); \
+  for (size_t j = 0; j < i; j++) { \
+    free(phone_numbers[j]); \
+  } \
+  free(phone_numbers); \
+  return NULL; \
+} while(0)
+
+#define LOAD_ERROR_4(file, head, phone_numbers, i, socials) \
+do { \
+  fclose(file); \
+  printf("error4\n"); \
+  phone_book_free(head); \
+  for (size_t j = 0; j < i; j++) { \
+    free(phone_numbers[j]); \
+  } \
+  free(phone_numbers); \
+  free(socials); \
+  return NULL; \
+} while(0)
+
+phone_book* phone_book_load(char file_name[]) {
+  FILE *file = fopen(file_name, "r");
+
+  if (file == NULL) {
+    return NULL;
+  }
+
+  char header[32];
+  if (fgets(header, sizeof(header), file) == NULL) LOAD_ERROR_1(file);
+  header[strlen(header) - 1] = '\0';
+  if (strcmp(header, "phone_book") != 0) LOAD_ERROR_1(file);
+  
+  phone_book* head = phone_book_create();
+  if (head == NULL) {
+    fclose(file);
+    return NULL;
+  }
+
+  char hyphens[16];
+  char line[512];
+  
+  while (fgets(hyphens, sizeof(hyphens), file) != NULL) {
+    hyphens[strlen(hyphens) - 1] = '\0';
+    
+    if (strcmp(hyphens, "---") != 0) break;
+    
+    char full_name[128];
+    char job_place[128];
+    char job_position[128];
+    char** phone_numbers = NULL;
+    size_t phone_numbers_n = 0;
+    socials_t* socials = NULL;
+    size_t socials_n = 0;
+    char other[512];
+
+    if (fgets(line, sizeof(line), file) == NULL) LOAD_ERROR_2(file, head);
+
+    if (fgets(full_name, sizeof(full_name), file) == NULL) LOAD_ERROR_2(file, head);
+    full_name[strlen(full_name) - 1] = '\0';
+    
+    if (fgets(job_place, sizeof(job_place), file) == NULL) LOAD_ERROR_2(file, head);
+    job_place[strlen(job_place) - 1] = '\0';
+    
+    if (fgets(job_position, sizeof(job_position), file) == NULL) LOAD_ERROR_2(file, head);
+    job_position[strlen(job_position) - 1] = '\0';
+
+    if (fgets(line, sizeof(line), file) == NULL) LOAD_ERROR_2(file, head);
+    line[strlen(line) - 1] = '\0';
+    if (strcmp(line, "numbers:") != 0) LOAD_ERROR_2(file, head);
+    
+    if (fgets(line, sizeof(line), file) == NULL) LOAD_ERROR_2(file, head);
+    phone_numbers_n = (size_t)strtoull(line, NULL, 10);
+
+    if (phone_numbers_n > 0) {
+      phone_numbers = (char**)malloc(sizeof(char*) * phone_numbers_n);
+      if (phone_numbers == NULL) LOAD_ERROR_2(file, head);
+      
+      for (size_t i = 0; i < phone_numbers_n; i++) {
+        if (fgets(line, sizeof(line), file) == NULL) {
+          LOAD_ERROR_3(file, head, phone_numbers, i);
+        }
+        line[strlen(line) - 1] = '\0';
+        
+        phone_numbers[i] = (char*)malloc(strlen(line) + 1);
+        if (phone_numbers[i] == NULL) {
+          LOAD_ERROR_3(file, head, phone_numbers, i);
+        }
+        strcpy(phone_numbers[i], line);
+      }
+    }
+
+    if (fgets(line, sizeof(line), file) == NULL) {
+      LOAD_ERROR_3(file, head, phone_numbers, phone_numbers_n);
+    }
+    line[strlen(line) - 1] = '\0';
+    if (strcmp(line, "socials:") != 0) {
+      LOAD_ERROR_3(file, head, phone_numbers, phone_numbers_n);
+    }
+    
+    if (fgets(line, sizeof(line), file) == NULL) {
+      LOAD_ERROR_3(file, head, phone_numbers, phone_numbers_n);
+    }
+    socials_n = (size_t)strtoull(line, NULL, 10);
+
+    if (socials_n > 0) {
+      socials = (socials_t*)malloc(sizeof(socials_t) * socials_n);
+      if (socials == NULL) {
+        LOAD_ERROR_3(file, head, phone_numbers, phone_numbers_n);
+      }
+      
+      for (size_t i = 0; i < socials_n; i++) {
+        if (fgets(line, sizeof(line), file) == NULL) {
+          LOAD_ERROR_4(file, head, phone_numbers, phone_numbers_n, socials);
+        }
+        line[strlen(line) - 1] = '\0';
+        strcpy(socials[i].social_network_name, line);
+
+        if (fgets(line, sizeof(line), file) == NULL) {
+          LOAD_ERROR_4(file, head, phone_numbers, phone_numbers_n, socials);
+        }
+        line[strlen(line) - 1] = '\0';
+        strcpy(socials[i].social_network_url, line);
+      }
+    }
+
+    if (fgets(other, sizeof(other), file) == NULL) {
+      LOAD_ERROR_4(file, head, phone_numbers, phone_numbers_n, socials);
+    }
+    other[strlen(other) - 1] = '\0';
+
+    if (phone_book_add_page(head, full_name, job_place, job_position, 
+                           phone_numbers, phone_numbers_n, socials, socials_n, other) != SUCCESS) {
+      if (phone_numbers != NULL) {
+        for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]);
+        free(phone_numbers);
+      }
+      if (socials != NULL) free(socials);
+      LOAD_ERROR_2(file, head);
+    }
+
+    if (phone_numbers != NULL) {
+      for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]);
+      free(phone_numbers);
+    }
+    if (socials != NULL) free(socials);
+
+    if (fgets(line, sizeof(line), file) == NULL) LOAD_ERROR_2(file, head);
+    line[strlen(line) - 1] = '\0';
+    if (strcmp(line, "---") != 0) LOAD_ERROR_2(file, head);
+  }
+
+  fclose(file);
+  return head;
+}
+
+int phone_book_compare_pages(phone_book* pb1, phone_book* pb2) {
+  if (pb1 == NULL || pb2 == NULL) return 0;
+  int result;
+
+  result = !strcmp(pb1->full_name, pb2->full_name) && !strcmp(pb1->job_place, pb2->job_place) && !strcmp(pb1->job_position, pb2->job_position) && !strcmp(pb1->other, pb2->other) && pb1->phone_numbers_n == pb2->phone_numbers_n && pb1->socials_n == pb2->socials_n;
+
+  for (size_t i = 0; i < pb1->phone_numbers_n && result; i++) {
+    result &= !strcmp(pb1->phone_numbers[i], pb2->phone_numbers[i]);
+  }
+  for (size_t i = 0; i < pb1->socials_n && result; i++) {
+    result &= !strcmp(pb1->socials[i].social_network_name, pb2->socials[i].social_network_name);
+    result &= !strcmp(pb1->socials[i].social_network_url, pb2->socials[i].social_network_url);
+  }
+
+  return result;
+}
+
+int phone_book_compare(phone_book* head1, phone_book* head2) {
+  if (head1 == NULL || head2 == NULL) return 0;
+  int result = 1;
+  phone_book* ptr1 = head1->next, *ptr2 = head2->next;
+
+  while (result && (ptr1 != NULL || ptr2 != NULL)) {
+    result &= phone_book_compare_pages(ptr1, ptr2);
+
+    ptr1 = ptr1->next;
+    ptr2 = ptr2->next;
+  }
+  result &= (ptr1 == NULL && ptr2 == NULL);
+
+  return result;
 }
