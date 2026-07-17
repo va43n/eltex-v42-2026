@@ -68,20 +68,20 @@ START_TEST(check_find_1) {
                    0);
 
   ck_assert_int_eq(
-      strcmp(phone_book_get_page(head, phone_book_find_page_by_phone_number(
+      strcmp(phone_book_get_page(head, phone_book_find_page_by_number(
                                            head, "\\+73332221100"))
                  ->other,
              OTHER1),
       0);
   ck_assert_int_eq(
       strcmp(phone_book_get_page(
-                 head, phone_book_find_page_by_phone_number(head, NUMBER2))
+                 head, phone_book_find_page_by_number(head, NUMBER2))
                  ->other,
              OTHER2),
       0);
   ck_assert_int_eq(
       strcmp(phone_book_get_page(
-                 head, phone_book_find_page_by_phone_number(head, "-45"))
+                 head, phone_book_find_page_by_number(head, "-45"))
                  ->other,
              OTHER6),
       0);
@@ -111,7 +111,7 @@ START_TEST(check_find_2) {
   ck_assert_int_eq(phone_book_find_page_by_full_name(head, "Denis"),
                    INDEX_NOT_FOUND);
 
-  ck_assert_int_eq(phone_book_find_page_by_phone_number(head, "123-456-789-0"),
+  ck_assert_int_eq(phone_book_find_page_by_number(head, "123-456-789-0"),
                    INDEX_NOT_FOUND);
 
   ck_assert_int_eq(phone_book_free(head), SUCCESS);

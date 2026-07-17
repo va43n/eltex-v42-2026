@@ -31,7 +31,11 @@ size_t _get_unique_index(phone_book* head) {
 
   qsort(indices, n, sizeof(size_t), _size_t_sort);
   for (size_t i = 1; i < n; i++) {
-    if (indices[i] - 1 > indices[i - 1]) return indices[i - 1] + 1;
+    if (indices[i] - 1 > indices[i - 1]) {
+      n = indices[i - 1] + 1;
+      free(indices);
+      return n;
+    }
   }
 
   n = indices[n - 1] + 1;
@@ -41,14 +45,14 @@ size_t _get_unique_index(phone_book* head) {
 }
 
 void _free_one_page(phone_book* pb) {
-  if (pb->phone_numbers != NULL) {
-    for (size_t i = 0; i < pb->phone_numbers_n; i++) free(pb->phone_numbers[i]);
-    free(pb->phone_numbers);
+  if (pb->numbers != NULL) {
+    for (size_t i = 0; i < pb->numbers_n; i++) free(pb->numbers[i]);
+    free(pb->numbers);
   }
   if (pb->socials != NULL) free(pb->socials);
 }
 
-int _check_phone_number(char* pn) {
+int _check_number(char* pn) {
   regex_t regex;
   int reti;
 

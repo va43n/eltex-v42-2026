@@ -5,7 +5,7 @@
 Suite *check_add();
 Suite *check_remove();
 Suite *check_find();
-// Suite *check_set();
+Suite *check_set();
 Suite *check_save_load();
 
 #define NAME1 "Yashkov Ivan Vitalevich"
@@ -53,9 +53,9 @@ do { \
   char full_name[] = n; \
   char job_place[] = jp; \
   char job_position[] = jpos; \
-  char** phone_numbers; \
+  char** numbers; \
   char n1[] = N1, n2[] = N2; \
-  size_t phone_numbers_n = 2; \
+  size_t numbers_n = 2; \
   socials_t* socials; \
   char sn1[] = SN1, sn2[] = SN2, sn3[] = SN3, sn4[] = SN4; \
   char su1[] = SU1, su2[] = SU2, \
@@ -63,27 +63,27 @@ do { \
   size_t socials_n = 4; \
   char other[] = o; \
   \
-  phone_numbers = (char**)malloc(sizeof(char*) * phone_numbers_n); \
-  phone_numbers[0] = (char*)malloc(sizeof(char) * (strlen(n1) + 1)); \
-  strcpy(phone_numbers[0], n1); \
-  phone_numbers[1] = (char*)malloc(sizeof(char) * (strlen(n2) + 1)); \
-  strcpy(phone_numbers[1], n2); \
+  numbers = (char**)malloc(sizeof(char*) * numbers_n); \
+  numbers[0] = (char*)malloc(sizeof(char) * (strlen(n1) + 1)); \
+  strcpy(numbers[0], n1); \
+  numbers[1] = (char*)malloc(sizeof(char) * (strlen(n2) + 1)); \
+  strcpy(numbers[1], n2); \
   \
   socials = (socials_t*)malloc(sizeof(socials_t) * socials_n); \
-  strcpy(socials[0].social_network_name, sn1); \
-  strcpy(socials[0].social_network_url, su1); \
-  strcpy(socials[1].social_network_name, sn2); \
-  strcpy(socials[1].social_network_url, su2); \
-  strcpy(socials[2].social_network_name, sn3); \
-  strcpy(socials[2].social_network_url, su3); \
-  strcpy(socials[3].social_network_name, sn4); \
-  strcpy(socials[3].social_network_url, su4); \
+  strcpy(socials[0].social_name, sn1); \
+  strcpy(socials[0].social_url, su1); \
+  strcpy(socials[1].social_name, sn2); \
+  strcpy(socials[1].social_url, su2); \
+  strcpy(socials[2].social_name, sn3); \
+  strcpy(socials[2].social_url, su3); \
+  strcpy(socials[3].social_name, sn4); \
+  strcpy(socials[3].social_url, su4); \
   \
-  *result = phone_book_add_page(head, full_name, job_place, job_position, phone_numbers, \
-                      phone_numbers_n, socials, socials_n, other); \
+  *result = phone_book_add_page(head, full_name, job_place, job_position, numbers, \
+                      numbers_n, socials, socials_n, other); \
   \
-  for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]); \
-  free(phone_numbers); \
+  for (size_t i = 0; i < numbers_n; i++) free(numbers[i]); \
+  free(numbers); \
   free(socials); \
 } while(0)
 
@@ -92,28 +92,28 @@ do { \
   char full_name[] = n; \
   char job_place[] = jp; \
   char job_position[] = jpos; \
-  char** phone_numbers; \
+  char** numbers; \
   char n1[] = N1; \
-  size_t phone_numbers_n = 1; \
+  size_t numbers_n = 1; \
   socials_t* socials; \
   char sn1[] = SN1; \
   char su1[] = SU1; \
   size_t socials_n = 1; \
   char other[] = o; \
   \
-  phone_numbers = (char**)malloc(sizeof(char*) * phone_numbers_n); \
-  phone_numbers[0] = (char*)malloc(sizeof(char) * (strlen(n1) + 1)); \
-  strcpy(phone_numbers[0], n1); \
+  numbers = (char**)malloc(sizeof(char*) * numbers_n); \
+  numbers[0] = (char*)malloc(sizeof(char) * (strlen(n1) + 1)); \
+  strcpy(numbers[0], n1); \
   \
   socials = (socials_t*)malloc(sizeof(socials_t) * socials_n); \
-  strcpy(socials[0].social_network_name, sn1); \
-  strcpy(socials[0].social_network_url, su1); \
+  strcpy(socials[0].social_name, sn1); \
+  strcpy(socials[0].social_url, su1); \
   \
-  *result = phone_book_add_page(head, full_name, job_place, job_position, phone_numbers, \
-                      phone_numbers_n, socials, socials_n, other); \
+  *result = phone_book_add_page(head, full_name, job_place, job_position, numbers, \
+                      numbers_n, socials, socials_n, other); \
   \
-  for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]); \
-  free(phone_numbers); \
+  for (size_t i = 0; i < numbers_n; i++) free(numbers[i]); \
+  free(numbers); \
   free(socials); \
 } while(0)
 
@@ -122,20 +122,20 @@ do { \
   char full_name[] = n; \
   char job_place[] = jp; \
   char job_position[] = jpos; \
-  char** phone_numbers; \
-  size_t phone_numbers_n = 0; \
+  char** numbers; \
+  size_t numbers_n = 0; \
   size_t socials_n = 0; \
   socials_t *socials; \
   char other[] = o; \
   \
-  phone_numbers = (char**)malloc(sizeof(char*) * phone_numbers_n); \
+  numbers = (char**)malloc(sizeof(char*) * numbers_n); \
   \
   socials = (socials_t*)malloc(sizeof(socials_t) * socials_n); \
   \
-  *result = phone_book_add_page(head, full_name, job_place, job_position, phone_numbers, \
-                      phone_numbers_n, socials, socials_n, other); \
+  *result = phone_book_add_page(head, full_name, job_place, job_position, numbers, \
+                      numbers_n, socials, socials_n, other); \
   \
-  for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]); \
-  free(phone_numbers); \
+  for (size_t i = 0; i < numbers_n; i++) free(numbers[i]); \
+  free(numbers); \
   free(socials); \
 } while(0)
