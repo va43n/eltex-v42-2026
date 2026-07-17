@@ -521,3 +521,122 @@ int phone_book_compare(phone_book* head1, phone_book* head2) {
 
   return result;
 }
+
+int phone_book_edit(phone_book* pb, unsigned int format, ...) {
+  va_list va;
+  int ret;
+
+  va_start(va, format);
+
+  if ((format & EDIT_FULL_NAME) == EDIT_FULL_NAME) {
+    char* full_name = va_arg(va, char*);
+    ret = phone_book_set_full_name(pb, full_name);
+    if (ret == ERROR) return ret;
+  }
+  if ((format & EDIT_JOB_PLACE) == EDIT_JOB_PLACE) {
+    char* job_place = va_arg(va, char*);
+    ret = phone_book_set_job_place(pb, job_place);
+    if (ret == ERROR) return ret;
+  }
+  if ((format & EDIT_JOB_POSITION) == EDIT_JOB_POSITION) {
+    char* job_position = va_arg(va, char*);
+    ret = phone_book_set_job_position(pb, job_position);
+    if (ret == ERROR) return ret;
+  }
+  if ((format & EDIT_NUMBERS) == EDIT_NUMBERS) {
+    int is_adding = format & EDIT_NUMBERS_ADD;
+    if (is_adding) {
+      char* number = va_arg(va, char*);
+      size_t new_numbers_n = pb->numbers_n + 1;
+      char** new_numbers = (char**)malloc(sizeof(char*) * new_numbers_n);
+      for (size_t i = 0; i < new_numbers_n - 1; i++) {
+        new_numbers[i] = (char*)malloc(sizeof(char) * strlen(pb->numbers[i]));
+        strcpy(new_numbers[i], pb->numbers[i]);
+      }
+      new_numbers[new_numbers_n - 1] =
+          (char*)malloc(sizeof(char) * strlen(number));
+      strcpy(new_numbers[new_numbers_n - 1], number);
+
+      ret = phone_book_set_numbers(pb, new_numbers, new_numbers_n);
+      for (size_t i = 0; i < new_numbers_n; i++) free(new_numbers[i]);
+      free(new_numbers);
+      if (ret == ERROR) return ret;
+    } else {
+      size_t pos = va_arg(va, size_t);
+      size_t new_numbers_n = pb->numbers_n - 1;
+      if (pos > new_numbers_n) return ERROR;
+
+      for (size_t i = 0; i < pb->numbers_n; i++) {
+        printf("%s\n", pb->numbers[i]);
+      }
+
+      char** new_numbers = (char**)malloc(sizeof(char*) * new_numbers_n);
+      for (size_t i = 0; i < pos; i++) {
+        new_numbers[i] = (char*)malloc(sizeof(char) * strlen(pb->numbers[i]));
+        strcpy(new_numbers[i], pb->numbers[i]);
+      }
+      for (size_t i = pos; i < new_numbers_n; i++) {
+        new_numbers[i] = (char*)malloc(sizeof(char) * strlen(pb->numbers[i]));
+        strcpy(new_numbers[i], pb->numbers[i + 1]);
+      }
+
+      for (size_t i = 0; i < new_numbers_n; i++) {
+        printf("%s\n", new_numbers[i]);
+      }
+
+      ret = phone_book_set_numbers(pb, new_numbers, new_numbers_n);
+      for (size_t i = 0; i < new_numbers_n; i++) free(new_numbers[i]);
+      free(new_numbers);
+      if (ret == ERROR) return ret;
+    }
+  }
+  if ((format & EDIT_SOCIALS) == EDIT_SOCIALS) {
+    int is_adding = format & EDIT_SOCIALS_ADD;
+
+    if (is_adding) {
+      socials_t social = va_arg(va, socials_t);
+      size_t new_socials_n = pb->socials_n + 1;
+
+      socials_t* new_socials =
+          (socials_t*)malloc(sizeof(socials_t) * new_socials_n);
+      for (size_t i = 0; i < new_socials_n - 1; i++) {
+        strcpy(new_socials[i].social_name, pb->socials[i].social_name);
+        strcpy(new_socials[i].social_url, pb->socials[i].social_url);
+      }
+      strcpy(new_socials[new_socials_n - 1].social_name, social.social_name);
+      strcpy(new_socials[new_socials_n - 1].social_url, social.social_url);
+
+      ret = phone_book_set_socials(pb, new_socials, new_socials_n);
+      free(new_socials);
+      if (ret == ERROR) return ret;
+    } else {
+      size_t pos = va_arg(va, size_t);
+      size_t new_socials_n = pb->socials_n - 1;
+      if (pos > new_socials_n) return ERROR;
+
+      socials_t* new_socials =
+          (socials_t*)malloc(sizeof(socials_t) * new_socials_n);
+      for (size_t i = 0; i < pos; i++) {
+        strcpy(new_socials[i].social_name, pb->socials[i].social_name);
+        strcpy(new_socials[i].social_url, pb->socials[i].social_url);
+      }
+      for (size_t i = pos; i < new_socials_n; i++) {
+        strcpy(new_socials[i].social_name, pb->socials[i + 1].social_name);
+        strcpy(new_socials[i].social_url, pb->socials[i + 1].social_url);
+      }
+
+      ret = phone_book_set_socials(pb, new_socials, new_socials_n);
+      free(new_socials);
+      if (ret == ERROR) return ret;
+    }
+  }
+  if ((format & EDIT_OTHER) == EDIT_OTHER) {
+    char* other = va_arg(va, char*);
+    ret = phone_book_set_other(pb, other);
+    if (ret == ERROR) return ret;
+  }
+
+  va_end(va);
+
+  return SUCCESS;
+}

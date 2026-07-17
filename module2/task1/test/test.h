@@ -7,6 +7,7 @@ Suite *check_remove();
 Suite *check_find();
 Suite *check_set();
 Suite *check_save_load();
+Suite *check_edit();
 
 #define NAME1 "Yashkov Ivan Vitalevich"
 #define NAME2 "Ivanov Ivan"
