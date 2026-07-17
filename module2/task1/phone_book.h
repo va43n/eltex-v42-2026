@@ -31,14 +31,12 @@ phone_book* phone_book_create();
 int phone_book_free(phone_book* head);
 
 int phone_book_add_page(phone_book* head, char full_name[], char job_place[],
-                        char job_position[], char** numbers,
-                        size_t numbers_n, socials_t* socials,
-                        size_t socials_n, char other[]);
+                        char job_position[], char** numbers, size_t numbers_n,
+                        socials_t* socials, size_t socials_n, char other[]);
 int phone_book_remove_page(phone_book* head, size_t index);
 
 size_t phone_book_find_page_by_full_name(phone_book* head, char full_name[]);
-size_t phone_book_find_page_by_number(phone_book* head,
-                                            char number[]);
+size_t phone_book_find_page_by_number(phone_book* head, char number[]);
 
 phone_book* phone_book_get_page(phone_book* head, size_t index);
 
@@ -48,8 +46,7 @@ int phone_book_print_page(phone_book* page);
 int phone_book_set_full_name(phone_book* pb, char full_name[]);
 int phone_book_set_job_place(phone_book* pb, char job_place[]);
 int phone_book_set_job_position(phone_book* pb, char job_position[]);
-int phone_book_set_numbers(phone_book* pb, char** numbers,
-                                 size_t numbers_n);
+int phone_book_set_numbers(phone_book* pb, char** numbers, size_t numbers_n);
 int phone_book_set_socials(phone_book* pb, socials_t* socials,
                            size_t socials_n);
 int phone_book_set_other(phone_book* pb, char other[]);

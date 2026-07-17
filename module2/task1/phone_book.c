@@ -24,9 +24,8 @@ int phone_book_free(phone_book* head) {
 }
 
 int phone_book_add_page(phone_book* head, char full_name[], char job_place[],
-                        char job_position[], char** numbers,
-                        size_t numbers_n, socials_t* socials,
-                        size_t socials_n, char other[]) {
+                        char job_position[], char** numbers, size_t numbers_n,
+                        socials_t* socials, size_t socials_n, char other[]) {
   if (head == NULL) return ERROR;
 
   size_t index = _get_unique_index(head);
@@ -100,8 +99,7 @@ size_t phone_book_find_page_by_full_name(phone_book* head, char full_name[]) {
   return INDEX_NOT_FOUND;
 }
 
-size_t phone_book_find_page_by_number(phone_book* head,
-                                            char number[]) {
+size_t phone_book_find_page_by_number(phone_book* head, char number[]) {
   if (head == NULL) return INDEX_NOT_FOUND;
 
   regex_t regex;
@@ -159,11 +157,9 @@ int phone_book_set_job_position(phone_book* pb, char job_position[]) {
   return SUCCESS;
 }
 
-int phone_book_set_numbers(phone_book* pb, char** numbers,
-                                 size_t numbers_n) {
+int phone_book_set_numbers(phone_book* pb, char** numbers, size_t numbers_n) {
   for (size_t i = 0; i < numbers_n; i++) {
-    if (!_check_number(numbers[i]) || strlen(numbers[i]) == 0)
-      return ERROR;
+    if (!_check_number(numbers[i]) || strlen(numbers[i]) == 0) return ERROR;
   }
 
   if (pb->numbers != NULL) {
@@ -175,8 +171,7 @@ int phone_book_set_numbers(phone_book* pb, char** numbers,
   pb->numbers_n = numbers_n;
   pb->numbers = (char**)malloc(sizeof(char*) * numbers_n);
   for (size_t i = 0; i < numbers_n; i++) {
-    pb->numbers[i] =
-        (char*)malloc(sizeof(char) * (strlen(numbers[i]) + 1));
+    pb->numbers[i] = (char*)malloc(sizeof(char) * (strlen(numbers[i]) + 1));
     strcpy(pb->numbers[i], numbers[i]);
   }
 
@@ -297,8 +292,7 @@ int phone_book_save(phone_book* head, char file_name[]) {
     fprintf(file, "socials:\n");
     fprintf(file, "%ld\n", all_pages[i - 1]->socials_n);
     for (size_t j = 0; j < all_pages[i - 1]->socials_n; j++)
-      fprintf(file, "%s\n%s\n",
-              all_pages[i - 1]->socials[j].social_name,
+      fprintf(file, "%s\n%s\n", all_pages[i - 1]->socials[j].social_name,
               all_pages[i - 1]->socials[j].social_url);
 
     fprintf(file, "%s\n", all_pages[i - 1]->other);
@@ -329,28 +323,28 @@ int phone_book_save(phone_book* head, char file_name[]) {
   } while (0)
 
 #define LOAD_ERROR_3(file, head, numbers, i) \
-  do {                                             \
-    fclose(file);                                  \
-    printf("error3\n");                            \
-    phone_book_free(head);                         \
-    for (size_t j = 0; j < i; j++) {               \
+  do {                                       \
+    fclose(file);                            \
+    printf("error3\n");                      \
+    phone_book_free(head);                   \
+    for (size_t j = 0; j < i; j++) {         \
       free(numbers[j]);                      \
-    }                                              \
+    }                                        \
     free(numbers);                           \
-    return NULL;                                   \
+    return NULL;                             \
   } while (0)
 
 #define LOAD_ERROR_4(file, head, numbers, i, socials) \
-  do {                                                      \
-    fclose(file);                                           \
-    printf("error4\n");                                     \
-    phone_book_free(head);                                  \
-    for (size_t j = 0; j < i; j++) {                        \
+  do {                                                \
+    fclose(file);                                     \
+    printf("error4\n");                               \
+    phone_book_free(head);                            \
+    for (size_t j = 0; j < i; j++) {                  \
       free(numbers[j]);                               \
-    }                                                       \
+    }                                                 \
     free(numbers);                                    \
-    free(socials);                                          \
-    return NULL;                                            \
+    free(socials);                                    \
+    return NULL;                                      \
   } while (0)
 
 phone_book* phone_book_load(char file_name[]) {
@@ -466,9 +460,8 @@ phone_book* phone_book_load(char file_name[]) {
     }
     other[strlen(other) - 1] = '\0';
 
-    if (phone_book_add_page(head, full_name, job_place, job_position,
-                            numbers, numbers_n, socials, socials_n,
-                            other) != SUCCESS) {
+    if (phone_book_add_page(head, full_name, job_place, job_position, numbers,
+                            numbers_n, socials, socials_n, other) != SUCCESS) {
       if (numbers != NULL) {
         for (size_t i = 0; i < numbers_n; i++) free(numbers[i]);
         free(numbers);
@@ -500,17 +493,14 @@ int phone_book_compare_pages(phone_book* pb1, phone_book* pb2) {
            !strcmp(pb1->job_place, pb2->job_place) &&
            !strcmp(pb1->job_position, pb2->job_position) &&
            !strcmp(pb1->other, pb2->other) &&
-           pb1->numbers_n == pb2->numbers_n &&
-           pb1->socials_n == pb2->socials_n;
+           pb1->numbers_n == pb2->numbers_n && pb1->socials_n == pb2->socials_n;
 
   for (size_t i = 0; i < pb1->numbers_n && result; i++) {
     result &= !strcmp(pb1->numbers[i], pb2->numbers[i]);
   }
   for (size_t i = 0; i < pb1->socials_n && result; i++) {
-    result &= !strcmp(pb1->socials[i].social_name,
-                      pb2->socials[i].social_name);
-    result &= !strcmp(pb1->socials[i].social_url,
-                      pb2->socials[i].social_url);
+    result &= !strcmp(pb1->socials[i].social_name, pb2->socials[i].social_name);
+    result &= !strcmp(pb1->socials[i].social_url, pb2->socials[i].social_url);
   }
 
   return result;

@@ -57,8 +57,7 @@ int main() {
   strcpy(numbers[2], n2);
 
   phone_book_set_full_name(phone_book_get_page(head, 1), "Ivan Yashkov");
-  phone_book_set_numbers(phone_book_get_page(head, 1), numbers,
-                               numbers_n + 1);
+  phone_book_set_numbers(phone_book_get_page(head, 1), numbers, numbers_n + 1);
   phone_book_print_page(phone_book_get_page(head, 1));
 
   for (size_t i = 0; i < numbers_n; i++) free(numbers[i]);
@@ -80,9 +79,8 @@ int main() {
 
   socials2 = (socials_t*)malloc(sizeof(socials_t) * socials_n2);
 
-  phone_book_add_page(head, full_name2, job_place2, job_position2,
-                      numbers2, numbers_n2, socials2, socials_n2,
-                      other2);
+  phone_book_add_page(head, full_name2, job_place2, job_position2, numbers2,
+                      numbers_n2, socials2, socials_n2, other2);
   for (size_t i = 0; i < numbers_n2; i++) free(numbers2[i]);
   free(numbers2);
   free(socials2);
@@ -102,9 +100,8 @@ int main() {
 
   socials3 = (socials_t*)malloc(sizeof(socials_t) * socials_n3);
 
-  phone_book_add_page(head, full_name3, job_place3, job_position3,
-                      numbers3, numbers_n3, socials3, socials_n3,
-                      other3);
+  phone_book_add_page(head, full_name3, job_place3, job_position3, numbers3,
+                      numbers_n3, socials3, socials_n3, other3);
   for (size_t i = 0; i < numbers_n3; i++) free(numbers3[i]);
   free(numbers3);
   free(socials3);

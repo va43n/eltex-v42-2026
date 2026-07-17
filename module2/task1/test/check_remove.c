@@ -51,8 +51,7 @@ START_TEST(check_remove_1) {
 
   ck_assert_int_eq(head->next->next->socials_n == 1, 1);
   ck_assert_int_eq(
-      strcmp(head->next->next->socials[0].social_name, SOCIALS_NAME1),
-      0);
+      strcmp(head->next->next->socials[0].social_name, SOCIALS_NAME1), 0);
   ck_assert_int_eq(
       strcmp(head->next->next->socials[0].social_url, SOCIALS_URL1), 0);
 
@@ -65,40 +64,26 @@ START_TEST(check_remove_1) {
                    0);
 
   ck_assert_int_eq(head->next->next->next->numbers_n == 2, 1);
-  ck_assert_int_eq(strcmp(head->next->next->next->numbers[0], NUMBER1),
-                   0);
-  ck_assert_int_eq(strcmp(head->next->next->next->numbers[1], NUMBER2),
-                   0);
+  ck_assert_int_eq(strcmp(head->next->next->next->numbers[0], NUMBER1), 0);
+  ck_assert_int_eq(strcmp(head->next->next->next->numbers[1], NUMBER2), 0);
 
   ck_assert_int_eq(head->next->next->next->socials_n == 4, 1);
   ck_assert_int_eq(
-      strcmp(head->next->next->next->socials[0].social_name,
-             SOCIALS_NAME1),
-      0);
-  ck_assert_int_eq(strcmp(head->next->next->next->socials[0].social_url,
-                          SOCIALS_URL1),
-                   0);
+      strcmp(head->next->next->next->socials[0].social_name, SOCIALS_NAME1), 0);
   ck_assert_int_eq(
-      strcmp(head->next->next->next->socials[1].social_name,
-             SOCIALS_NAME2),
-      0);
-  ck_assert_int_eq(strcmp(head->next->next->next->socials[1].social_url,
-                          SOCIALS_URL2),
-                   0);
+      strcmp(head->next->next->next->socials[0].social_url, SOCIALS_URL1), 0);
   ck_assert_int_eq(
-      strcmp(head->next->next->next->socials[2].social_name,
-             SOCIALS_NAME3),
-      0);
-  ck_assert_int_eq(strcmp(head->next->next->next->socials[2].social_url,
-                          SOCIALS_URL3),
-                   0);
+      strcmp(head->next->next->next->socials[1].social_name, SOCIALS_NAME2), 0);
   ck_assert_int_eq(
-      strcmp(head->next->next->next->socials[3].social_name,
-             SOCIALS_NAME4),
-      0);
-  ck_assert_int_eq(strcmp(head->next->next->next->socials[3].social_url,
-                          SOCIALS_URL4),
-                   0);
+      strcmp(head->next->next->next->socials[1].social_url, SOCIALS_URL2), 0);
+  ck_assert_int_eq(
+      strcmp(head->next->next->next->socials[2].social_name, SOCIALS_NAME3), 0);
+  ck_assert_int_eq(
+      strcmp(head->next->next->next->socials[2].social_url, SOCIALS_URL3), 0);
+  ck_assert_int_eq(
+      strcmp(head->next->next->next->socials[3].social_name, SOCIALS_NAME4), 0);
+  ck_assert_int_eq(
+      strcmp(head->next->next->next->socials[3].social_url, SOCIALS_URL4), 0);
 
   ck_assert_int_eq(phone_book_free(head), SUCCESS);
 }
