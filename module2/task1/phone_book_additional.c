@@ -1,22 +1,43 @@
 #include "phone_book.h"
 
-size_t _get_unique_index(phone_book* head) {
-  phone_book* ptr = head->next;
-  size_t biggest_index, cur_index;
+int _size_t_sort(const void* a, const void* b) {
+  int val_a = *(size_t*)a;
+  int val_b = *(size_t*)b;
 
-  biggest_index = ptr != NULL ? ptr->index + 1 : FIRST_UNIQUE_INDEX;
-  cur_index = biggest_index;
+  if (val_a < val_b) return -1;
+  if (val_a > val_b) return 1;
+  return 0;
+}
+
+size_t _get_unique_index(phone_book* head) {
+  if (head->next == NULL) return FIRST_UNIQUE_INDEX;
+
+  phone_book* ptr = head->next;
+  size_t* indices = NULL;
+  size_t n = 0;
 
   while (ptr != NULL) {
-    if (ptr->index + 1 < cur_index) {
-      return cur_index - 1;
+    n++;
+    size_t* temp = realloc(indices, sizeof(size_t) * n);
+    if (temp == NULL) {
+      free(indices);
+      return INDEX_NOT_FOUND;
     }
+    indices = temp;
+    indices[n - 1] = ptr->index;
 
-    cur_index = ptr->index;
     ptr = ptr->next;
   }
 
-  return biggest_index;
+  qsort(indices, n, sizeof(size_t), _size_t_sort);
+  for (size_t i = 1; i < n; i++) {
+    if (indices[i] - 1 > indices[i - 1]) return indices[i - 1] + 1;
+  }
+
+  n = indices[n - 1] + 1;
+  free(indices);
+
+  return n;
 }
 
 void _free_one_page(phone_book* pb) {

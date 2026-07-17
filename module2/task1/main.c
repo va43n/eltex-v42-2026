@@ -41,7 +41,7 @@ int main() {
                       phone_numbers_n, socials, socials_n, other);
 
   phone_book_print(head);
-  
+
   phone_book_print_page(phone_book_get_page(head, 1));
 
   for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]);
@@ -57,7 +57,8 @@ int main() {
   strcpy(phone_numbers[2], n2);
 
   phone_book_set_full_name(phone_book_get_page(head, 1), "Ivan Yashkov");
-  phone_book_set_phone_numbers(phone_book_get_page(head, 1), phone_numbers, phone_numbers_n + 1);
+  phone_book_set_phone_numbers(phone_book_get_page(head, 1), phone_numbers,
+                               phone_numbers_n + 1);
   phone_book_print_page(phone_book_get_page(head, 1));
 
   for (size_t i = 0; i < phone_numbers_n; i++) free(phone_numbers[i]);
@@ -112,8 +113,15 @@ int main() {
 
   phone_book_save(head, "full.o");
 
-  printf("%d %d %d %d\n", phone_book_compare_pages(head->next->next, head->next->next), phone_book_compare_pages(head->next, head->next), phone_book_compare_pages(head->next->next->next, head->next->next->next), phone_book_compare_pages(head->next->next, head->next->next->next));
-  printf("%d %d %d\n", phone_book_compare(head, head), phone_book_compare(head->next, head->next), phone_book_compare(head, head->next));
+  printf(
+      "%d %d %d %d\n",
+      phone_book_compare_pages(head->next->next, head->next->next),
+      phone_book_compare_pages(head->next, head->next),
+      phone_book_compare_pages(head->next->next->next, head->next->next->next),
+      phone_book_compare_pages(head->next->next, head->next->next->next));
+  printf("%d %d %d\n", phone_book_compare(head, head),
+         phone_book_compare(head->next, head->next),
+         phone_book_compare(head, head->next));
 
   phone_book* head2 = phone_book_load("full.o");
   printf("compare %d\n", phone_book_compare(head, head2));
@@ -140,8 +148,10 @@ int main() {
          phone_book_find_page_by_phone_number(head, ""),
          phone_book_find_page_by_phone_number(head, "123"));
 
-  phone_book_print_page(phone_book_get_page(head, phone_book_find_page_by_full_name(head, "Denis")));
-  phone_book_print_page(phone_book_get_page(head, phone_book_find_page_by_full_name(head, "ich")));
+  phone_book_print_page(phone_book_get_page(
+      head, phone_book_find_page_by_full_name(head, "Denis")));
+  phone_book_print_page(phone_book_get_page(
+      head, phone_book_find_page_by_full_name(head, "ich")));
 
   phone_book_remove_page(head, 2);
   phone_book_print(head);

@@ -3,14 +3,15 @@
 #include "../phone_book.h"
 
 Suite *check_add();
-// Suite *check_remove();
-// Suite *check_find();
+Suite *check_remove();
+Suite *check_find();
 // Suite *check_set();
-// Suite *check_save_load();
+Suite *check_save_load();
 
 #define NAME1 "Yashkov Ivan Vitalevich"
 #define NAME2 "Ivanov Ivan"
 #define NAME3 "123456"
+#define NAME4 "Vitalevich Alexey"
 #define WRONG_NAME1 ""
 
 #define JOB_PLACE1 "Eltex"
@@ -43,6 +44,9 @@ Suite *check_add();
 #define OTHER1 "Hello, this is some information about me."
 #define OTHER2 "2"
 #define OTHER3 ""
+#define OTHER4 "4"
+#define OTHER5 "5"
+#define OTHER6 "6"
 
 #define USER_1(n, jp, jpos, N1, N2, SN1, SN2, SN3, SN4, SU1, SU2, SU3, SU4, o, result) \
 do { \

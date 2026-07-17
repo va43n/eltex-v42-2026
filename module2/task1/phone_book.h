@@ -49,8 +49,9 @@ int phone_book_set_full_name(phone_book* pb, char full_name[]);
 int phone_book_set_job_place(phone_book* pb, char job_place[]);
 int phone_book_set_job_position(phone_book* pb, char job_position[]);
 int phone_book_set_phone_numbers(phone_book* pb, char** phone_numbers,
-                      size_t phone_numbers_n);
-int phone_book_set_socials(phone_book* pb, socials_t* socials, size_t socials_n);
+                                 size_t phone_numbers_n);
+int phone_book_set_socials(phone_book* pb, socials_t* socials,
+                           size_t socials_n);
 int phone_book_set_other(phone_book* pb, char other[]);
 
 int phone_book_compare_pages(phone_book* pb1, phone_book* pb2);
