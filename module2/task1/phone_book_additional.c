@@ -2,15 +2,17 @@
 
 size_t _get_unique_index(phone_book* head) {
   phone_book* ptr = head->next;
-  size_t biggest_index = FIRST_UNIQUE_INDEX;
+  size_t biggest_index, cur_index;
+
+  biggest_index = ptr != NULL ? ptr->index + 1 : FIRST_UNIQUE_INDEX;
+  cur_index = biggest_index;
 
   while (ptr != NULL) {
-    if (ptr->index < biggest_index) {
-      biggest_index = ptr->index + 1;
-      break;
+    if (ptr->index + 1 < cur_index) {
+      return cur_index - 1;
     }
 
-    biggest_index = ptr->index + 1;
+    cur_index = ptr->index;
     ptr = ptr->next;
   }
 

@@ -155,6 +155,10 @@ int phone_book_set_job_position(phone_book* pb, char job_position[]) {
 
 int phone_book_set_phone_numbers(phone_book* pb, char** phone_numbers,
                       size_t phone_numbers_n) {
+  for (size_t i = 0; i < phone_numbers_n; i++) {
+    if (!_check_phone_number(phone_numbers[i]) || strlen(phone_numbers[i]) == 0) return ERROR;
+  }
+  
   if (pb->phone_numbers != NULL) {
     for (size_t i = 0; i < pb->phone_numbers_n; i++) {
       free(pb->phone_numbers[i]);
@@ -164,10 +168,6 @@ int phone_book_set_phone_numbers(phone_book* pb, char** phone_numbers,
   pb->phone_numbers_n = phone_numbers_n;
   pb->phone_numbers = (char**)malloc(sizeof(char*) * phone_numbers_n);
   for (size_t i = 0; i < phone_numbers_n; i++) {
-    if (!_check_phone_number(phone_numbers[i])) {
-      pb->phone_numbers_n = i;
-      return ERROR;
-    }
     pb->phone_numbers[i] =
         (char*)malloc(sizeof(char) * (strlen(phone_numbers[i]) + 1));
     strcpy(pb->phone_numbers[i], phone_numbers[i]);
@@ -177,9 +177,14 @@ int phone_book_set_phone_numbers(phone_book* pb, char** phone_numbers,
 }
 
 int phone_book_set_socials(phone_book* pb, socials_t* socials, size_t socials_n) {
+  for (size_t i = 0; i < socials_n; i++) {
+    if (strlen(socials[i].social_network_name) == 0 || strlen(socials[i].social_network_url) == 0) return ERROR;
+  }
+
   if (pb->socials != NULL) {
     free(pb->socials);
   }
+  
   pb->socials_n = socials_n;
   pb->socials = (socials_t*)malloc(sizeof(socials_t) * socials_n);
   for (size_t i = 0; i < socials_n; i++) {
