@@ -566,10 +566,6 @@ int phone_book_edit(phone_book* pb, unsigned int format, ...) {
       size_t new_numbers_n = pb->numbers_n - 1;
       if (pos > new_numbers_n) return ERROR;
 
-      for (size_t i = 0; i < pb->numbers_n; i++) {
-        printf("%s\n", pb->numbers[i]);
-      }
-
       char** new_numbers = (char**)malloc(sizeof(char*) * new_numbers_n);
       for (size_t i = 0; i < pos; i++) {
         new_numbers[i] = (char*)malloc(sizeof(char) * strlen(pb->numbers[i]));
@@ -578,10 +574,6 @@ int phone_book_edit(phone_book* pb, unsigned int format, ...) {
       for (size_t i = pos; i < new_numbers_n; i++) {
         new_numbers[i] = (char*)malloc(sizeof(char) * strlen(pb->numbers[i]));
         strcpy(new_numbers[i], pb->numbers[i + 1]);
-      }
-
-      for (size_t i = 0; i < new_numbers_n; i++) {
-        printf("%s\n", new_numbers[i]);
       }
 
       ret = phone_book_set_numbers(pb, new_numbers, new_numbers_n);
