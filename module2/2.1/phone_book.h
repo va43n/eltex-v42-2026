@@ -58,16 +58,16 @@ int phone_book_compare(phone_book* head1, phone_book* head2);
 int phone_book_save(phone_book* head, char file_name[]);
 phone_book* phone_book_load(char file_name[]);
 
-#define EDIT_FULL_NAME 0x10000000
-#define EDIT_JOB_PLACE 0x01000000
-#define EDIT_JOB_POSITION 0x00100000
-#define EDIT_NUMBERS 0x00010000
-#define EDIT_NUMBERS_ADD 0x00001000
-//  EDIT_NUMBERS_DELETE  0x____0___
-#define EDIT_SOCIALS 0x00000100
-#define EDIT_SOCIALS_ADD 0x00000010
-//  EDIT_SOCIALS_DELETE  0x______0_
-#define EDIT_OTHER 0x00000001
+#define EDIT_FULL_NAME 0b10000000
+#define EDIT_JOB_PLACE 0b01000000
+#define EDIT_JOB_POSITION 0b00100000
+#define EDIT_NUMBERS 0b00010000
+#define EDIT_NUMBERS_ADD 0b00001000
+//  EDIT_NUMBERS_DELETE  0b____0___
+#define EDIT_SOCIALS 0b00000100
+#define EDIT_SOCIALS_ADD 0b00000010
+//  EDIT_SOCIALS_DELETE  0b______0_
+#define EDIT_OTHER 0b00000001
 
 int phone_book_edit(phone_book* head, unsigned int format, ...);
 
