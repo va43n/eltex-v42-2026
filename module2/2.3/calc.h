@@ -30,7 +30,7 @@ typedef struct {
   char symbol;
   size_t priority;
   size_t position;
-  int (*operation) (double, double, double*);
+  int (*operation)(double, double, double*);
 } operator;
 
 int calculate(char* formula, double* result);

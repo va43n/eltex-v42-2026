@@ -23,7 +23,7 @@ START_TEST(check_calculation_1) {
 
   ck_assert_int_eq(calculate("1+0", &result), SUCCESS);
   ck_assert_double_eq_tol(result, 1.0, EPS);
-  
+
   ck_assert_int_eq(calculate("0+1", &result), SUCCESS);
   ck_assert_double_eq_tol(result, 1.0, EPS);
 
