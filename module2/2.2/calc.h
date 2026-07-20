@@ -7,6 +7,7 @@
 
 #define SUCCESS 1
 #define ERROR 0
+#define CALC_ERROR 2
 
 #define EPS 1e-6
 
@@ -46,7 +47,7 @@ void _add_number(double** numbers, size_t* numbers_n, double* number,
                  int* digit);
 void _add_operator(operator** operators,
                    size_t* operators_n, operator actual_operator,
-                   double numbers_n);
+                   size_t numbers_n);
 int _check_operator_validity(operator* operators, size_t operators_n,
                              size_t numbers_n);
 int _compute_result(double** numbers, size_t* numbers_n, operator** operators,

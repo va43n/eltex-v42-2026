@@ -16,7 +16,7 @@ int _mul(double a, double b, double* result) {
 }
 
 int _div(double a, double b, double* result) {
-  if (fabs(b) < EPS) return ERROR;
+  if (fabs(b) < EPS) return CALC_ERROR;
   *result = a / b;
   return SUCCESS;
 }
@@ -32,6 +32,7 @@ int _parse_formula(char* formula, operator* actual_operators,
 
   double number = 0;
   int digit = 0;
+  int dot_started = 0;
 
   for (size_t i = 0; i < strlen(formula); i++) {
     if ((int)formula[i] >= ASCII_0 && (int)formula[i] <= ASCII_9) {
@@ -42,9 +43,13 @@ int _parse_formula(char* formula, operator* actual_operators,
         number = number + (formula[i] - '0') * pow(10.0, digit);
         digit--;
       }
+      dot_started = 0;
     } else if ((int)formula[i] == ASCII_DOT) {
+      if (digit <= 0) return ERROR;
       digit = -1;
+      dot_started = 1;
     } else {
+      if (dot_started) return ERROR;
       if (digit != 0) _add_number(numbers, numbers_n, &number, &digit);
 
       int operator_found = 0;
@@ -63,6 +68,7 @@ int _parse_formula(char* formula, operator* actual_operators,
       }
     }
   }
+  if (dot_started) return ERROR;
   if (digit != 0) _add_number(numbers, numbers_n, &number, &digit);
 
   return SUCCESS;
@@ -80,37 +86,41 @@ void _add_number(double** numbers, size_t* numbers_n, double* number,
 
 void _add_operator(operator** operators,
                    size_t* operators_n, operator actual_operator,
-                   double numbers_n) {
+                   size_t numbers_n) {
   (*operators_n)++;
   operator* temp =(operator*)
       realloc(*operators, sizeof(operator) * *operators_n);
   *operators = temp;
   (*operators)[*operators_n - 1].symbol = actual_operator.symbol;
   (*operators)[*operators_n - 1].priority = actual_operator.priority;
-  (*operators)[*operators_n - 1].position = numbers_n;
+  (*operators)[*operators_n - 1].position = numbers_n - 1;
 }
 
 int _check_operator_validity(operator* operators, size_t operators_n,
                              size_t numbers_n) {
-  if (operators_n == 0) return ERROR;
-  if (operators[0].position == 0) return ERROR;
-  if (operators[operators_n - 1].position >= numbers_n) return ERROR;
-  for (size_t i = 1; i < operators_n; i++) {
-    if (operators[i].position == operators[i - 1].position) return ERROR;
+  if (operators_n == 0) return SUCCESS;
+  for (size_t i = 0; i < operators_n; i++) {
+    if (operators[i].position >= numbers_n - 1) return ERROR;
   }
-
+  for (size_t i = 0; i < operators_n; i++) {
+    for (size_t j = i + 1; j < operators_n; j++) {
+      if (operators[i].position == operators[j].position) return ERROR;
+    }
+  }
   return SUCCESS;
 }
 
 int _compute_result(double** numbers, size_t* numbers_n, operator** operators,
                     size_t* operators_n, double* result) {
-  for (size_t i = MAX_PRIORITY; i <= MIN_PRIORITY; i++) {
-    for (size_t j = 1; j < *operators_n + 1; j++) {
-      if ((*operators)[j - 1].priority == i) {
-        if (!_compute_single_operator(numbers, numbers_n, operators,
-                                      operators_n, j - 1))
-          return ERROR;
-        j--;
+  for (size_t priority = MAX_PRIORITY; priority <= MIN_PRIORITY; priority++) {
+    size_t i = 0;
+    while (i < *operators_n) {
+      if ((*operators)[i].priority == priority) {
+        if (_compute_single_operator(numbers, numbers_n, operators,
+                                      operators_n, i) == CALC_ERROR)
+          return CALC_ERROR;
+      } else {
+        i++;
       }
     }
   }
@@ -127,20 +137,20 @@ int _compute_single_operator(double** numbers,
   operator op =(*operators)[operator_i];
   switch (op.symbol) {
     case '+':
-      if (!_sum((*numbers)[op.position], (*numbers)[op.position + 1], &res))
-        return ERROR;
+      if (_sum((*numbers)[op.position], (*numbers)[op.position + 1], &res) == CALC_ERROR)
+        return CALC_ERROR;
       break;
     case '-':
-      if (!_sub((*numbers)[op.position], (*numbers)[op.position + 1], &res))
-        return ERROR;
+      if (_sub((*numbers)[op.position], (*numbers)[op.position + 1], &res) == CALC_ERROR)
+        return CALC_ERROR;
       break;
     case '*':
-      if (!_mul((*numbers)[op.position], (*numbers)[op.position + 1], &res))
-        return ERROR;
+      if (_mul((*numbers)[op.position], (*numbers)[op.position + 1], &res) == CALC_ERROR)
+        return CALC_ERROR;
       break;
     case '/':
-      if (!_div((*numbers)[op.position], (*numbers)[op.position + 1], &res))
-        return ERROR;
+      if (_div((*numbers)[op.position], (*numbers)[op.position + 1], &res) == CALC_ERROR)
+        return CALC_ERROR;
       break;
   }
 
@@ -155,34 +165,39 @@ int _remove_operator_and_two_numbers(double** numbers,
                                      size_t* numbers_n, operator** operators,
                                      size_t* operators_n, size_t operator_i,
                                      double new_number) {
-  double* numbers_temp = (double*)malloc(sizeof(double) * ((*numbers_n) - 2));
-  operator* operators_temp =(operator*)
-      malloc(sizeof(operator) * ((*operators_n) - 1));
-  operator op =(*operators)[operator_i];
+  size_t pos = (*operators)[operator_i].position;
 
-  for (size_t i = 0; i < op.position - 1; i++) {
-    numbers_temp[i] = (*numbers)[i];
+  (*numbers)[pos] = new_number;
+  for (size_t i = pos + 1; i < *numbers_n - 1; i++) {
+    (*numbers)[i] = (*numbers)[i + 1];
   }
-  numbers_temp[op.position - 1] = new_number;
-  for (size_t i = op.position + 1; i < *numbers_n; i++) {
-    numbers_temp[i - 1] = (*numbers)[i];
+  (*numbers_n)--;
+  double* temp_num = (double*)realloc(*numbers, sizeof(double) * (*numbers_n));
+  if (temp_num == NULL && *numbers_n > 0) {
+    free(*numbers);
+    free(*operators);
+    return ERROR;
   }
+  *numbers = temp_num;
 
-  for (size_t i = 0; i < operator_i; i++) {
-    operators_temp[i] = (*operators)[i];
+  for (size_t i = operator_i; i < *operators_n - 1; i++) {
+    (*operators)[i] = (*operators)[i + 1];
   }
-  for (size_t i = operator_i + 1; i < *operators_n; i++) {
-    operators_temp[i - 1] = (*operators)[i];
-  }
-
-  free(*numbers);
-  free(*operators);
-
-  (*numbers_n) = (*numbers_n) - 2;
   (*operators_n)--;
+  operator* temp_op =(operator*)
+      realloc(*operators, sizeof(operator) * (*operators_n));
+  if (temp_op == NULL && *operators_n > 0) {
+    free(*numbers);
+    free(*operators);
+    return ERROR;
+  }
+  *operators = temp_op;
 
-  numbers = &numbers_temp;
-  operators = &operators_temp;
+  for (size_t i = 0; i < *operators_n; i++) {
+    if ((*operators)[i].position > pos) {
+      (*operators)[i].position--;
+    }
+  }
 
   return SUCCESS;
 }
