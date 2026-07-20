@@ -61,11 +61,7 @@ int _parse_formula(char* formula, operator* actual_operators,
           operator_found = 1;
         }
       }
-      if (!operator_found) {
-        free(*numbers);
-        free(*operators);
-        return ERROR;
-      }
+      if (!operator_found) return ERROR;
     }
   }
   if (dot_started) return ERROR;
@@ -116,8 +112,8 @@ int _compute_result(double** numbers, size_t* numbers_n, operator** operators,
     size_t i = 0;
     while (i < *operators_n) {
       if ((*operators)[i].priority == priority) {
-        if (_compute_single_operator(numbers, numbers_n, operators,
-                                      operators_n, i) == CALC_ERROR)
+        if (_compute_single_operator(numbers, numbers_n, operators, operators_n,
+                                     i) == CALC_ERROR)
           return CALC_ERROR;
       } else {
         i++;
@@ -137,19 +133,23 @@ int _compute_single_operator(double** numbers,
   operator op =(*operators)[operator_i];
   switch (op.symbol) {
     case '+':
-      if (_sum((*numbers)[op.position], (*numbers)[op.position + 1], &res) == CALC_ERROR)
+      if (_sum((*numbers)[op.position], (*numbers)[op.position + 1], &res) ==
+          CALC_ERROR)
         return CALC_ERROR;
       break;
     case '-':
-      if (_sub((*numbers)[op.position], (*numbers)[op.position + 1], &res) == CALC_ERROR)
+      if (_sub((*numbers)[op.position], (*numbers)[op.position + 1], &res) ==
+          CALC_ERROR)
         return CALC_ERROR;
       break;
     case '*':
-      if (_mul((*numbers)[op.position], (*numbers)[op.position + 1], &res) == CALC_ERROR)
+      if (_mul((*numbers)[op.position], (*numbers)[op.position + 1], &res) ==
+          CALC_ERROR)
         return CALC_ERROR;
       break;
     case '/':
-      if (_div((*numbers)[op.position], (*numbers)[op.position + 1], &res) == CALC_ERROR)
+      if (_div((*numbers)[op.position], (*numbers)[op.position + 1], &res) ==
+          CALC_ERROR)
         return CALC_ERROR;
       break;
   }
@@ -172,26 +172,23 @@ int _remove_operator_and_two_numbers(double** numbers,
     (*numbers)[i] = (*numbers)[i + 1];
   }
   (*numbers_n)--;
-  double* temp_num = (double*)realloc(*numbers, sizeof(double) * (*numbers_n));
-  if (temp_num == NULL && *numbers_n > 0) {
-    free(*numbers);
-    free(*operators);
-    return ERROR;
+  if ((*numbers_n) != 0) {
+    double* temp_num =
+        (double*)realloc(*numbers, sizeof(double) * (*numbers_n));
+    if (temp_num == NULL) return ERROR;
+    *numbers = temp_num;
   }
-  *numbers = temp_num;
 
   for (size_t i = operator_i; i < *operators_n - 1; i++) {
     (*operators)[i] = (*operators)[i + 1];
   }
   (*operators_n)--;
-  operator* temp_op =(operator*)
-      realloc(*operators, sizeof(operator) * (*operators_n));
-  if (temp_op == NULL && *operators_n > 0) {
-    free(*numbers);
-    free(*operators);
-    return ERROR;
+  if ((*operators_n) != 0) {
+    operator* temp_op =(operator*)
+        realloc(*operators, sizeof(operator) * (*operators_n));
+    if (temp_op == NULL) return ERROR;
+    *operators = temp_op;
   }
-  *operators = temp_op;
 
   for (size_t i = 0; i < *operators_n; i++) {
     if ((*operators)[i].position > pos) {
