@@ -11,7 +11,7 @@ endif
 
 SRC = my_chmod.c my_chmod_additional.c
 OBJ = $(SRC:.c=.o)
-LIB_NAME = calc.a
+LIB_NAME = my_chmod.a
 
 MANUAL_TEST_SRC = main.c
 MANUAL_TEST_TARGET = man_test_exe
