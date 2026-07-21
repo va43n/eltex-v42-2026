@@ -26,3 +26,4 @@ int gateway_print(const gateway gw);
 
 int _parse_ip(gateway* gw, const char* const ip);
 int _parse_mask(gateway* gw, const char* const mask);
+unsigned int _generate_ip();

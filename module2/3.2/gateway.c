@@ -19,7 +19,7 @@ int gateway_generate(const gateway gw, gateway_stats* stats) {
   (*stats).in = 0;
 
   for (size_t i = 0; i < (*stats).N; i++) {
-    unsigned int some_ip = (unsigned int)rand();
+    unsigned int some_ip = _generate_ip();
     if (gateway_check_ip(gw, some_ip)) (*stats).in++;
   }
 
@@ -27,7 +27,7 @@ int gateway_generate(const gateway gw, gateway_stats* stats) {
 
   printf(
       "Stats for %ld IP's:\n        Belongs: %ld\nDoes not belong: %ld\n     "
-      "Percentage: %.3lf\n",
+      "Percentage: %.2lf%%\n",
       (*stats).N, (*stats).in, (*stats).N - (*stats).in, (*stats).percentage);
 
   return SUCCESS;

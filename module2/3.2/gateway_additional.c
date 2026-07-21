@@ -99,3 +99,13 @@ int _parse_mask(gateway* gw, const char* const mask) {
 
   return SUCCESS;
 }
+
+unsigned int _generate_ip() {
+  unsigned int some_ip = 0;
+  some_ip |= (unsigned int)(rand() & 0b11111111) << 24;
+  some_ip |= (unsigned int)(rand() & 0b11111111) << 16;
+  some_ip |= (unsigned int)(rand() & 0b11111111) << 8;
+  some_ip |= (unsigned int)(rand() & 0b11111111);
+
+  return some_ip;
+}
