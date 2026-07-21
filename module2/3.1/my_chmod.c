@@ -51,25 +51,29 @@ int my_chmod_print(const mod m) {
 int my_chmod_change(mod* const m, const char* const format) {
   size_t len = strlen(format);
   if (len == 0) return ERROR;
-  if (format[0] == USER_SYMBOL || format[0] == GROUP_SYMBOL || format[0] == OTHER_SYMBOL || format[0] == ALL_SYMBOL || format[0] == PLUS || format[0] == MINUS || format[0] == EQUAL) {
+  if (format[0] == USER_SYMBOL || format[0] == GROUP_SYMBOL ||
+      format[0] == OTHER_SYMBOL || format[0] == ALL_SYMBOL ||
+      format[0] == PLUS || format[0] == MINUS || format[0] == EQUAL) {
     unsigned int mask = 0;
     int mode;
     if (!_parse_complex_input(format, &mask, &mode)) return ERROR;
 
-    if (mode == PLUS_MODE) (*m).numbers |= mask;
-    else if (mode == MINUS_MODE) (*m).numbers &= ~mask;
-    else if (mode == EQUAL_MODE) (*m).numbers = mask;
+    if (mode == PLUS_MODE)
+      (*m).numbers |= mask;
+    else if (mode == MINUS_MODE)
+      (*m).numbers &= ~mask;
+    else if (mode == EQUAL_MODE)
+      (*m).numbers = mask;
 
     if (!_convert_numbers_to_letters((*m).numbers, (*m).letters)) return ERROR;
-  }
-  else if (isdigit(format[0])) {
+  } else if (isdigit(format[0])) {
     unsigned int mask = 0;
     if (!_get_numbers_from_input(format, &mask)) return ERROR;
 
     (*m).numbers = mask;
     if (!_convert_numbers_to_letters((*m).numbers, (*m).letters)) return ERROR;
-  }
-  else return ERROR;
-  
+  } else
+    return ERROR;
+
   return SUCCESS;
 }

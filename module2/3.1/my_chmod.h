@@ -47,4 +47,5 @@ int my_chmod_change(mod* const m, const char* const format);
 int _get_numbers_from_input(const char* const input, unsigned int* mask);
 int _convert_numbers_to_letters(const unsigned int numbers,
                                 char* const letters);
-int _parse_complex_input(const char* const input, unsigned int* mask, int* mode);
+int _parse_complex_input(const char* const input, unsigned int* mask,
+                         int* mode);

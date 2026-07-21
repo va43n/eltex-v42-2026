@@ -39,7 +39,8 @@ int _convert_numbers_to_letters(const unsigned int numbers,
   return SUCCESS;
 }
 
-int _parse_complex_input(const char* const input, unsigned int* mask, int* mode) {
+int _parse_complex_input(const char* const input, unsigned int* mask,
+                         int* mode) {
   *mask = 0;
   unsigned int rwx_mask = 0;
   size_t len = strlen(input);
@@ -47,38 +48,47 @@ int _parse_complex_input(const char* const input, unsigned int* mask, int* mode)
   int is_operator_set = 0;
 
   for (size_t i = 0; i < len; i++) {
-    if (input[i] == READ_SYMBOL || input[i] == WRITE_SYMBOL || input[i] == EXEC_SYMBOL) {
+    if (input[i] == READ_SYMBOL || input[i] == WRITE_SYMBOL ||
+        input[i] == EXEC_SYMBOL) {
       if (!is_operator_set) return ERROR;
-      
-      if (input[i] == READ_SYMBOL) rwx_mask |= READ;
-      else if (input[i] == WRITE_SYMBOL) rwx_mask |= WRITE;
-      else rwx_mask |= EXEC;
-    }
-    else if (input[i] == PLUS || input[i] == MINUS || input[i] == EQUAL) {
+
+      if (input[i] == READ_SYMBOL)
+        rwx_mask |= READ;
+      else if (input[i] == WRITE_SYMBOL)
+        rwx_mask |= WRITE;
+      else
+        rwx_mask |= EXEC;
+    } else if (input[i] == PLUS || input[i] == MINUS || input[i] == EQUAL) {
       if (is_operator_set) return ERROR;
       if (*mask == 0) *mask = USER | GROUP | OTHER;
       is_operator_set = 1;
-      if (input[i] == PLUS) *mode = PLUS_MODE;
-      else if (input[i] == MINUS) *mode = MINUS_MODE;
-      else  *mode = EQUAL_MODE;
-    }
-    else if (input[i] == USER_SYMBOL || input[i] == GROUP_SYMBOL || input[i] == OTHER_SYMBOL || input[i] == ALL_SYMBOL) {
+      if (input[i] == PLUS)
+        *mode = PLUS_MODE;
+      else if (input[i] == MINUS)
+        *mode = MINUS_MODE;
+      else
+        *mode = EQUAL_MODE;
+    } else if (input[i] == USER_SYMBOL || input[i] == GROUP_SYMBOL ||
+               input[i] == OTHER_SYMBOL || input[i] == ALL_SYMBOL) {
       if (is_operator_set) return ERROR;
 
-      if (input[i] == USER_SYMBOL) *mask |= USER;
-      else if (input[i] == GROUP_SYMBOL) *mask |= GROUP;
-      else if (input[i] == OTHER_SYMBOL) *mask |= OTHER;
-      else *mask |= USER | GROUP | OTHER;
-    }
-    else return ERROR;
+      if (input[i] == USER_SYMBOL)
+        *mask |= USER;
+      else if (input[i] == GROUP_SYMBOL)
+        *mask |= GROUP;
+      else if (input[i] == OTHER_SYMBOL)
+        *mask |= OTHER;
+      else
+        *mask |= USER | GROUP | OTHER;
+    } else
+      return ERROR;
   }
   if (!is_operator_set) return ERROR;
 
   if (rwx_mask == 0 && (*mode == PLUS_MODE || *mode == MINUS_MODE)) {
     *mask = 0;
     *mode = PLUS_MODE;
-  }
-  else
+  } else
     *mask &= rwx_mask;
 
   return SUCCESS;
