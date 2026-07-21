@@ -3,7 +3,8 @@
 int main() {
   SRunner *sr = srunner_create(NULL);
 
-  srunner_add_suite(sr, check_calculation());
+  srunner_add_suite(sr, check_init());
+  srunner_add_suite(sr, check_change());
 
   srunner_run_all(sr, CK_NORMAL);
 

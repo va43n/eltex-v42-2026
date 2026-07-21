@@ -16,6 +16,20 @@ int main() {
   my_chmod_print(m1);
   my_chmod_print(m2);
   my_chmod_print(m3);
+  
+  if (!my_chmod_change(&m1, "016")) {
+    printf("ERROR 4\n");
+  }
+  if (!my_chmod_change(&m2, "+x")) {
+    printf("ERROR 5\n");
+  }
+  if (!my_chmod_change(&m3, "g-r")) {
+    printf("ERROR 6\n");
+  }
+
+  my_chmod_print(m1);
+  my_chmod_print(m2);
+  my_chmod_print(m3);
 
   return 0;
 }

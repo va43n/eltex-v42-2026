@@ -1,6 +1,6 @@
 #include <check.h>
 
-#include "../calc.h"
+#include "../my_chmod.h"
 
-Suite *check_calculation();
-
+Suite *check_init();
+Suite *check_change();
