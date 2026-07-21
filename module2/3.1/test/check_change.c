@@ -124,7 +124,7 @@ START_TEST(check_change_2) {
 
 Suite *check_change() {
   Suite *s = suite_create("check_change");
-  TCase *tc = tcase_create("change test cases for calc.a");
+  TCase *tc = tcase_create("change test cases for my_chmod.a");
 
   tcase_add_test(tc, check_change_1);
   tcase_add_test(tc, check_change_2);

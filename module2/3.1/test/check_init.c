@@ -103,7 +103,7 @@ START_TEST(check_init_3) {
 
 Suite *check_init() {
   Suite *s = suite_create("check_init");
-  TCase *tc = tcase_create("init test cases for calc.a");
+  TCase *tc = tcase_create("init test cases for my_chmod.a");
 
   tcase_add_test(tc, check_init_1);
   tcase_add_test(tc, check_init_2);
