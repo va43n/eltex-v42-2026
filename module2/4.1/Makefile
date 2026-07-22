@@ -10,7 +10,7 @@ endif
 
 SRC = phone_book.c phone_book_additional.c
 OBJ = $(SRC:.c=.o)
-LIB_NAME = phone_book.a
+# LIB_NAME = phone_book.a
 
 MANUAL_TEST_SRC = main.c
 MANUAL_TEST_TARGET = man_test_exe
@@ -20,20 +20,20 @@ TEST_TARGET = tests_exe
 
 all: $(LIB_NAME)
 
-$(LIB_NAME): $(OBJ)
-	@ar rcs $@ $^
+# $(LIB_NAME): $(OBJ)
+# 	@ar rcs $@ $^
 
 %.o: %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
-manual_testing: $(LIB_NAME)
-	@$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(LIB_NAME) -o $(MANUAL_TEST_TARGET)
+manual_testing: $(OBJ)
+	@$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(OBJ) -o $(MANUAL_TEST_TARGET)
 	./$(MANUAL_TEST_TARGET)
 
 test: CFLAGS += $(COVERAGE_FLAGS)
-test: $(LIB_NAME)
+test: $(OBJ)
 	@rm -rf */*.gcda */*.info *.gcda *.info 
-	@$(CC) $(CFLAGS) $(TEST_SRC) $(LIB_NAME) $(CHECK_LIBS) -o $(TEST_TARGET)
+	@$(CC) $(CFLAGS) $(TEST_SRC) $(OBJ) $(CHECK_LIBS) -o $(TEST_TARGET)
 	./$(TEST_TARGET)
 
 gcov_report:
@@ -51,7 +51,6 @@ valgrind: test
 
 clean:
 	@rm -rf $(OBJ) \
-			$(LIB_NAME) \
 			$(TEST_TARGET) \
 			$(MANUAL_TEST_TARGET) \
 			*.gcno \
