@@ -2,7 +2,7 @@
 
 int _simple_task_function(int priority, int value) {
   printf("Task %d (value = %d) completed\n", priority, value);
-  
+
   return SUCCESS;
 }
 

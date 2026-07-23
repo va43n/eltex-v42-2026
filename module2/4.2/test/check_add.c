@@ -1,7 +1,7 @@
 #include "test.h"
 
 START_TEST(check_add_1) {
-  queue* head = task_manager_init(NULL);
+  queue *head = task_manager_init(NULL);
   ck_assert_int_eq(head->next == NULL, 1);
 
   ck_assert_int_eq(task_manager_add_task(head, 0, 10), SUCCESS);
@@ -32,7 +32,8 @@ START_TEST(check_add_1) {
   ck_assert_int_eq(head->next->next->next->next->next->t.value == 15, 1);
 
   ck_assert_int_eq(head->next->next->next->next->next->next->index == 6, 1);
-  ck_assert_int_eq(head->next->next->next->next->next->next->t.priority == 255, 1);
+  ck_assert_int_eq(head->next->next->next->next->next->next->t.priority == 255,
+                   1);
   ck_assert_int_eq(head->next->next->next->next->next->next->t.value == 255, 1);
 
   ck_assert_int_eq(task_manager_add_task(head, 290, 10), ERROR);

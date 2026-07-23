@@ -13,25 +13,34 @@ START_TEST(check_execute_1) {
   ck_assert_int_eq(task_manager_add_task(head, 1, 2), SUCCESS);
   ck_assert_int_eq(task_manager_add_task(head, 255, 255), SUCCESS);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 0), SUCCESS);
+  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 0),
+                   SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 1), INDEX_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 0), SUCCESS);
+  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 0),
+                   SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 3), INDEX_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 0), PRIORITY_IS_NOT_FOUND);
+  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 0),
+                   PRIORITY_IS_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 22), PRIORITY_IS_NOT_FOUND);
+  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 22),
+                   PRIORITY_IS_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 1), SUCCESS);
+  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 1),
+                   SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 5), INDEX_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 255), SUCCESS);
+  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 255),
+                   SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 6), INDEX_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 256), ERROR);
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, -22), ERROR);
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(NULL, 10), ERROR);
+  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, 256),
+                   ERROR);
+  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(head, -22),
+                   ERROR);
+  ck_assert_int_eq(task_manager_execute_task_with_certain_priority(NULL, 10),
+                   ERROR);
 
   ck_assert_int_eq(task_manager_free(head), SUCCESS);
 }
@@ -49,28 +58,48 @@ START_TEST(check_execute_2) {
   ck_assert_int_eq(task_manager_add_task(head, 1, 2), SUCCESS);
   ck_assert_int_eq(task_manager_add_task(head, 255, 255), SUCCESS);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 255), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 255),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 6), INDEX_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 255), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 255),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 2), INDEX_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 0), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 0),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 1), INDEX_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 0), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 0),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 3), INDEX_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 0), PRIORITY_IS_NOT_FOUND);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 0),
+      PRIORITY_IS_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 8), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 8),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 5), INDEX_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 8), PRIORITY_IS_NOT_FOUND);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 8),
+      PRIORITY_IS_NOT_FOUND);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 1000), ERROR);
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, -1000), ERROR);
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(NULL, 10), ERROR);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 1000),
+      ERROR);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, -1000),
+      ERROR);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(NULL, 10),
+      ERROR);
 
   ck_assert_int_eq(task_manager_free(head), SUCCESS);
 }
@@ -85,12 +114,16 @@ START_TEST(check_execute_3) {
   ck_assert_int_eq(head->next->t.priority == 2, 1);
   ck_assert_int_eq(head->next->t.value == 10, 1);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 5), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 5),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 1), INDEX_NOT_FOUND);
 
   ck_assert_int_eq(head->next == NULL, 1);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 5), PRIORITY_IS_NOT_FOUND);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 5),
+      PRIORITY_IS_NOT_FOUND);
 
   ck_assert_int_eq(task_manager_add_task(head, 2, 10), SUCCESS);
   ck_assert_int_eq(task_manager_add_task(head, 2, 11), SUCCESS);
@@ -117,17 +150,29 @@ START_TEST(check_execute_3) {
   ck_assert_int_eq(head->next->next->next->next->next->next->index == 6, 1);
   ck_assert_int_eq(head->next->next->next->next->next->next->t.value == 5, 1);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 4), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 4),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 4), INDEX_NOT_FOUND);
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 4), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 4),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 3), INDEX_NOT_FOUND);
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 2), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 2),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 1), INDEX_NOT_FOUND);
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 255), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 255),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 6), INDEX_NOT_FOUND);
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 4), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 4),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 2), INDEX_NOT_FOUND);
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 4), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 4),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 5), INDEX_NOT_FOUND);
 
   ck_assert_int_eq(task_manager_free(head), SUCCESS);
@@ -143,12 +188,16 @@ START_TEST(check_execute_4) {
   ck_assert_int_eq(head->next->t.priority == 2, 1);
   ck_assert_int_eq(head->next->t.value == 10, 1);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 5), SUCCESS);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 5),
+      SUCCESS);
   ck_assert_int_eq(task_manager_remove_task(head, 1), INDEX_NOT_FOUND);
 
   ck_assert_int_eq(head->next == NULL, 1);
 
-  ck_assert_int_eq(task_manager_execute_task_with_certain_priority_or_higher(head, 5), PRIORITY_IS_NOT_FOUND);
+  ck_assert_int_eq(
+      task_manager_execute_task_with_certain_priority_or_higher(head, 5),
+      PRIORITY_IS_NOT_FOUND);
 
   ck_assert_int_eq(task_manager_add_task(head, 2, 10), SUCCESS);
   ck_assert_int_eq(task_manager_add_task(head, 2, 11), SUCCESS);
@@ -191,9 +240,9 @@ START_TEST(check_execute_4) {
   ck_assert_int_eq(task_manager_free(head), SUCCESS);
 }
 
-Suite *check_execute() {
-  Suite *s = suite_create("check_execute");
-  TCase *tc = tcase_create("execute test cases for task_manager.a");
+Suite* check_execute() {
+  Suite* s = suite_create("check_execute");
+  TCase* tc = tcase_create("execute test cases for task_manager.a");
 
   tcase_add_test(tc, check_execute_1);
   tcase_add_test(tc, check_execute_2);

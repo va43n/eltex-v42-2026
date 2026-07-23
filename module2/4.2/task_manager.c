@@ -1,8 +1,8 @@
 #include "task_manager.h"
 
-queue* task_manager_init(int (*task_func) (int, int)) {
+queue* task_manager_init(int (*task_func)(int, int)) {
   if (task_func == NULL) task_func = _simple_task_function;
-  
+
   queue* head = (queue*)calloc(1, sizeof(queue));
   head->t.task_func = task_func;
   head->next = NULL;
@@ -33,9 +33,10 @@ int task_manager_add_task(queue* head, int priority, int value) {
   queue* q = (queue*)calloc(1, sizeof(queue));
   q->index = index;
 
-  if (task_manager_set_priority(q, priority) && task_manager_set_value(q, value) == SUCCESS) {
+  if (task_manager_set_priority(q, priority) &&
+      task_manager_set_value(q, value) == SUCCESS) {
     q->t.task_func = head->t.task_func;
-    queue *ptr = head;
+    queue* ptr = head;
     while (ptr->next != NULL && ptr->next->t.priority <= priority) {
       ptr = ptr->next;
     }
@@ -114,7 +115,7 @@ int task_manager_execute_task_with_certain_priority(queue* head, int priority) {
   if (head == NULL) return ERROR;
   if (priority < HIGHEST_PRIORITY || priority > LOWEST_PRIORITY) return ERROR;
 
-  queue *ptr = head->next;
+  queue* ptr = head->next;
 
   while (ptr != NULL) {
     if (ptr->t.priority == priority) {
@@ -128,7 +129,8 @@ int task_manager_execute_task_with_certain_priority(queue* head, int priority) {
   return PRIORITY_IS_NOT_FOUND;
 }
 
-int task_manager_execute_task_with_certain_priority_or_higher(queue* head, int priority) {
+int task_manager_execute_task_with_certain_priority_or_higher(queue* head,
+                                                              int priority) {
   if (head == NULL) return ERROR;
   if (priority < HIGHEST_PRIORITY || priority > LOWEST_PRIORITY) return ERROR;
 
@@ -148,17 +150,17 @@ int task_manager_execute_task_with_certain_priority_or_higher(queue* head, int p
   if (higher != NULL) {
     higher->t.task_func(higher->t.priority, higher->t.value);
     task_manager_remove_task(head, higher->index);
-    
+
     return SUCCESS;
   }
 
   return PRIORITY_IS_NOT_FOUND;
 }
 
-int tesk_manager_execute_first_task_in_queue(queue *head) {
+int tesk_manager_execute_first_task_in_queue(queue* head) {
   if (head == NULL) return ERROR;
 
-  queue *ptr = head->next;
+  queue* ptr = head->next;
 
   if (ptr != NULL) {
     ptr->t.task_func(ptr->t.priority, ptr->t.value);

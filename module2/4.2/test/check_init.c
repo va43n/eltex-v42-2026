@@ -6,7 +6,7 @@ int some_function(int priority, int value) {
 }
 
 START_TEST(check_init_1) {
-  queue* head = task_manager_init(NULL);
+  queue *head = task_manager_init(NULL);
   ck_assert_int_eq(head->next == NULL, 1);
 
   ck_assert_int_eq(task_manager_free(head), SUCCESS);

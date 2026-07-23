@@ -17,7 +17,7 @@
 typedef struct {
   int priority;
   int value;
-  int (*task_func) (int, int);
+  int (*task_func)(int, int);
 } task;
 
 typedef struct queue {
@@ -26,7 +26,7 @@ typedef struct queue {
   struct queue* next;
 } queue;
 
-queue* task_manager_init(int (*task_func) (int, int));
+queue* task_manager_init(int (*task_func)(int, int));
 int task_manager_free(queue* head);
 
 int task_manager_add_task(queue* head, int priority, int value);
@@ -36,8 +36,9 @@ int task_manager_set_priority(queue* q, int priority);
 int task_manager_set_value(queue* q, int value);
 
 int task_manager_execute_task_with_certain_priority(queue* head, int priority);
-int task_manager_execute_task_with_certain_priority_or_higher(queue* head, int priority);
-int tesk_manager_execute_first_task_in_queue(queue *head);
+int task_manager_execute_task_with_certain_priority_or_higher(queue* head,
+                                                              int priority);
+int tesk_manager_execute_first_task_in_queue(queue* head);
 
 int task_manager_print(queue* head);
 int task_manager_print_task(queue* t);
