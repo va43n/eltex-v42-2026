@@ -10,8 +10,7 @@ ifeq ($(shell uname),Linux)
 endif
 
 SRC = $(wildcard calc_*.c)
-OBJ = $(SRC:.c=.o)
-LIB_NAME = calc.a
+LIBS = $(SRC:.c=.so)
 
 MANUAL_TEST_SRC = main.c
 MANUAL_TEST_TARGET = man_test_exe
@@ -19,22 +18,19 @@ MANUAL_TEST_TARGET = man_test_exe
 TEST_SRC = $(wildcard test/*.c)
 TEST_TARGET = tests_exe
 
-all: $(LIB_NAME)
+all: $(LIBS)
 
-$(LIB_NAME): $(OBJ)
-	@ar rcs $@ $^
+%.so: %.c
+	@$(CC) $(CFLAGS) -shared -o $@ $< $(MATH_LIB)
 
-%.o: %.c
-	@$(CC) $(CFLAGS) -c $< -o $@
-
-manual_testing: $(LIB_NAME)
-	@$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(LIB_NAME) $(MATH_LIB) -o $(MANUAL_TEST_TARGET)
+manual_testing: $(LIBS)
+	@$(CC) $(CFLAGS) -rdynamic -o $(MANUAL_TEST_TARGET) $(MANUAL_TEST_SRC) -ldl
 	./$(MANUAL_TEST_TARGET)
 
 test: CFLAGS += $(COVERAGE_FLAGS)
-test: $(LIB_NAME)
+test: $(LIBS)
 	@rm -rf */*.gcda */*.info *.gcda *.info 
-	@$(CC) $(CFLAGS) $(TEST_SRC) $(LIB_NAME) $(CHECK_LIBS) $(MATH_LIB) -o $(TEST_TARGET)
+	@$(CC) $(CFLAGS) -rdynamic -o $(TEST_TARGET) $(TEST_SRC) $(CHECK_LIBS) $(MATH_LIB) -ldl
 	./$(TEST_TARGET)
 
 gcov_report:
@@ -52,7 +48,7 @@ valgrind: test
 
 clean:
 	@rm -rf $(OBJ) \
-			$(LIB_NAME) \
+	        $(LIBS) \
 			$(TEST_TARGET) \
 			$(MANUAL_TEST_TARGET) \
 			*.gcno \

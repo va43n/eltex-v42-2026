@@ -34,5 +34,7 @@ int calculate(char* formula, double* result) {
   if (numbers != NULL) free(numbers);
   if (operators != NULL) free(operators);
 
+  // *result = 0;
+
   return SUCCESS;
 }
