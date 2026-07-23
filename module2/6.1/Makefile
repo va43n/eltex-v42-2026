@@ -10,7 +10,8 @@ endif
 
 SRC = phone_book.c phone_book_additional.c
 OBJ = $(SRC:.c=.o)
-LIB_NAME = phone_book.a
+LIB_NAME = libphone_book.a
+SHORT_LIB_NAME = -lphone_book
 
 MANUAL_TEST_SRC = main.c
 MANUAL_TEST_TARGET = man_test_exe
@@ -21,13 +22,13 @@ TEST_TARGET = tests_exe
 all: $(LIB_NAME)
 
 $(LIB_NAME): $(OBJ)
-	@ar rcs $@ $^
+	@ar rc $@ $^
 
 %.o: %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 manual_testing: $(LIB_NAME)
-	@$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(LIB_NAME) -o $(MANUAL_TEST_TARGET)
+	@$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) -o $(MANUAL_TEST_TARGET) -L. $(SHORT_LIB_NAME)
 	./$(MANUAL_TEST_TARGET)
 
 test: CFLAGS += $(COVERAGE_FLAGS)
