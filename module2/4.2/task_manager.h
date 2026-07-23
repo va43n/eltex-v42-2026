@@ -37,6 +37,7 @@ int task_manager_set_value(queue* q, int value);
 
 int task_manager_execute_task_with_certain_priority(queue* head, int priority);
 int task_manager_execute_task_with_certain_priority_or_higher(queue* head, int priority);
+int tesk_manager_execute_first_task_in_queue(queue *head);
 
 int task_manager_print(queue* head);
 int task_manager_print_task(queue* t);

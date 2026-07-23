@@ -154,3 +154,17 @@ int task_manager_execute_task_with_certain_priority_or_higher(queue* head, int p
 
   return PRIORITY_IS_NOT_FOUND;
 }
+
+int tesk_manager_execute_first_task_in_queue(queue *head) {
+  if (head == NULL) return ERROR;
+
+  queue *ptr = head->next;
+
+  if (ptr != NULL) {
+    ptr->t.task_func(ptr->t.priority, ptr->t.value);
+    task_manager_remove_task(head, ptr->index);
+    return SUCCESS;
+  }
+
+  return INDEX_NOT_FOUND;
+}
