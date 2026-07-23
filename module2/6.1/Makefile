@@ -34,7 +34,7 @@ manual_testing: $(LIB_NAME)
 test: CFLAGS += $(COVERAGE_FLAGS)
 test: $(LIB_NAME)
 	@rm -rf */*.gcda */*.info *.gcda *.info 
-	@$(CC) $(CFLAGS) $(TEST_SRC) $(LIB_NAME) $(CHECK_LIBS) -o $(TEST_TARGET)
+	@$(CC) $(CFLAGS) $(TEST_SRC) $(CHECK_LIBS) -o $(TEST_TARGET)  -L. $(SHORT_LIB_NAME)
 	./$(TEST_TARGET)
 
 gcov_report:
