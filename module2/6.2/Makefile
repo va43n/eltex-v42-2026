@@ -22,7 +22,7 @@ TEST_TARGET = tests_exe
 all: $(LIB_NAME)
 
 $(LIB_NAME): $(OBJ)
-	@$(CC) -shared -fPIC $^ -o $@
+	@$(CC) -shared $^ -o $@
 
 %.o: %.c
 	@$(CC) -c -fPIC $(CFLAGS) $<
