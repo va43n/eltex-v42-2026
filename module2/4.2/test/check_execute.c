@@ -240,6 +240,43 @@ START_TEST(check_execute_4) {
   ck_assert_int_eq(task_manager_free(head), SUCCESS);
 }
 
+#include <time.h>
+
+int _task_sort(const void* a, const void* b) {
+  task val_a = *(task*)a;
+  task val_b = *(task*)b;
+
+  if (val_a.priority <= val_b.priority)
+    return -1;
+  else
+    return 1;
+}
+
+START_TEST(check_execute_5) {
+  srand(time(NULL));
+  queue* head = task_manager_init(NULL);
+
+  size_t N = 1000;
+  task* tasks = (task*)malloc(N * sizeof(task));
+
+  for (size_t i = 0; i < N; i++) {
+    tasks[i].priority = rand() % 255;
+    tasks[i].value = rand();
+
+    task_manager_add_task(head, tasks[i].priority, tasks[i].value);
+  }
+
+  qsort(tasks, N, sizeof(task), _task_sort);
+
+  queue* ptr = head->next;
+  for (size_t i = 0; i < N; i++, ptr = ptr->next) {
+    ck_assert_int_eq(ptr->t.priority == tasks[i].priority, 1);
+    ck_assert_int_eq(ptr->t.value == tasks[i].value, 1);
+  }
+
+  ck_assert_int_eq(task_manager_free(head), SUCCESS);
+}
+
 Suite* check_execute() {
   Suite* s = suite_create("check_execute");
   TCase* tc = tcase_create("execute test cases for task_manager.a");
@@ -248,6 +285,7 @@ Suite* check_execute() {
   tcase_add_test(tc, check_execute_2);
   tcase_add_test(tc, check_execute_3);
   tcase_add_test(tc, check_execute_4);
+  tcase_add_test(tc, check_execute_5);
   suite_add_tcase(s, tc);
 
   return s;
