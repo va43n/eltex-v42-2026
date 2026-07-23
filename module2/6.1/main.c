@@ -56,7 +56,7 @@ int main() {
   numbers[2] = (char*)malloc(sizeof(char) * (strlen(n2) + 1));
   strcpy(numbers[2], n2);
 
-  phone_book_set_full_name(phone_book_get_page(head, 1), "Ivan Yashkov");
+  phone_book_set_full_name(head, 1, "Ivan Yashkov");
   phone_book_set_numbers(phone_book_get_page(head, 1), numbers, numbers_n + 1);
   phone_book_print_page(phone_book_get_page(head, 1));
 

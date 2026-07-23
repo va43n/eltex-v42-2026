@@ -35,7 +35,7 @@ START_TEST(check_set_1) {
 
   ck_assert_int_eq(strcmp(head->next->other, OTHER1), 0);
 
-  phone_book_set_full_name(head->next, NAME2);
+  phone_book_set_full_name(head, 1, NAME2);
   phone_book_set_job_place(head->next, JOB_PLACE2);
   phone_book_set_job_position(head->next, JOB_POSITION2);
   phone_book_set_other(head->next, OTHER2);
