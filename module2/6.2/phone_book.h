@@ -45,7 +45,7 @@ phone_book* phone_book_get_page(phone_book* head, size_t index);
 int phone_book_print(phone_book* head);
 int phone_book_print_page(phone_book* page);
 
-int phone_book_set_full_name(phone_book* pb, char full_name[]);
+int phone_book_set_full_name(phone_book* head, size_t index, char full_name[]);
 int phone_book_set_job_place(phone_book* pb, char job_place[]);
 int phone_book_set_job_position(phone_book* pb, char job_position[]);
 int phone_book_set_numbers(phone_book* pb, char** numbers, size_t numbers_n);
@@ -70,8 +70,9 @@ phone_book* phone_book_load(char file_name[]);
 //  EDIT_SOCIALS_DELETE  0b______0_
 #define EDIT_OTHER 0b00000001
 
-int phone_book_edit(phone_book* head, unsigned int format, ...);
+int phone_book_edit(phone_book* head, size_t index, unsigned int format, ...);
 
 void _free_one_page(phone_book* pb);
 size_t _get_unique_index(phone_book* head);
 int _check_number(char* pn);
+int _set_full_name(phone_book* pb, char full_name[]);

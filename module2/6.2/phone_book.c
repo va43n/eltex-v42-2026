@@ -37,7 +37,7 @@ int phone_book_add_page(phone_book* head, char full_name[], char job_place[],
   phone_book* pb = (phone_book*)calloc(1, sizeof(phone_book));
   pb->index = index;
 
-  if (phone_book_set_full_name(pb, full_name) &&
+  if (_set_full_name(pb, full_name) &&
       phone_book_set_job_place(pb, job_place) &&
       phone_book_set_job_position(pb, job_position) &&
       phone_book_set_numbers(pb, numbers, numbers_n) &&
@@ -160,10 +160,20 @@ phone_book* phone_book_get_page(phone_book* head, size_t index) {
   return NULL;
 }
 
-int phone_book_set_full_name(phone_book* pb, char full_name[]) {
+int phone_book_set_full_name(phone_book* head, size_t index, char full_name[]) {
   if (strlen(full_name) == 0) return ERROR;
 
-  strcpy(pb->full_name, full_name);
+  phone_book *pb = phone_book_get_page(head, index);
+  if (pb == NULL) return ERROR;
+
+  if (!phone_book_add_page(head, full_name, pb->job_place, pb->job_position, pb->numbers, pb->numbers_n, pb->socials, pb->socials_n, pb->other)) return ERROR;
+
+  phone_book* new_pb = phone_book_get_page(head, phone_book_find_page_by_full_name(head, full_name));
+
+  if (!phone_book_remove_page(head, index)) return ERROR;
+
+  new_pb->index = index;
+
   return SUCCESS;
 }
 
@@ -542,7 +552,9 @@ int phone_book_compare(phone_book* head1, phone_book* head2) {
   return result;
 }
 
-int phone_book_edit(phone_book* pb, unsigned int format, ...) {
+int phone_book_edit(phone_book* head, size_t index, unsigned int format, ...) {
+  phone_book* pb = phone_book_get_page(head, index);
+  if (pb == NULL) return ERROR;
   va_list va;
   int ret;
 
@@ -550,7 +562,8 @@ int phone_book_edit(phone_book* pb, unsigned int format, ...) {
 
   if ((format & EDIT_FULL_NAME) == EDIT_FULL_NAME) {
     char* full_name = va_arg(va, char*);
-    ret = phone_book_set_full_name(pb, full_name);
+    ret = phone_book_set_full_name(head, index, full_name);
+    pb = phone_book_get_page(head, index);
     if (ret == ERROR) return ret;
   }
   if ((format & EDIT_JOB_PLACE) == EDIT_JOB_PLACE) {

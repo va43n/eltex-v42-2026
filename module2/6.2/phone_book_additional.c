@@ -67,3 +67,10 @@ int _check_number(char* pn) {
 
   return !reti;
 }
+
+int _set_full_name(phone_book* pb, char full_name[]) {
+  if (strlen(full_name) == 0) return ERROR;
+
+  strcpy(pb->full_name, full_name);
+  return SUCCESS;
+}
