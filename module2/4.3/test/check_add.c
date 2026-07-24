@@ -126,7 +126,13 @@ START_TEST(check_add_3) {
   USER_3("n", JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
   ck_assert_int_eq(result, SUCCESS);
 
+  USER_3("p", JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  ck_assert_int_eq(result, SUCCESS);
+
   USER_3("o", JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  ck_assert_int_eq(result, SUCCESS);
+
+  USER_3("r", JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
   ck_assert_int_eq(result, SUCCESS);
 
   phone_book_print_tree(head);

@@ -1,5 +1,7 @@
 #include "phone_book.h"
 
+// static int _balancing_in_progress = 0;
+
 phone_book* phone_book_create() {
   phone_book* head = (phone_book*)calloc(1, sizeof(phone_book));
   head->index = 0;
@@ -19,8 +21,6 @@ int phone_book_free(phone_book* head) {
 int phone_book_add_page(phone_book* head, char full_name[], char job_place[],
                         char job_position[], char** numbers, size_t numbers_n,
                         socials_t* socials, size_t socials_n, char other[]) {
-  // static size_t function_used = 0;
-
   if (head == NULL) return ERROR;
 
   size_t index = _get_unique_index(head);
@@ -41,10 +41,15 @@ int phone_book_add_page(phone_book* head, char full_name[], char job_place[],
       return ERROR;
     }
 
-    // function_used++;
-    // if (function_used == BALANCING_NUMBER) {
-    //   function_used = 0;
-    //   phone_book_balance(&head);
+    // if (!_balancing_in_progress) {
+    //   static size_t function_used = 0;
+    //   function_used++;
+    //   if (function_used == BALANCING_NUMBER) {
+    //     function_used = 0;
+    //     _balancing_in_progress = 1;
+    //     phone_book_balance(&head);
+    //     _balancing_in_progress = 0;
+    //   }
     // }
     return SUCCESS;
   }
@@ -225,11 +230,11 @@ int phone_book_print_page(phone_book* page) {
 
 int phone_book_print_tree(phone_book* head) {
   if (head == NULL) return ERROR;
-    printf("===============================\n");
-    printf("My phone book (tree style)! \n");
-    _print_tree_like_tree(head->left, 0);
-    printf("===============================\n\n");
-    return SUCCESS;
+  printf("===============================\n");
+  printf("My phone book (tree style)! \n");
+  _print_tree_like_tree(head->left, 0);
+  printf("===============================\n\n");
+  return SUCCESS;
 }
 
 int phone_book_compare_pages(phone_book* pb1, phone_book* pb2) {
@@ -385,7 +390,7 @@ int phone_book_balance(phone_book** head) {
   if (head == NULL || (*head) == NULL) return ERROR;
   if ((*head)->left == NULL) return SUCCESS;
 
-  phone_book *pbs = NULL;
+  phone_book* pbs = NULL;
   size_t pbs_n = 0;
 
   _get_all_pages_from_tree((*head)->left, &pbs, &pbs_n);
@@ -395,8 +400,7 @@ int phone_book_balance(phone_book** head) {
 
   _add_pages_in_balanced_order(head, pbs, 0, pbs_n - 1);
 
-  for (size_t i = 0; i < pbs_n; i++)
-    _free_one_page(&pbs[i]);
+  for (size_t i = 0; i < pbs_n; i++) _free_one_page(&pbs[i]);
 
   return SUCCESS;
 }

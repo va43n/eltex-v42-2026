@@ -91,6 +91,7 @@ int _find_page_by_full_name_in_tree(phone_book* node, regex_t regex,
 int _find_page_by_number_in_tree(phone_book* pb, regex_t regex, size_t* result);
 int _print_tree_infix(phone_book* pb);
 void _print_tree_like_tree(phone_book* pb, int depth);
-size_t _get_depth_of_tree(phone_book* head);
-void _get_all_pages_from_tree(phone_book* head, phone_book** pbs, size_t* pbs_n);
-int _add_pages_in_balanced_order(phone_book** head, phone_book* pbs, size_t start, size_t end);
+void _get_all_pages_from_tree(phone_book* head, phone_book** pbs,
+                              size_t* pbs_n);
+int _add_pages_in_balanced_order(phone_book** head, phone_book* pbs,
+                                 size_t start, size_t end);
