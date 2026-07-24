@@ -44,7 +44,7 @@ int phone_book_add_page(phone_book* head, char full_name[], char job_place[],
       phone_book_set_socials(pb, socials, socials_n) &&
       phone_book_set_other(pb, other) == SUCCESS) {
     phone_book* ptr = head->next;
-    
+
     if (ptr == head || strcmp(full_name, ptr->full_name) <= 0) {
       pb->next = ptr;
       pb->prev = head;
@@ -54,7 +54,7 @@ int phone_book_add_page(phone_book* head, char full_name[], char job_place[],
       while (ptr != head && strcmp(full_name, ptr->full_name) > 0) {
         ptr = ptr->next;
       }
-      
+
       pb->next = ptr;
       pb->prev = ptr->prev;
       ptr->prev->next = pb;
@@ -79,7 +79,7 @@ int phone_book_remove_page(phone_book* head, size_t index) {
     if (ptr->index == index) {
       ptr->prev->next = ptr->next;
       ptr->next->prev = ptr->prev;
-      
+
       _free_one_page(ptr);
       free(ptr);
 
@@ -163,12 +163,16 @@ phone_book* phone_book_get_page(phone_book* head, size_t index) {
 int phone_book_set_full_name(phone_book* head, size_t index, char full_name[]) {
   if (strlen(full_name) == 0) return ERROR;
 
-  phone_book *pb = phone_book_get_page(head, index);
+  phone_book* pb = phone_book_get_page(head, index);
   if (pb == NULL) return ERROR;
 
-  if (!phone_book_add_page(head, full_name, pb->job_place, pb->job_position, pb->numbers, pb->numbers_n, pb->socials, pb->socials_n, pb->other)) return ERROR;
+  if (!phone_book_add_page(head, full_name, pb->job_place, pb->job_position,
+                           pb->numbers, pb->numbers_n, pb->socials,
+                           pb->socials_n, pb->other))
+    return ERROR;
 
-  phone_book* new_pb = phone_book_get_page(head, phone_book_find_page_by_full_name(head, full_name));
+  phone_book* new_pb = phone_book_get_page(
+      head, phone_book_find_page_by_full_name(head, full_name));
 
   if (!phone_book_remove_page(head, index)) return ERROR;
 

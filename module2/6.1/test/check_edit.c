@@ -11,8 +11,8 @@ START_TEST(check_edit_1) {
   ck_assert_int_eq(phone_book_edit(head, 1, EDIT_FULL_NAME, NAME2), SUCCESS);
   ck_assert_int_eq(phone_book_edit(head, 1, EDIT_JOB_PLACE, JOB_PLACE2),
                    SUCCESS);
-  ck_assert_int_eq(
-      phone_book_edit(head, 1, EDIT_JOB_POSITION, JOB_POSITION2), SUCCESS);
+  ck_assert_int_eq(phone_book_edit(head, 1, EDIT_JOB_POSITION, JOB_POSITION2),
+                   SUCCESS);
 
   ck_assert_int_eq(
       phone_book_edit(head, 1, EDIT_NUMBERS | EDIT_NUMBERS_ADD, NUMBER3),
@@ -146,8 +146,8 @@ START_TEST(check_edit_3) {
          OTHER1, &result);
   USER_2(NAME2, JOB_PLACE1, JOB_POSITION1, NUMBER1, SOCIALS_NAME1, SOCIALS_URL1,
          OTHER2, &result);
-  USER_2(OTHER4, JOB_PLACE1, JOB_POSITION1, NUMBER1, SOCIALS_NAME1, SOCIALS_URL1,
-         OTHER3, &result);
+  USER_2(OTHER4, JOB_PLACE1, JOB_POSITION1, NUMBER1, SOCIALS_NAME1,
+         SOCIALS_URL1, OTHER3, &result);
   USER_2(NAME4, JOB_PLACE1, JOB_POSITION1, NUMBER1, SOCIALS_NAME1, SOCIALS_URL1,
          OTHER4, &result);
   USER_2(NAME2, JOB_PLACE1, JOB_POSITION1, NUMBER1, SOCIALS_NAME1, SOCIALS_URL1,
@@ -169,7 +169,8 @@ START_TEST(check_edit_3) {
 
   phone_book_print(head);
 
-  printf("%s %s %ld\n", head->next->full_name, head->next->other, head->next->index);
+  printf("%s %s %ld\n", head->next->full_name, head->next->other,
+         head->next->index);
 
   ck_assert_int_eq(strcmp(head->next->full_name, OTHER4), 0);
   ck_assert_int_eq(strcmp(head->next->other, OTHER3), 0);

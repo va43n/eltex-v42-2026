@@ -119,7 +119,8 @@ START_TEST(check_remove_2) {
 
   ck_assert_int_eq(strcmp(head->next->other, OTHER4), 0);
   ck_assert_int_eq(strcmp(head->next->next->next->other, OTHER6), 0);
-  ck_assert_int_eq(strcmp(head->next->next->next->next->next->other, OTHER5), 0);
+  ck_assert_int_eq(strcmp(head->next->next->next->next->next->other, OTHER5),
+                   0);
 
   ck_assert_int_eq(phone_book_free(head), SUCCESS);
 }
