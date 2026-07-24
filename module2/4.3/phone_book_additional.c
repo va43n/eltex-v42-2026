@@ -201,3 +201,22 @@ int _print_tree_infix(phone_book* pb) {
 
   return SUCCESS;
 }
+
+void _print_tree_like_tree(phone_book* pb, int depth) {
+    if (pb == NULL) return;
+    _print_tree_like_tree(pb->right, depth + 1);
+    for (int i = 0; i < depth; i++) {
+        printf("    ");
+    }
+    printf("'%-8.8s' (i=%ld)\n", pb->full_name, pb->index);
+    _print_tree_like_tree(pb->left, depth + 1);
+}
+
+size_t _get_depth_of_tree(phone_book* head) {
+  if (head == NULL) return 0;
+
+  size_t left = _get_depth_of_tree(head->left);
+  size_t right = _get_depth_of_tree(head->left);
+  
+  return left > right ? left + 1 : right + 1;
+}

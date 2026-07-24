@@ -78,7 +78,7 @@ START_TEST(check_remove_2) {
          OTHER2, &result);
   USER_3(NAME3, JOB_PLACE2, JOB_POSITION1, OTHER2, &result);
 
-  phone_book_print(head);
+  phone_book_print_tree(head);
 
   phone_book_remove_page(head, 2);
   phone_book_remove_page(head, 3);
@@ -139,7 +139,7 @@ START_TEST(check_remove_3) {
   phone_book_remove_page(head, 5);
 
   printf("remove_3\n");
-  phone_book_print(head->left);
+  phone_book_print_tree(head);
 
   ck_assert_int_eq(head->left == NULL, 1);
 

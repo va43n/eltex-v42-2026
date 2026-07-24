@@ -209,6 +209,15 @@ int phone_book_print_page(phone_book* page) {
   return SUCCESS;
 }
 
+int phone_book_print_tree(phone_book* head) {
+  if (head == NULL) return ERROR;
+    printf("===============================\n");
+    printf("My phone book (tree style)! \n");
+    _print_tree_like_tree(head->left, 0);
+    printf("===============================\n\n");
+    return SUCCESS;
+}
+
 int phone_book_compare_pages(phone_book* pb1, phone_book* pb2) {
   if (pb1 == NULL || pb2 == NULL) return 0;
   int result;

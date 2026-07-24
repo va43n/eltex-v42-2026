@@ -109,12 +109,46 @@ START_TEST(check_add_2) {
   ck_assert_int_eq(phone_book_free(head), SUCCESS);
 }
 
+START_TEST(check_add_3) {
+  int result;
+
+  phone_book *head = phone_book_create();
+
+  USER_3(NAME2, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  ck_assert_int_eq(result, SUCCESS);
+
+  USER_3(NAME2, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  ck_assert_int_eq(result, SUCCESS);
+
+  USER_3(NAME2, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  ck_assert_int_eq(result, SUCCESS);
+
+  USER_3(NAME2, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  ck_assert_int_eq(result, SUCCESS);
+
+  USER_3(NAME2, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  ck_assert_int_eq(result, SUCCESS);
+
+  phone_book_print_tree(head);
+
+  USER_3(NAME4, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  ck_assert_int_eq(result, SUCCESS);
+
+  USER_3(NAME3, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  ck_assert_int_eq(result, SUCCESS);
+
+  phone_book_print_tree(head);
+
+  ck_assert_int_eq(phone_book_free(head), SUCCESS);
+}
+
 Suite *check_add() {
   Suite *s = suite_create("check_add");
   TCase *tc = tcase_create("add test cases for phone_book.a");
 
   tcase_add_test(tc, check_add_1);
   tcase_add_test(tc, check_add_2);
+  tcase_add_test(tc, check_add_3);
   suite_add_tcase(s, tc);
 
   return s;

@@ -155,7 +155,7 @@ START_TEST(check_edit_3) {
   USER_2(NAME3, JOB_PLACE1, JOB_POSITION1, NUMBER1, SOCIALS_NAME1, SOCIALS_URL1,
          OTHER6, &result);
 
-  phone_book_print(head->left);
+  phone_book_print_tree(head);
 
   ck_assert_int_eq(strcmp(head->left->full_name, NAME1), 0);
   ck_assert_int_eq(strcmp(head->left->other, OTHER1), 0);

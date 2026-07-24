@@ -45,6 +45,8 @@ phone_book* phone_book_get_page(phone_book* head, size_t index);
 int phone_book_print(phone_book* head);
 int phone_book_print_page(phone_book* page);
 
+int phone_book_print_tree(phone_book* head);
+
 int phone_book_set_full_name(phone_book* head, size_t index, char full_name[]);
 int phone_book_set_job_place(phone_book* pb, char job_place[]);
 int phone_book_set_job_position(phone_book* pb, char job_position[]);
@@ -84,3 +86,5 @@ int _find_page_by_full_name_in_tree(phone_book* node, regex_t regex,
                                     size_t* result);
 int _find_page_by_number_in_tree(phone_book* pb, regex_t regex, size_t* result);
 int _print_tree_infix(phone_book* pb);
+void _print_tree_like_tree(phone_book* pb, int depth);
+size_t _get_depth_of_tree(phone_book* head);

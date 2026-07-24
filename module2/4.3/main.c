@@ -34,12 +34,12 @@ int main() {
   strcpy(socials[3].social_name, sn4);
   strcpy(socials[3].social_url, su4);
 
-  phone_book_print(head);
+  phone_book_print_tree(head);
 
   phone_book_add_page(head, full_name, job_place, job_position, numbers,
                       numbers_n, socials, socials_n, other);
 
-  phone_book_print(head);
+  phone_book_print_tree(head);
 
   phone_book_print_page(phone_book_get_page(head, 1));
 
@@ -106,6 +106,8 @@ int main() {
   free(socials3);
 
   phone_book_print(head);
+
+  phone_book_print_tree(head);
 
   printf("%ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld\n",
          phone_book_find_page_by_full_name(head, "Ivanov Ivan Ivanovich"),
