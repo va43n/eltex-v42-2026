@@ -232,28 +232,29 @@ void _get_all_pages_from_tree(phone_book* head, phone_book** pbs,
   }
 }
 
-int _add_pages_in_balanced_order(phone_book** head, phone_book* pbs, size_t start, size_t end) {
-    if (end < start) return 0;
-    size_t mid = (end - start) / 2 + start;
+int _add_pages_in_balanced_order(phone_book** head, phone_book* pbs,
+                                 size_t start, size_t end) {
+  if (end < start) return 0;
+  size_t mid = (end - start) / 2 + start;
 
-    phone_book* new_pb = (phone_book*)calloc(1, sizeof(phone_book));
-    if (!new_pb) return ERROR;
+  phone_book* new_pb = (phone_book*)calloc(1, sizeof(phone_book));
+  if (!new_pb) return ERROR;
 
-    new_pb->index = pbs[mid].index;
-    strcpy(new_pb->full_name, pbs[mid].full_name);
-    strcpy(new_pb->job_place, pbs[mid].job_place);
-    strcpy(new_pb->job_position, pbs[mid].job_position);
-    strcpy(new_pb->other, pbs[mid].other);
+  new_pb->index = pbs[mid].index;
+  strcpy(new_pb->full_name, pbs[mid].full_name);
+  strcpy(new_pb->job_place, pbs[mid].job_place);
+  strcpy(new_pb->job_position, pbs[mid].job_position);
+  strcpy(new_pb->other, pbs[mid].other);
 
-    phone_book_set_numbers(new_pb, pbs[mid].numbers, pbs[mid].numbers_n);
-    phone_book_set_socials(new_pb, pbs[mid].socials, pbs[mid].socials_n);
+  phone_book_set_numbers(new_pb, pbs[mid].numbers, pbs[mid].numbers_n);
+  phone_book_set_socials(new_pb, pbs[mid].socials, pbs[mid].socials_n);
 
-    _add_page_to_tree(&((*head)->left), new_pb);
+  _add_page_to_tree(&((*head)->left), new_pb);
 
-    if (end > start) {
-        _add_pages_in_balanced_order(head, pbs, start, mid - 1);
-        _add_pages_in_balanced_order(head, pbs, mid + 1, end);
-    }
+  if (end > start) {
+    _add_pages_in_balanced_order(head, pbs, start, mid - 1);
+    _add_pages_in_balanced_order(head, pbs, mid + 1, end);
+  }
 
-    return SUCCESS;
+  return SUCCESS;
 }
