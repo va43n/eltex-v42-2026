@@ -19,6 +19,8 @@ int phone_book_free(phone_book* head) {
 int phone_book_add_page(phone_book* head, char full_name[], char job_place[],
                         char job_position[], char** numbers, size_t numbers_n,
                         socials_t* socials, size_t socials_n, char other[]) {
+  // static size_t function_used = 0;
+
   if (head == NULL) return ERROR;
 
   size_t index = _get_unique_index(head);
@@ -38,6 +40,12 @@ int phone_book_add_page(phone_book* head, char full_name[], char job_place[],
       free(pb);
       return ERROR;
     }
+
+    // function_used++;
+    // if (function_used == BALANCING_NUMBER) {
+    //   function_used = 0;
+    //   phone_book_balance(&head);
+    // }
     return SUCCESS;
   }
 
@@ -48,12 +56,18 @@ int phone_book_add_page(phone_book* head, char full_name[], char job_place[],
 }
 
 int phone_book_remove_page(phone_book* head, size_t index) {
+  // static size_t function_used = 0;
   if (head == NULL || head->left == NULL) return ERROR;
 
   phone_book* ptr = head->left;
   head->left = _delete_page_from_tree(ptr, index);
 
   if (_find_page_in_tree(head->left, index) != NULL) return ERROR;
+  // function_used++;
+  // if (function_used == BALANCING_NUMBER) {
+  //   function_used = 0;
+  //   phone_book_balance(&head);
+  // }
   return SUCCESS;
 }
 
@@ -363,6 +377,26 @@ int phone_book_edit(phone_book* head, size_t index, unsigned int format, ...) {
   }
 
   va_end(va);
+
+  return SUCCESS;
+}
+
+int phone_book_balance(phone_book** head) {
+  if (head == NULL || (*head) == NULL) return ERROR;
+  if ((*head)->left == NULL) return SUCCESS;
+
+  phone_book *pbs = NULL;
+  size_t pbs_n = 0;
+
+  _get_all_pages_from_tree((*head)->left, &pbs, &pbs_n);
+
+  phone_book_free(*head);
+  *head = phone_book_create();
+
+  _add_pages_in_balanced_order(head, pbs, 0, pbs_n - 1);
+
+  for (size_t i = 0; i < pbs_n; i++)
+    _free_one_page(&pbs[i]);
 
   return SUCCESS;
 }

@@ -114,19 +114,19 @@ START_TEST(check_add_3) {
 
   phone_book *head = phone_book_create();
 
-  USER_3(NAME2, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  USER_3("k", JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
   ck_assert_int_eq(result, SUCCESS);
 
-  USER_3(NAME2, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  USER_3("l", JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
   ck_assert_int_eq(result, SUCCESS);
 
-  USER_3(NAME2, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  USER_3("m", JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
   ck_assert_int_eq(result, SUCCESS);
 
-  USER_3(NAME2, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  USER_3("n", JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
   ck_assert_int_eq(result, SUCCESS);
 
-  USER_3(NAME2, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
+  USER_3("o", JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
   ck_assert_int_eq(result, SUCCESS);
 
   phone_book_print_tree(head);
@@ -136,6 +136,10 @@ START_TEST(check_add_3) {
 
   USER_3(NAME3, JOB_PLACE1, JOB_POSITION1, OTHER1, &result);
   ck_assert_int_eq(result, SUCCESS);
+
+  phone_book_print_tree(head);
+
+  phone_book_balance(&head);
 
   phone_book_print_tree(head);
 

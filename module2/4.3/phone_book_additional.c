@@ -220,3 +220,32 @@ size_t _get_depth_of_tree(phone_book* head) {
   
   return left > right ? left + 1 : right + 1;
 }
+
+void _get_all_pages_from_tree(phone_book* head, phone_book** pbs, size_t* pbs_n) {
+  if (head != NULL) {
+    _get_all_pages_from_tree(head->left, pbs, pbs_n);
+    (*pbs_n)++;
+    phone_book* temp = (phone_book*)realloc(*pbs, *pbs_n * sizeof(phone_book));
+    *pbs = temp;
+    strcpy((*pbs)[*pbs_n - 1].full_name, head->full_name);
+    strcpy((*pbs)[*pbs_n - 1].job_place, head->job_place);
+    strcpy((*pbs)[*pbs_n - 1].job_position, head->job_position);
+    strcpy((*pbs)[*pbs_n - 1].other, head->other);
+    phone_book_set_numbers(&(*pbs)[*pbs_n - 1], head->numbers, head->numbers_n);
+    phone_book_set_socials(&(*pbs)[*pbs_n - 1], head->socials, head->socials_n);
+
+    _get_all_pages_from_tree(head->right, pbs, pbs_n);
+  }
+}
+
+int _add_pages_in_balanced_order(phone_book** head, phone_book* pbs, size_t start, size_t end) {
+  if (end < start) return 0;
+  size_t mid = (end - start) / 2 + start;
+  printf("%s: %ld %ld %ld\n", pbs[mid].full_name, mid, start, end);
+  phone_book_add_page(*head, pbs[mid].full_name, pbs[mid].job_place, pbs[mid].job_position, pbs[mid].numbers, pbs[mid].numbers_n, pbs[mid].socials, pbs[mid].socials_n, pbs[mid].other);
+  if (end == start || end == start + 1) return 0;
+  _add_pages_in_balanced_order(head, pbs, start, mid - 1);
+  _add_pages_in_balanced_order(head, pbs, mid + 1, end);
+
+  return 0;
+}

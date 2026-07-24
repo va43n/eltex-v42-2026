@@ -10,6 +10,8 @@
 #define FIRST_UNIQUE_INDEX 1
 #define INDEX_NOT_FOUND 0
 
+#define BALANCING_NUMBER 1
+
 typedef struct socials_t {
   char social_name[32];
   char social_url[128];
@@ -58,6 +60,8 @@ int phone_book_set_other(phone_book* pb, char other[]);
 int phone_book_compare_pages(phone_book* pb1, phone_book* pb2);
 int phone_book_compare(phone_book* head1, phone_book* head2);
 
+int phone_book_balance(phone_book** head);
+
 #define EDIT_FULL_NAME 0b10000000
 #define EDIT_JOB_PLACE 0b01000000
 #define EDIT_JOB_POSITION 0b00100000
@@ -88,3 +92,5 @@ int _find_page_by_number_in_tree(phone_book* pb, regex_t regex, size_t* result);
 int _print_tree_infix(phone_book* pb);
 void _print_tree_like_tree(phone_book* pb, int depth);
 size_t _get_depth_of_tree(phone_book* head);
+void _get_all_pages_from_tree(phone_book* head, phone_book** pbs, size_t* pbs_n);
+int _add_pages_in_balanced_order(phone_book** head, phone_book* pbs, size_t start, size_t end);
