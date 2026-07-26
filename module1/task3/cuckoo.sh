@@ -20,17 +20,19 @@ kill() {
 }
 trap kill SIGTERM SIGINT SIGQUIT SIGKILL
 
+DELAY=0.2
+
 while true; do
     if read -r message <&3; then
-        if [[ "$message" =~ ^([A-Za-z0-9_]+)\[([0-9]+)\]:\ how\ much\ time\ do\ I\ have\?$ ]]; then
+        if [[ "$message" =~ ^([A-Za-z0-9_.]+)\[([0-9]+)\]:\ how\ much\ time\ do\ I\ have\?$ ]]; then
             NAME="${BASH_REMATCH[1]}"
             PID="${BASH_REMATCH[2]}"
             N=$((RANDOM % 9 + 2))
 
-            echo "$NAME[$PID] $N"
+	    echo "${NAME}[${PID}] ${N}"
+	    sleep "$DELAY"
+	    echo "$N" >&3
             echo "$(date "+%d/%m/%Y %H:%M:%S") $NAME[$PID] $N" >> "$LOG_FILE"
-        else
-            echo "$(date "+%d/%m/%Y %H:%M:%S") ERROR: malformed request: $message" >> "$LOG_FILE"
         fi
     fi
 done

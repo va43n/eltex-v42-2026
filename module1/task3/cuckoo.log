@@ -31,3 +31,36 @@
 14/07/2026 12:56:07 Startup!
 14/07/2026 12:56:10 sasha[0] 9
 14/07/2026 12:59:58 Shutdown!
+26/07/2026 04:38:37 Startup!
+26/07/2026 04:40:11 Startup!
+26/07/2026 04:54:47 Startup!
+26/07/2026 04:54:58 ERROR: malformed request: eu ied  ae
+26/07/2026 04:55:06 Shutdown!
+26/07/2026 05:07:34 Startup!
+26/07/2026 05:07:57 Shutdown!
+26/07/2026 05:08:32 Startup!
+26/07/2026 05:08:47 Shutdown!
+26/07/2026 05:12:00 Startup!
+26/07/2026 05:12:29 Shutdown!
+26/07/2026 05:25:20 Startup!
+26/07/2026 05:25:29 ERROR: malformed request: template_tak.h[01] o uhtm oIhv?t03:hwmc m oIhv?tss[02] o uhtm oIhv?th03] o uhtm oIhv?t c ied  ae
+26/07/2026 05:25:35 ERROR: malformed request: tss[04] o uhtmd  ae
+26/07/2026 05:25:50 template_task.sh[60948] 8
+26/07/2026 05:25:50 ERROR: malformed request: 8
+26/07/2026 05:26:01 template_task.sh[60954] 5
+26/07/2026 05:26:01 ERROR: malformed request: 5
+26/07/2026 05:27:15 template_task.sh[60962] 6
+26/07/2026 05:27:15 ERROR: malformed request: 6
+26/07/2026 05:27:20 template_task.sh[60968] 3
+26/07/2026 05:27:20 ERROR: malformed request: 3
+26/07/2026 05:31:50 Shutdown!
+26/07/2026 05:37:50 Startup!
+26/07/2026 05:37:56 template_task.sh[61000] 7
+26/07/2026 05:39:45 template_task.sh[61010] 3
+26/07/2026 05:41:18 template_task.sh[61027] 3
+26/07/2026 05:42:28 template_task.sh[61038] 4
+26/07/2026 05:42:54 Shutdown!
+26/07/2026 05:43:08 Startup!
+26/07/2026 05:43:13 template_task.sh[61063] 6
+26/07/2026 05:43:21 template_task.sh[61074] 5
+26/07/2026 05:43:28 Shutdown!
