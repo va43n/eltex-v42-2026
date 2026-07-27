@@ -9,3 +9,4 @@
 man_test_exe
 tests_exe
 report
+*.odt
