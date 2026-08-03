@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
     for (size_t i = 0; i < size; i++) {
       printf("'%s': '%s'\n", file_names[i], pipe_names[i]);
     }
+
+    copy_files_with_ipc(size);
   }
 
   return 0;

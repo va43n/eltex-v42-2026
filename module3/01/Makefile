@@ -1,14 +1,8 @@
 CC = gcc
 CLANG_FORMAT = clang-format
 CFLAGS = -Wall -Wextra -Werror -std=gnu11
-COVERAGE_FLAGS = --coverage
 
-CHECK_LIBS = -lcheck -lm -lpthread
-ifeq ($(shell uname),Linux)
-    CHECK_LIBS += -lsubunit
-endif
-
-SRC = prepare.c
+SRC = prepare.c ipc.c
 OBJ = $(SRC:.c=.o)
 
 MANUAL_TEST_SRC = main.c
@@ -29,18 +23,14 @@ format:
 check_styles:
 	cppcheck --enable=all --suppress=missingIncludeSystem .
 
-valgrind: test
-	valgrind --tool=memcheck --leak-check=yes --quiet ./$(TEST_TARGET)
+valgrind: manual_testing
+	valgrind --tool=memcheck --leak-check=yes --quiet ./$(MANUAL_TEST_TARGET)
 
 clean:
 	@rm -rf $(OBJ) \
-			$(TEST_TARGET) \
 			$(MANUAL_TEST_TARGET) \
-			*.gcno \
-			*.gcda \
-			*.info \
-			report \
-			*.o
+			*.o \
+			*.copy
 
 .PHONY: all \
 		manual_testing \
