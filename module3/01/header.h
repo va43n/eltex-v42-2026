@@ -19,7 +19,9 @@
 #define PIPE 10
 #define FIFO 11
 
-#define BUFFER 512
+#define BUFFER 64
+
+#define STOP_MESSAGE "STOPSTOPSTOPSTOPSTOPSTOPSTOP123123"
 
 // prepare.c
 int parse_input(int argc, char* argv[], char*** file_names, char*** pipe_names,
@@ -34,7 +36,3 @@ int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size);
 int find_out_what_channels_to_create(char** pipe_names, size_t size,
                                      size_t*** mask, size_t* pipes_size,
                                      size_t* fifos_size);
-
-// copy.c
-//
-//

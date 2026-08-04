@@ -18,7 +18,7 @@ manual_testing: $(OBJ)
 	./$(MANUAL_TEST_TARGET)
 
 format:
-	$(CLANG_FORMAT) -i *.h $(SRC) $(TEST_SRC) $(MANUAL_TEST_SRC)
+	$(CLANG_FORMAT) -i *.h $(SRC) $(MANUAL_TEST_SRC)
 
 check_styles:
 	cppcheck --enable=all --suppress=missingIncludeSystem .
