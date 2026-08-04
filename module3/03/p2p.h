@@ -1,17 +1,32 @@
+#include <errno.h>
+#include <fcntl.h>
+#include <mqueue.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define TRUE 1
 #define FALSE 0
 
+#define CREATOR 123
+#define USER -123
+
 #define SUCCESS 111
 #define FAILURE -111
 
-// int parse_input(int argc, char* argv[]);
-// int check_if_queue_is_created(char* queue_name);
-// int create_queue(char* queue_name);
+#define SIZE 256
 
+// prepare.c
+int parse_input(int argc, char *argv[], char **queue_name);
+int make_stdin_nonblocking();
 
-// int send_message(char* message);
-// int recv_message(char** message);
+// queue_handler.c
+int check_if_queue_is_created(char *queue_name, int *status);
+int create_queue(char *queue_name);
+int connect_to_queue(char *queue_name, int status, mqd_t *read, mqd_t *write);
+int start_handler(mqd_t read, mqd_t write);
+int send_message(mqd_t write);
+int recv_message(mqd_t read);
+int delete_queue(char *queue_name);
+void create_actual_queue_name(char *buffer, char *queue_name, char *addition);
