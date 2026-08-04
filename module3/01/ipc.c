@@ -74,6 +74,9 @@ int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size) {
         write(fd_out, "i'm ready", strlen("i'm ready") + 1);
         read(fd_in, read_buf, sizeof(read_buf));
         write(fd_out, "i'm ready", strlen("i'm ready") + 1);
+        size_t number_of_bytes;
+        read(fd_in, &number_of_bytes, sizeof(size_t));
+        write(fd_out, "i'm ready", strlen("i'm ready") + 1);
 
         char* new_file_name =
             (char*)malloc(sizeof(char) * (strlen(read_buf) + 6));
@@ -83,12 +86,12 @@ int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size) {
         int fd = open(new_file_name, O_WRONLY | O_CREAT | O_TRUNC,
                       S_IRUSR | S_IWUSR);
 
-        while (TRUE) {
-          ssize_t bytes_read = read(fd_in, read_buf, sizeof(read_buf));
-          if (strcmp(read_buf, STOP_MESSAGE) == 0) break;
-          // if (bytes_read < BUFFER) read_buf[bytes_read] = '\0';
-
-          write(fd, read_buf, bytes_read);
+        size_t bytes_read = 0;
+        while (bytes_read < number_of_bytes) {
+          size_t new_bytes = read(fd_in, read_buf, sizeof(read_buf)); 
+          bytes_read += new_bytes;
+          
+          write(fd, read_buf, new_bytes);
         }
         close(fd);
 
@@ -117,11 +120,15 @@ int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size) {
     read(fd_in, read_buf, sizeof(read_buf));
 
     int fd = open(file_names[i], O_RDONLY);
+    size_t number_of_bytes = (size_t)lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
+    write(fd_out, &number_of_bytes, sizeof(size_t));
+    read(fd_in, read_buf, sizeof(read_buf));
+
     ssize_t bytes_read;
     while ((bytes_read = read(fd, write_buf, BUFFER)) > 0) {
       write(fd_out, write_buf, bytes_read);
     }
-    write(fd_out, STOP_MESSAGE, strlen(STOP_MESSAGE) + 1);
     close(fd);
   }
 

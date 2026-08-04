@@ -21,8 +21,6 @@
 
 #define BUFFER 64
 
-#define STOP_MESSAGE "STOPSTOPSTOPSTOPSTOPSTOPSTOP123123"
-
 // prepare.c
 int parse_input(int argc, char* argv[], char*** file_names, char*** pipe_names,
                 size_t* size);
