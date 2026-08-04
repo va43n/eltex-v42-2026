@@ -1,0 +1,14 @@
+./man_test_exe prepare.c
+./man_test_exe test_files/empty.txt
+./man_test_exe -p 123 prepare.c
+./man_test_exe prepare.c main.c
+./man_test_exe -p 123 prepare.c -p 456 main.c
+./man_test_exe -p 1 prepare.c test_files/empty.txt -p 3 test_files/some_file main.c
+
+# Ошибки
+./man_test_exe # ERROR: PARSE_INPUT - there are no file names in input.
+./man_test_exe 12345 # ERROR: PARSE_INPUT - File '12345' doesn't exist.
+./man_test_exe -p # ERROR: PARSE_INPUT - after flag -p there should be at least 2 arguments: name of the FIFO and name of the file.
+./man_test_exe -p 123 # ERROR: PARSE_INPUT - after flag -p there should be at least 2 arguments: name of the FIFO and name of the file.
+./man_test_exe prepare.c prepare.c # ERROR: PARSE_INPUT - File names and FIFO names should be different from each other.
+./man_test_exe -p 123 prepare.c -p 123 main.c # ERROR: PARSE_INPUT - File names and FIFO names should be different from each other.

@@ -34,3 +34,7 @@ int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size);
 int find_out_what_channels_to_create(char** pipe_names, size_t size,
                                      size_t*** mask, size_t* pipes_size,
                                      size_t* fifos_size);
+int fill_pipes(char** pipe_names, size_t size, int*** pipes_pc, int*** pipes_cp, size_t pipes_size, char*** fifos_pc, char*** fifos_cp, size_t fifos_size);
+int do_parent_process(int fd_out, int fd_in, char* file_name);
+int do_child_process(int fd_out, int fd_in);
+
