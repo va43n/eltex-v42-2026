@@ -15,7 +15,6 @@ all: manual_testing
 
 manual_testing: $(OBJ)
 	@$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(OBJ) -o $(MANUAL_TEST_TARGET)
-	./$(MANUAL_TEST_TARGET)
 
 format:
 	$(CLANG_FORMAT) -i *.h $(SRC) $(MANUAL_TEST_SRC)
@@ -30,7 +29,8 @@ clean:
 	@rm -rf $(OBJ) \
 			$(MANUAL_TEST_TARGET) \
 			*.o \
-			*.copy
+			*.copy \
+			test_files/*.copy
 
 .PHONY: all \
 		manual_testing \

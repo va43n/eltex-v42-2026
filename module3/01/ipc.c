@@ -1,7 +1,6 @@
 #include "header.h"
 
 int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size) {
-  // int ppid = getpid();
   pid_t* pids = (pid_t*)malloc(sizeof(pid_t) * size);
   size_t pipes_size, fifos_size;
   size_t** mask;
@@ -56,7 +55,6 @@ int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size) {
         perror("fork");
         exit(EXIT_FAILURE);
       case 0:
-        // char write_buf[BUFFER];
         char read_buf[BUFFER];
         int fd_in, fd_out;
 
@@ -67,8 +65,8 @@ int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size) {
           fd_in = pipes_pc[mask[i][1]][0];
           fd_out = pipes_cp[mask[i][1]][1];
         } else {
-          fd_in = open(fifos_pc[i], O_RDONLY);
-          fd_out = open(fifos_cp[i], O_WRONLY);
+          fd_in = open(fifos_pc[mask[i][1]], O_RDONLY);
+          fd_out = open(fifos_cp[mask[i][1]], O_WRONLY);
         }
 
         write(fd_out, "i'm ready", strlen("i'm ready") + 1);
@@ -88,11 +86,13 @@ int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size) {
 
         size_t bytes_read = 0;
         while (bytes_read < number_of_bytes) {
-          size_t new_bytes = read(fd_in, read_buf, sizeof(read_buf)); 
+          size_t new_bytes = read(fd_in, read_buf, sizeof(read_buf));
           bytes_read += new_bytes;
-          
+
           write(fd, read_buf, new_bytes);
         }
+        close(fd_in);
+        close(fd_out);
         close(fd);
 
         _exit(EXIT_SUCCESS);
@@ -111,8 +111,8 @@ int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size) {
       fd_in = pipes_cp[mask[i][1]][0];
       fd_out = pipes_pc[mask[i][1]][1];
     } else {
-      fd_out = open(fifos_pc[i], O_WRONLY);
-      fd_in = open(fifos_cp[i], O_RDONLY);
+      fd_out = open(fifos_pc[mask[i][1]], O_WRONLY);
+      fd_in = open(fifos_cp[mask[i][1]], O_RDONLY);
     }
 
     read(fd_in, read_buf, sizeof(read_buf));
@@ -135,6 +135,28 @@ int copy_files_with_ipc(char** file_names, char** pipe_names, size_t size) {
   for (size_t i = 0; i < size; i++) {
     wait(&rv);
   }
+
+  for (size_t i = 0; i < pipes_size; i++) {
+    free(pipes_pc[i]);
+    free(pipes_cp[i]);
+  }
+  free(pipes_pc);
+  free(pipes_cp);
+
+  for (size_t i = 0; i < fifos_size; i++) {
+    unlink(fifos_pc[i]);
+    unlink(fifos_cp[i]);
+    free(fifos_pc[i]);
+    free(fifos_cp[i]);
+  }
+  free(fifos_pc);
+  free(fifos_cp);
+
+  free(pids);
+  for (size_t i = 0; i < size; i++) {
+    free(mask[i]);
+  }
+  free(mask);
 
   return SUCCESS;
 }
