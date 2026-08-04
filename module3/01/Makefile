@@ -30,7 +30,9 @@ clean:
 			$(MANUAL_TEST_TARGET) \
 			*.o \
 			*.copy \
-			test_files/*.copy
+			test_files/*.copy \
+			*_pc \
+			*_cp
 
 .PHONY: all \
 		manual_testing \
