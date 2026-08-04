@@ -1,10 +1,6 @@
 #include "header.h"
 
 int main(int argc, char* argv[]) {
-  //   for (int i = 0; i < argc; i++) {
-  //     printf("%s\n", argv[i]);
-  //   }
-
   char **file_names, **pipe_names;
   size_t size;
 
@@ -13,7 +9,7 @@ int main(int argc, char* argv[]) {
       printf("'%s': '%s'\n", file_names[i], pipe_names[i]);
     }
 
-    copy_files_with_ipc(size);
+    copy_files_with_ipc(file_names, pipe_names, size);
   }
 
   return 0;
