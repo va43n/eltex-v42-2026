@@ -74,13 +74,14 @@ int connect_to_queue(char *queue_name, int status, mqd_t *read, mqd_t *write) {
 int start_handler(mqd_t read, mqd_t write) {
   signal(SIGINT, handle_SIGINT);
 
-  fd_set rfds;
+  fd_set rfds, rfds_start;
   int maxfd = (read > STDIN_FILENO ? read : STDIN_FILENO) + 1;
+  FD_ZERO(&rfds);
+  FD_SET(STDIN_FILENO, &rfds_start);
+  FD_SET(read, &rfds_start);
 
   while (!is_signal) {
-    FD_ZERO(&rfds);
-    FD_SET(STDIN_FILENO, &rfds);
-    FD_SET(read, &rfds);
+    rfds = rfds_start;
 
     int ret = select(maxfd, &rfds, NULL, NULL, NULL);
     if (ret == -1) {
@@ -117,6 +118,10 @@ int recv_message(mqd_t read) {
 
   ssize_t bytes = mq_receive(read, buffer, SIZE, &priority);
   if (bytes == -1) {
+    if (errno == EINTR) {
+      is_signal = 1;
+      return FAILURE;
+    }
     fprintf(stderr, "ERROR: RECV_MESSAGE - some error occured.\n");
     perror("cannot receive");
     return FAILURE;
@@ -137,6 +142,10 @@ int get_message_and_send(mqd_t write) {
   char buffer[SIZE];
 
   if (fgets(buffer, SIZE, stdin) == NULL) {
+    if (errno == EINTR) {
+      is_signal = 1;
+      return FAILURE;
+    }
     fprintf(stderr, "ERROR: get_message_and_send - sent message is empty.\n");
     return FAILURE;
   }
@@ -149,6 +158,10 @@ int get_message_and_send(mqd_t write) {
 
 int send_message(mqd_t write, char *buffer, unsigned int priority) {
   if (mq_send(write, buffer, strlen(buffer) + 1, priority) == -1) {
+    if (errno == EINTR) {
+      is_signal = 1;
+      return FAILURE;
+    }
     fprintf(stderr, "ERROR: send_message - some error occured.\n");
     perror("Sending message error");
     return FAILURE;
