@@ -2,7 +2,12 @@ CC = gcc
 CLANG_FORMAT = clang-format
 CFLAGS = -Wall -Wextra -Werror -std=gnu11
 
-SRC = parser.c publisher.c broker.c subscriber.c
+SRC = parser.c \
+      general_ipc_functions.c \
+			publisher.c \
+			broker.c \
+			subscriber.c \
+			participant_array_logic.c
 OBJ = $(SRC:.c=.o)
 
 MANUAL_TEST_SRC = main.c
