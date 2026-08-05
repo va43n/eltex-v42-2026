@@ -89,25 +89,23 @@ int start_handler(mqd_t read, mqd_t write) {
         is_signal = 1;
         continue;
       }
-      fprintf(stderr, "ERROR: start_handler - some error occured while trying "
-                      "to wait for some user activity.\n");
+      fprintf(stderr,
+              "ERROR: start_handler - some error occured while trying "
+              "to wait for some user activity.\n");
       perror("select");
       break;
     }
 
     if (FD_ISSET(STDIN_FILENO, &rfds)) {
-      if (get_message_and_send(write) == FAILURE)
-        break;
+      if (get_message_and_send(write) == FAILURE) break;
     }
 
     if (FD_ISSET(read, &rfds)) {
-      if (recv_message(read) == FAILURE)
-        break;
+      if (recv_message(read) == FAILURE) break;
     }
   }
 
-  if (is_signal)
-    send_message(write, "exit", SIGINT);
+  if (is_signal) send_message(write, "exit", SIGINT);
 
   return SUCCESS;
 }
@@ -150,8 +148,7 @@ int get_message_and_send(mqd_t write) {
     return FAILURE;
   }
 
-  if (send_message(write, buffer, 0) == FAILURE)
-    return FAILURE;
+  if (send_message(write, buffer, 0) == FAILURE) return FAILURE;
 
   return SUCCESS;
 }
