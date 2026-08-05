@@ -2,7 +2,7 @@ CC = gcc
 CLANG_FORMAT = clang-format
 CFLAGS = -Wall -Wextra -Werror -std=gnu11
 
-SRC = prepare.c queue_handler.c
+SRC = prepare.c queue_handler.c signal_handler.c
 OBJ = $(SRC:.c=.o)
 
 MANUAL_TEST_SRC = main.c
@@ -14,7 +14,7 @@ all: manual_testing
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 manual_testing: $(OBJ)
-	@$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(OBJ) -o $(MANUAL_TEST_TARGET)
+	@$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(OBJ) -o $(MANUAL_TEST_TARGET) -lrt
 
 format:
 	$(CLANG_FORMAT) -i *.h $(SRC) $(MANUAL_TEST_SRC)
