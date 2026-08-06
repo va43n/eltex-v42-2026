@@ -38,8 +38,10 @@ int get_message_and_send(int write, message *my_msg,
   buffer[len - 1] = '\0';
 
   number_of_inputs++;
-  if (number_of_inputs == 1)
+  if (number_of_inputs == 1) {
+    buffer[TOPIC_SIZE - 1] = '\0';
     strcpy(my_msg->topic, buffer);
+  }
   else if (number_of_inputs == 2)
     strcpy(my_msg->payload, buffer);
 

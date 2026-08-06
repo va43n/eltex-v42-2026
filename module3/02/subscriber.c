@@ -22,6 +22,10 @@ int do_subscriber_activity() {
   set_some_message_parameters(&my_msg, MT_SUBSCRIBER, getpid(), 1);
   set_some_message_parameters(&recv_msg, MT_SUBSCRIBER, getpid(), getpid());
 
+  printf(
+      "To send message:\n\t1) enter the topic\n\t2) press 'Enter'\n\t3) enter "
+      "the type of message: '%s' to subscribe, '%s' to unsubscribe\n\t4) press "
+      "'Enter' again\n", SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT);
   pid_t pid = fork();
   if (pid < 0) {
     fprintf(stderr,
@@ -31,6 +35,7 @@ int do_subscriber_activity() {
   if (pid == 0) {
     char buffer[PAYLOAD_SIZE];
     while (!is_signal) {
+      printf("> ");
       if (scanf(buffer, "%s") == EOF) {
         if (errno == EINTR) {
           printf("ended in scanf\n");
@@ -48,8 +53,11 @@ int do_subscriber_activity() {
   } else {
     while (!is_signal) {
       if (recv_message(msgid, &recv_msg) == FAILURE) break;
-      printf("Some publisher wrote a message on one of your desired topics:");
-      printf("TOPIC: '%s'\nPAYLOAD:\n%s\n\n", recv_msg.topic, recv_msg.payload);
+      printf(
+          "-------\nSome publisher wrote a message on one of your desired "
+          "topics:\n");
+      printf("TOPIC: '%s'\nPAYLOAD:\n%s\n-------\n\n", recv_msg.topic,
+             recv_msg.payload);
     }
     kill(pid, SIGKILL);
   }

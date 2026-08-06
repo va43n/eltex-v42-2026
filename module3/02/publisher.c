@@ -26,7 +26,9 @@ int do_publisher_activity() {
   FD_ZERO(&rfds);
   FD_SET(STDIN_FILENO, &rfds_start);
 
-  printf("To send message:\n\t1) enter the topic\n\t2) press 'Enter'\n\t3) enter the payload\n\t4) press 'Enter' again\n");
+  printf(
+      "To send message:\n\t1) enter the topic\n\t2) press 'Enter'\n\t3) enter "
+      "the payload\n\t4) press 'Enter' again\n");
   while (!is_signal) {
     printf("> ");
     rfds = rfds_start;

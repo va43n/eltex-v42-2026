@@ -49,7 +49,8 @@ int do_broker_activity() {
         is_signal = TRUE;
         continue;
       }
-    } else if (recv_msg.message_type == MT_SUBSCRIBER && strcmp(recv_msg.payload, SUBSCRIBE_TEXT) == 0) {
+    } else if (recv_msg.message_type == MT_SUBSCRIBER &&
+               strcmp(recv_msg.payload, SUBSCRIBE_TEXT) == 0) {
       size_t index;
       if (participant_find_by_pid(subscribers, subs_n, recv_msg.pid, &index) ==
           FAILURE) {
@@ -64,7 +65,8 @@ int do_broker_activity() {
         printf("...Subscriber №%ld subscribed to a new theme...\n", index);
         participant_print(subscribers, subs_n, SUBSCRIBER_NAME);
       }
-    } else if (recv_msg.message_type == MT_SUBSCRIBER && strcmp(recv_msg.payload, UNSUBSCRIBE_TEXT) == 0) {
+    } else if (recv_msg.message_type == MT_SUBSCRIBER &&
+               strcmp(recv_msg.payload, UNSUBSCRIBE_TEXT) == 0) {
       size_t index;
       if (participant_find_by_pid(subscribers, subs_n, recv_msg.pid, &index) ==
           SUCCESS) {
@@ -106,15 +108,3 @@ int broker_send_message_to_all_subscribers(int write, message my_msg,
 
   return SUCCESS;
 }
-
-// int broker_handle_publisher_message() {
-
-// }
-
-// int broker_handle_subscribe_message() {
-
-// }
-
-// int broker_handle_unsubscribe_message() {
-  
-// }
