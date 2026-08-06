@@ -33,6 +33,10 @@ int get_message_and_send(int write, message *my_msg,
     return FAILURE;
   }
 
+  size_t len = strlen(buffer);
+  if (len <= 1) return SUCCESS;
+  buffer[len - 1] = '\0';
+
   number_of_inputs++;
   if (number_of_inputs == 1)
     strcpy(my_msg->topic, buffer);

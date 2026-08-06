@@ -19,7 +19,8 @@ int do_subscriber_activity() {
   }
 
   message my_msg, recv_msg;
-  set_some_message_parameters(&my_msg, MT_SUBSCRIBE, getpid(), 1);
+  set_some_message_parameters(&my_msg, MT_SUBSCRIBER, getpid(), 1);
+  set_some_message_parameters(&recv_msg, MT_SUBSCRIBER, getpid(), getpid());
 
   pid_t pid = fork();
   if (pid < 0) {
@@ -43,15 +44,12 @@ int do_subscriber_activity() {
         }
       }
       if (get_message_and_send(msgid, &my_msg, 2) == FAILURE) break;
-      if (strcmp(my_msg.payload, SUBSCRIBE_TEXT) == 0)
-        my_msg.message_type = MT_SUBSCRIBE;
-      else if (strcmp(my_msg.payload, UNSUBSCRIBE_TEXT) == 0)
-        my_msg.message_type = MT_UNSUBSCRIBE;
     }
   } else {
     while (!is_signal) {
       if (recv_message(msgid, &recv_msg) == FAILURE) break;
-      printf("TOPIC: %s\nPAYLOAD: %s\n\n", recv_msg.topic, recv_msg.payload);
+      printf("Some publisher wrote a message on one of your desired topics:");
+      printf("TOPIC: '%s'\nPAYLOAD:\n%s\n\n", recv_msg.topic, recv_msg.payload);
     }
     kill(pid, SIGKILL);
   }

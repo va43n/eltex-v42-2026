@@ -23,26 +23,25 @@ int do_broker_activity() {
   size_t subs_n = 0, pubs_n = 0;
 
   message recv_msg;
-  set_some_message_parameters(&recv_msg, MT_SEND, getpid(), 1);
+  set_some_message_parameters(&recv_msg, MT_PUBLISHER, getpid(), 1);
 
   while (!is_signal) {
     if (recv_message(msgid, &recv_msg) == FAILURE) {
       is_signal = TRUE;
       continue;
     }
-    printf("got message ");
-    if (recv_msg.message_type == MT_SEND) {
+    if (recv_msg.message_type == MT_PUBLISHER) {
       size_t index;
       if (participant_find_by_pid(publishers, pubs_n, recv_msg.pid, &index) ==
           FAILURE) {
         participant_push_back(&publishers, &pubs_n, recv_msg.pid,
                               recv_msg.topic, recv_msg.payload);
-        printf("New publisher added...\n");
+        printf("...New publisher added...\n");
         participant_print(publishers, pubs_n, PUBLISHER_NAME);
       } else {
         participant_add_message_by_index(&publishers, index, recv_msg.topic,
                                          recv_msg.payload);
-        printf("Publisher №%ld created new theme...\n", index);
+        printf("...Publisher №%ld created new theme...\n", index);
         participant_print(publishers, pubs_n, PUBLISHER_NAME);
       }
       if (broker_send_message_to_all_subscribers(msgid, recv_msg, subscribers,
@@ -50,27 +49,27 @@ int do_broker_activity() {
         is_signal = TRUE;
         continue;
       }
-    } else if (recv_msg.message_type == MT_SUBSCRIBE) {
+    } else if (recv_msg.message_type == MT_SUBSCRIBER && strcmp(recv_msg.payload, SUBSCRIBE_TEXT) == 0) {
       size_t index;
       if (participant_find_by_pid(subscribers, subs_n, recv_msg.pid, &index) ==
           FAILURE) {
         participant_push_back(&subscribers, &subs_n, recv_msg.pid,
                               recv_msg.topic, recv_msg.payload);
-        printf("New subscriber added...\n");
+        printf("...New subscriber added...\n");
         participant_print(subscribers, subs_n, SUBSCRIBER_NAME);
       } else if (participant_check_if_topic_exists(subscribers, index,
                                                    recv_msg.topic) == FALSE) {
         participant_add_message_by_index(&subscribers, index, recv_msg.topic,
                                          recv_msg.payload);
-        printf("Subscriber №%ld subscribed to a new theme...\n", index);
+        printf("...Subscriber №%ld subscribed to a new theme...\n", index);
         participant_print(subscribers, subs_n, SUBSCRIBER_NAME);
       }
-    } else if (recv_msg.message_type == MT_UNSUBSCRIBE) {
+    } else if (recv_msg.message_type == MT_SUBSCRIBER && strcmp(recv_msg.payload, UNSUBSCRIBE_TEXT) == 0) {
       size_t index;
       if (participant_find_by_pid(subscribers, subs_n, recv_msg.pid, &index) ==
           SUCCESS) {
         participant_remove_topic_by_index(&subscribers, index, recv_msg.topic);
-        printf("Subscriber №%ld unsubscribed from some theme...\n", index);
+        printf("...Subscriber №%ld unsubscribed from some theme...\n", index);
         participant_print(subscribers, subs_n, SUBSCRIBER_NAME);
       }
     }
@@ -90,7 +89,7 @@ int broker_send_message_to_all_subscribers(int write, message my_msg,
                                            participant* subscribers,
                                            size_t subs_t) {
   message broker_message;
-  broker_message.message_type = MT_SEND;
+  broker_message.message_type = MT_PUBLISHER;
   broker_message.pid = my_msg.pid;
   strcpy(broker_message.topic, my_msg.topic);
   strcpy(broker_message.payload, my_msg.payload);
@@ -107,3 +106,15 @@ int broker_send_message_to_all_subscribers(int write, message my_msg,
 
   return SUCCESS;
 }
+
+// int broker_handle_publisher_message() {
+
+// }
+
+// int broker_handle_subscribe_message() {
+
+// }
+
+// int broker_handle_unsubscribe_message() {
+  
+// }

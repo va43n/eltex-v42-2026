@@ -37,11 +37,10 @@ typedef struct {
   char payload[PAYLOAD_SIZE];
 } message;
 
-#define MT_SEND 10
-#define MT_SUBSCRIBE 11
-#define SUBSCRIBE_TEXT "subscribe"
-#define MT_UNSUBSCRIBE 12
-#define UNSUBSCRIBE_TEXT "unsubscribe"
+#define MT_PUBLISHER 10
+#define MT_SUBSCRIBER 11
+#define SUBSCRIBE_TEXT "sub"
+#define UNSUBSCRIBE_TEXT "unsub"
 
 static volatile int is_signal = FALSE;
 

@@ -18,17 +18,17 @@ int do_publisher_activity() {
     return FAILURE;
   }
 
-  // msgctl(msgid, IPC_RMID, NULL);
-
   message my_msg;
-  set_some_message_parameters(&my_msg, MT_SEND, getpid(), 1);
+  set_some_message_parameters(&my_msg, MT_PUBLISHER, getpid(), 1);
 
   fd_set rfds, rfds_start;
   int maxfd = STDIN_FILENO + 1;
   FD_ZERO(&rfds);
   FD_SET(STDIN_FILENO, &rfds_start);
 
+  printf("To send message:\n\t1) enter the topic\n\t2) press 'Enter'\n\t3) enter the payload\n\t4) press 'Enter' again\n");
   while (!is_signal) {
+    printf("> ");
     rfds = rfds_start;
 
     int ret = select(maxfd, &rfds, NULL, NULL, NULL);
