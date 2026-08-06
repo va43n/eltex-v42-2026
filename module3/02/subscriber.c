@@ -11,8 +11,9 @@ int do_subscriber_activity() {
   }
   int msgid = msgget(key, 0666 | IPC_CREAT);
   if (msgid == -1) {
-    fprintf(stderr, "ERROR: DO_SUBSCRIBER_ACTIVITY - some error occured while "
-                    "working with queue.\n");
+    fprintf(stderr,
+            "ERROR: DO_SUBSCRIBER_ACTIVITY - some error occured while "
+            "working with queue.\n");
     perror("msgget");
     return FAILURE;
   }
@@ -35,26 +36,27 @@ int do_subscriber_activity() {
         is_signal = 1;
         continue;
       }
-      fprintf(stderr, "ERROR: DO_SUBSCRIBER_ACTIVITY - some error occured while trying "
-                      "to wait for some user activity.\n");
+      fprintf(stderr,
+              "ERROR: DO_SUBSCRIBER_ACTIVITY - some error occured while trying "
+              "to wait for some user activity.\n");
       perror("select");
       break;
     }
 
     if (FD_ISSET(STDIN_FILENO, &rfds)) {
-      if (get_message_and_send(msgid, &my_msg, 2) == FAILURE)
-        break;
+      if (get_message_and_send(msgid, &my_msg, 2) == FAILURE) break;
       if (strcmp(my_msg.payload, SUBSCRIBE_TEXT) == 0)
         my_msg.message_type = MT_SUBSCRIBE;
       else if (strcmp(my_msg.payload, UNSUBSCRIBE_TEXT) == 0)
         my_msg.message_type = MT_UNSUBSCRIBE;
-      else break;
+      else
+        break;
     }
 
     if (FD_ISSET(msgid, &rfds)) {
-      if (recv_message(msgid, &recv_msg) == FAILURE)
-        break;
-      printf("TOPIC: '%s'\nPAYLOAD: '%s'\n\n", recv_msg.topic, recv_msg.payload);
+      if (recv_message(msgid, &recv_msg) == FAILURE) break;
+      printf("TOPIC: '%s'\nPAYLOAD: '%s'\n\n", recv_msg.topic,
+             recv_msg.payload);
       fflush(stdout);
     }
   }

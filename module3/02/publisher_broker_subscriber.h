@@ -12,8 +12,11 @@
 #define FALSE 0
 
 #define PUBLISHER 'p'
+#define PUBLISHER_NAME "Publisher"
 #define BROKER 'b'
+#define BROKER_NAME "Broker"
 #define SUBSCRIBER 's'
+#define SUBSCRIBER_NAME "Subscriber"
 
 #define SUCCESS 111
 #define FAILURE -111
@@ -41,15 +44,15 @@ typedef struct {
 static volatile int is_signal = FALSE;
 
 // parser.c
-int parse_input(int argc, char *argv[], char *mode);
-int parse_flag(char *flag, char *mode);
+int parse_input(int argc, char* argv[], char* mode);
+int parse_flag(char* flag, char* mode);
 int start_corresponding_mode(char mode);
 
 // general_ipc_functions.c
 int check_if_queue_is_created(key_t key);
-int set_some_message_parameters(message *my_msg, int message_type, int pid,
+int set_some_message_parameters(message* my_msg, int message_type, int pid,
                                 long priority);
-int get_message_and_send(int write, message *my_msg,
+int get_message_and_send(int write, message* my_msg,
                          unsigned int number_of_inputs_needed);
 int send_message(int write, message my_msg);
 int recv_message(int write, message* my_msg);
@@ -61,19 +64,27 @@ typedef struct {
   size_t size;
   int pid;
 } participant;
-int participant_push_back(participant** ps, size_t* size, int pid, char* topic, char* payload);
-int participant_add_message_by_index(participant** ps, size_t size, size_t index, char* topic, char* payload);
-int participant_find_by_pid(participant* ps, size_t size, int pid, size_t* index);
-int participant_remove_topic_by_index(participant** ps, size_t* size, size_t index, char* topic);
-int participant_check_if_topic_exists(participant* ps, size_t size, size_t index, char* topic);
+int participant_push_back(participant** ps, size_t* size, int pid, char* topic,
+                          char* payload);
+int participant_add_message_by_index(participant** ps, size_t index,
+                                     char* topic, char* payload);
+int participant_find_by_pid(participant* ps, size_t size, int pid,
+                            size_t* index);
+int participant_remove_topic_by_index(participant** ps, size_t index,
+                                      char* topic);
+int participant_check_if_topic_exists(participant* ps, size_t index,
+                                      char* topic);
 int participant_free(participant* ps, size_t size);
+int participant_print(participant* ps, size_t size, char* participant_type);
 
 // publisher.c
 int do_publisher_activity();
 
 // broker.c
 int do_broker_activity();
-int broker_send_message_to_all_subscribers(int write, message my_msg, participant* subscribers, size_t subs_t);
+int broker_send_message_to_all_subscribers(int write, message my_msg,
+                                           participant* subscribers,
+                                           size_t subs_t);
 
 // subscriber.c
 int do_subscriber_activity();

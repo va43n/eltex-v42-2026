@@ -2,8 +2,9 @@
 
 int parse_input(int argc, char *argv[], char *mode) {
   if (argc != 2) {
-    fprintf(stderr, "ERROR: PARSE_INPUT - there should be exactly 1 argument "
-                    "in the input - flag.\n");
+    fprintf(stderr,
+            "ERROR: PARSE_INPUT - there should be exactly 1 argument "
+            "in the input - flag.\n");
     return FAILURE;
   }
 
@@ -12,8 +13,9 @@ int parse_input(int argc, char *argv[], char *mode) {
 
 int parse_flag(char *flag, char *mode) {
   if (strlen(flag) != 2) {
-    fprintf(stderr, "ERROR: PARSE_FLAG - the length of the flag should be 2: "
-                    "the first symbol is '-', the second - an identifier.\n");
+    fprintf(stderr,
+            "ERROR: PARSE_FLAG - the length of the flag should be 2: "
+            "the first symbol is '-', the second - an identifier.\n");
     return FAILURE;
   }
 
@@ -25,9 +27,10 @@ int parse_flag(char *flag, char *mode) {
   }
 
   if (flag[1] != PUBLISHER && flag[1] != BROKER && flag[1] != SUBSCRIBER) {
-    fprintf(stderr, "ERROR: PARSE_FLAG - the second symbol of the flag should "
-                    "be an identifier:\n\t'p' - publisher;\n\t'b' - "
-                    "broker;\n\t's' - subscriber.\n");
+    fprintf(stderr,
+            "ERROR: PARSE_FLAG - the second symbol of the flag should "
+            "be an identifier:\n\t'p' - publisher;\n\t'b' - "
+            "broker;\n\t's' - subscriber.\n");
     return FAILURE;
   }
 

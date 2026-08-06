@@ -4,8 +4,7 @@ int check_if_queue_is_created(key_t key) {
   int msgid = msgget(key, 0);
 
   if (msgid == -1) {
-    if (errno == ENOENT)
-      return FALSE;
+    if (errno == ENOENT) return FALSE;
   }
 
   return TRUE;
@@ -14,7 +13,7 @@ int check_if_queue_is_created(key_t key) {
 int set_some_message_parameters(message *my_msg, int message_type, int pid,
                                 long priority) {
   my_msg->mtype = priority;
-  my_msg->message_type;
+  my_msg->message_type = message_type;
   my_msg->pid = pid;
 
   return SUCCESS;
@@ -22,7 +21,7 @@ int set_some_message_parameters(message *my_msg, int message_type, int pid,
 
 int get_message_and_send(int write, message *my_msg,
                          unsigned int number_of_inputs_needed) {
-  static int number_of_inputs = 0;
+  static unsigned int number_of_inputs = 0;
   char buffer[PAYLOAD_SIZE];
 
   if (fgets(buffer, PAYLOAD_SIZE, stdin) == NULL) {
@@ -46,8 +45,7 @@ int get_message_and_send(int write, message *my_msg,
 
   if (number_of_inputs >= number_of_inputs_needed) {
     number_of_inputs = 0;
-    if (send_message(write, *my_msg) == FAILURE)
-      return FAILURE;
+    if (send_message(write, *my_msg) == FAILURE) return FAILURE;
   }
 
   return SUCCESS;
@@ -67,7 +65,7 @@ int send_message(int write, message my_msg) {
   return SUCCESS;
 }
 
-int recv_message(int write, message* my_msg) {
+int recv_message(int write, message *my_msg) {
   size_t buf_size = sizeof(message) - sizeof(long);
   if (msgrcv(write, &my_msg, buf_size, my_msg->mtype, 0) == -1) {
     if (errno == EINTR) {
