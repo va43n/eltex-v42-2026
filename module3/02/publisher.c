@@ -18,6 +18,8 @@ int do_publisher_activity() {
     return FAILURE;
   }
 
+  // msgctl(msgid, IPC_RMID, NULL);
+
   message my_msg;
   set_some_message_parameters(&my_msg, MT_SEND, getpid(), 1);
 

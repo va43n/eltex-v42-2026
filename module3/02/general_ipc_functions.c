@@ -34,18 +34,15 @@ int get_message_and_send(int write, message *my_msg,
   }
 
   number_of_inputs++;
-  if (number_of_inputs == 1) {
-    if (number_of_inputs_needed == 1)
-      strcpy(my_msg->payload, buffer);
-    else
-      strcpy(my_msg->topic, buffer);
-  } else if (number_of_inputs == 2) {
+  if (number_of_inputs == 1)
+    strcpy(my_msg->topic, buffer);
+  else if (number_of_inputs == 2)
     strcpy(my_msg->payload, buffer);
-  }
 
   if (number_of_inputs >= number_of_inputs_needed) {
     number_of_inputs = 0;
     if (send_message(write, *my_msg) == FAILURE) return FAILURE;
+    printf("...message is sent...\n");
   }
 
   return SUCCESS;
@@ -67,7 +64,7 @@ int send_message(int write, message my_msg) {
 
 int recv_message(int write, message *my_msg) {
   size_t buf_size = sizeof(message) - sizeof(long);
-  if (msgrcv(write, &my_msg, buf_size, my_msg->mtype, 0) == -1) {
+  if (msgrcv(write, my_msg, buf_size, my_msg->mtype, 0) == -1) {
     if (errno == EINTR) {
       is_signal = 1;
       return FAILURE;

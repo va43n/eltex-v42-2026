@@ -23,12 +23,14 @@ int do_broker_activity() {
   size_t subs_n = 0, pubs_n = 0;
 
   message recv_msg;
+  set_some_message_parameters(&recv_msg, MT_SEND, getpid(), 1);
 
   while (!is_signal) {
     if (recv_message(msgid, &recv_msg) == FAILURE) {
       is_signal = TRUE;
       continue;
     }
+    printf("got message ");
     if (recv_msg.message_type == MT_SEND) {
       size_t index;
       if (participant_find_by_pid(publishers, pubs_n, recv_msg.pid, &index) ==
@@ -73,6 +75,9 @@ int do_broker_activity() {
       }
     }
   }
+
+  participant_send_signal_to_all_participants(subscribers, subs_n, SIGINT);
+  participant_send_signal_to_all_participants(publishers, pubs_n, SIGINT);
   participant_free(subscribers, subs_n);
   participant_free(publishers, pubs_n);
 

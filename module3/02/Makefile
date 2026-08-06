@@ -7,7 +7,8 @@ SRC = parser.c \
 			publisher.c \
 			broker.c \
 			subscriber.c \
-			participant_array_logic.c
+			participant_array_logic.c \
+			signal_handler.c
 OBJ = $(SRC:.c=.o)
 
 MANUAL_TEST_SRC = main.c

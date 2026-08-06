@@ -1,11 +1,13 @@
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/select.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #define TRUE 1
@@ -76,6 +78,8 @@ int participant_check_if_topic_exists(participant* ps, size_t index,
                                       char* topic);
 int participant_free(participant* ps, size_t size);
 int participant_print(participant* ps, size_t size, char* participant_type);
+int participant_send_signal_to_all_participants(participant* ps, size_t size,
+                                                int signal);
 
 // publisher.c
 int do_publisher_activity();
@@ -88,3 +92,6 @@ int broker_send_message_to_all_subscribers(int write, message my_msg,
 
 // subscriber.c
 int do_subscriber_activity();
+
+// signal_handler.c
+void handle_SIGINT(int sig);

@@ -40,6 +40,7 @@ int parse_flag(char *flag, char *mode) {
 }
 
 int start_corresponding_mode(char mode) {
+  signal(SIGINT, handle_SIGINT);
   if (mode == PUBLISHER) {
     return do_publisher_activity();
   } else if (mode == BROKER) {
