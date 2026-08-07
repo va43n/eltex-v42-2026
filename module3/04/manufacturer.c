@@ -26,7 +26,6 @@ int do_manufacturer_activity() {
     for (int i = 0; i < MANUFACTURER_CHUNKS && !is_full; i++) {
       my_item = generate_item();
       if (shared_memory_write(key, my_item) == FAILURE) {
-        printf("...The memory is full...\n");
         is_full = TRUE;
       }
     }
