@@ -1,7 +1,7 @@
 #include "factory.h"
 
 #define MANUFACTURER_SLEEP_TIME 3
-#define MANUFACTURER_CHUNKS 10
+#define MANUFACTURER_CHUNK_SIZE 10
 
 int do_manufacturer_activity() {
   printf("I'm a manufacturer\n");
@@ -18,47 +18,44 @@ int do_manufacturer_activity() {
   shm_key key;
   if (shared_memory_create(&key) == FAILURE) return FAILURE;
 
-  item my_item;
-
   int is_full = FALSE;
-  int is_everything_processed = FALSE;
-  while (!is_signal) {
-    for (int i = 0; i < MANUFACTURER_CHUNKS && !is_full; i++) {
-      my_item = generate_item();
-      if (shared_memory_write(key, my_item, manufacturer_fill_item) ==
-          FAILURE) {
+  while (is_signal == FALSE) {
+    if (is_full == FALSE) printf("> Starting to create another chunk...\n");
+    for (int i = 0; i < MANUFACTURER_CHUNK_SIZE && is_full == FALSE; i++) {
+      if (shared_memory_write(key, manufacturer_fill_item) == FAILURE) {
+        printf("\t%d new items are added.\n", i + 1);
+        printf("> All of the items are created...\n");
         is_full = TRUE;
       }
     }
+    if (is_full == FALSE)
+      printf("\t%d new items are added.\n", MANUFACTURER_CHUNK_SIZE);
 
     if (is_full) {
-      item* read_item = NULL;
-      do {
-        if (shared_memory_read(key, read_item) == FAILURE) return FAILURE;
-        if (read_item != NULL &&
-            check_if_item_is_processed(read_item) == FALSE) {
-          is_everything_processed = TRUE;
-          break;
-        }
-      } while (read_item != NULL);
-
-      if (is_everything_processed) {
-        printf("...All of the items have been processed...\n");
+      printf("> Checking if there any item that is not processed...\n");
+      if (!shared_memory_is_all_processed(key)) {
+        printf("\tThere is still an item that is not processed yet.\n");
+      } else {
+        printf("> Everything is processed - stopping...\n");
         break;
       }
     }
 
-    sleep(MANUFACTURER_SLEEP_TIME);
+    unsigned int sec = sleep(MANUFACTURER_SLEEP_TIME);
+    if (sec > 0) is_signal = TRUE;
   }
+
+  if (shared_memory_delete(key) == FAILURE) return FAILURE;
 
   return SUCCESS;
 }
 
-int manufacturer_fill_item(item* my_item, unsigned int index) {
+int manufacturer_fill_item(item* my_item) {
   for (int i = 0; i < ARRAY_SIZE; i++) {
     my_item->array[i] = rand();
   }
-  my_item->next = (index + 1) % SHARED_MEMORY_SIZE;
+  my_item->size = ARRAY_SIZE;
+  my_item->next = 0;
 
   return SUCCESS;
 }

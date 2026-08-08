@@ -1,3 +1,6 @@
+#ifndef ITEM_H
+#define ITEM_H
+
 #define TRUE 1
 #define FALSE 0
 
@@ -11,4 +14,5 @@ typedef struct {
 } item;
 
 int check_if_item_is_processed(item* my_item);
-item generate_item();
+
+#endif

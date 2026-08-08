@@ -1,6 +1,6 @@
 #include "factory.h"
 
-#define CONSUMER_SLEEP_TIME 1
+#define CONSUMER_SLEEP_TIME 2
 
 int do_consumer_activity() {
   printf("I'm a consumer\n");
@@ -14,24 +14,17 @@ int do_consumer_activity() {
   shm_key key;
   if (shared_memory_connect(&key) == FAILURE) return FAILURE;
 
-  item *my_item = NULL;
-  int is_item_found = FALSE;
-  while (!is_signal) {
-    do {
-      if (shared_memory_read(key, my_item) == FAILURE) return FAILURE;
-      if (my_item != NULL && check_if_item_is_processed(my_item) == FALSE) {
-        is_item_found = TRUE;
-        break;
-      }
-    } while (my_item != NULL);
-    if (is_item_found == FALSE) {
-      printf("All of the items are already processed...\n");
+  while (is_signal == FALSE) {
+    printf("> Looking for item that is not processed yet...\n");
+    int result = shared_memory_get_and_process(key, consumer_process_item);
+    if (result == SUCCESS) {
+      printf("> Item was found and processed...\n");
+    } else {
+      printf("> Everything is processed - stopping...\n");
       break;
     }
-    if (shared_memory_process(key, my_item, consumer_process_item) == FAILURE)
-      return FAILURE;
-    is_item_found = FALSE;
-    sleep(CONSUMER_SLEEP_TIME);
+    unsigned int sec = sleep(CONSUMER_SLEEP_TIME);
+    if (sec > 0) is_signal = TRUE;
   }
 
   return SUCCESS;
@@ -47,7 +40,7 @@ int consumer_process_item(item *my_item) {
   }
 
   (*my_item).size = 0;
-  printf("New item processed:\n\tmax = %d\n\tmin = %d\n\n", max, min);
+  printf("\tNew item processed:\n\tmax = %d\n\tmin = %d\n\n", max, min);
 
   return SUCCESS;
 }

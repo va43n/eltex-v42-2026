@@ -1,3 +1,6 @@
+#ifndef SHARED_MEMORY_OPERATIONS_H
+#define SHARED_MEMORY_OPERATIONS_H
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,8 +43,9 @@ typedef struct {
 int shared_memory_check_if_created();
 int shared_memory_create(shm_key* key);
 int shared_memory_connect(shm_key* key);
-int shared_memory_write(shm_key key, item my_item,
-                        int (*func)(item*, unsigned int));
-int shared_memory_read(shm_key key, item* my_item);
-int shared_memory_process(shm_key key, item* my_item, int (*func)(item*));
+int shared_memory_write(shm_key key, int (*func)(item*));
+int shared_memory_get_and_process(shm_key key, int (*func)(item*));
+int shared_memory_is_all_processed(shm_key key);
 int shared_memory_delete(shm_key key);
+
+#endif

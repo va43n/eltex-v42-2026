@@ -2,13 +2,6 @@
 
 int shared_memory_check_if_created() {
   key_t key = ftok(PATHNAME, PROJ_ID);
-  if (key == -1) {
-    fprintf(stderr,
-            "ERROR: shared_memory_check_if_created - something went wrong "
-            "while trying to check if the shared memory is created.\n");
-    perror("ftok");
-    return FAILURE;
-  }
 
   if (shmget(key, sizeof(item) * SHARED_MEMORY_SIZE, 0666) == -1 &&
       errno == ENOENT)
@@ -32,7 +25,7 @@ int shared_memory_create(shm_key* key) {
   key->shmid = shmid;
   printf("Shared memory shmid is: %d\n", shmid);
 
-  int semid = semget(key, 1, 0666 | IPC_CREAT);
+  int semid = semget(key->key, 1, 0666 | IPC_CREAT);
   if (semid == -1) {
     fprintf(stderr,
             "ERROR: shared_memory_create - something went wrong while trying "
@@ -41,7 +34,8 @@ int shared_memory_create(shm_key* key) {
     return FAILURE;
   }
   key->semid = semid;
-  printf("Semaphore semid is: %d\n", shmid);
+  printf("Semaphore semid is: %d\n", semid);
+
   union semun arg;
   arg.val = 0;
   semctl(key->semid, 0, SETVAL, arg);
@@ -54,8 +48,11 @@ int shared_memory_create(shm_key* key) {
     perror("shmat");
     return FAILURE;
   }
-  for (int i = 0; i < SHARED_MEMORY_SIZE; i++) {
-    head[0].next = NULL_ITEM;
+  head[0].next = 0;
+  head[0].size = 0;
+  for (int i = 1; i < SHARED_MEMORY_SIZE; i++) {
+    head[i].next = NULL_ITEM;
+    head[i].size = 0;
   }
   struct sembuf v = V;
   semop(key->semid, &v, 1);
@@ -83,11 +80,20 @@ int shared_memory_connect(shm_key* key) {
   }
   key->shmid = shmid;
 
+  int semid = semget(key->key, 1, 0666);
+  if (semid == -1) {
+    fprintf(stderr,
+            "ERROR: shared_memory_connect - something went wrong while trying "
+            "to connect to the semaphore.\n");
+    perror("semget");
+    return FAILURE;
+  }
+  key->semid = semid;
+
   return SUCCESS;
 }
 
-int shared_memory_write(shm_key key, item my_item,
-                        int (*func)(item*, unsigned int)) {
+int shared_memory_write(shm_key key, int (*func)(item*)) {
   item* head = (item*)shmat(key.shmid, NULL, 0);
   int index;
   if (head == (item*)(-1)) {
@@ -102,53 +108,74 @@ int shared_memory_write(shm_key key, item my_item,
   struct sembuf v = V;
 
   index = 0;
-  while (index != NULL_ITEM) {
+  semop(key.semid, &p, 1);
+  while (head[index].next != 0) {
     index = head[index].next;
-    if (index == 0) {
-      printf("...The memory is full...\n");
-      return FAILURE;
-    }
+  }
+  if (index == SHARED_MEMORY_SIZE - 1) {
+    printf("...The memory is full...\n");
+    semop(key.semid, &v, 1);
+    return FAILURE;
   }
 
-  semop(key.semid, &p, 1);
-  int result = func(&(head[index]), index);
+  head[index].next = index + 1;
+  int result = func(&(head[index + 1]));
   semop(key.semid, &v, 1);
 
-  return SUCCESS;
+  return result;
 }
 
-int shared_memory_read(shm_key key, item* my_item) {
-  static int index = 0;
-
+int shared_memory_get_and_process(shm_key key, int (*func)(item*)) {
   item* head = (item*)shmat(key.shmid, NULL, 0);
-  if (head == (item*)(-1)) {
+  if (head == (item*)-1) {
     fprintf(stderr,
-            "ERROR: shared_memory_read - something went wrong while trying to "
+            "ERROR: shared_memory_get_and_process - something went wrong "
+            "while trying to "
             "get the first element from the shared memory.\n");
     perror("shmat");
     return FAILURE;
   }
+  struct sembuf p = P, v = V;
+  semop(key.semid, &p, 1);
 
-  if (head[index].size == 0) {
-    index = (index + 1) % 16;
-    if (index == 0) {
-      printf("...Shared memory is fully processed...\n");
-      return FAILURE;
+  int cur = head[0].next;
+  while (cur != 0 && cur != NULL_ITEM) {
+    if (head[cur].size > 0) {
+      int res = func(&(head[cur]));
+      semop(key.semid, &v, 1);
+      return res;
     }
+    cur = head[cur].next;
   }
 
-  return SUCCESS;
+  semop(key.semid, &v, 1);
+  return FAILURE;
 }
 
-int shared_memory_process(shm_key key, item* my_item, int (*func)(item*)) {
-  struct sembuf p = P;
-  struct sembuf v = V;
-
+int shared_memory_is_all_processed(shm_key key) {
+  item* head = (item*)shmat(key.shmid, NULL, 0);
+  if (head == (item*)-1) {
+    fprintf(stderr,
+            "ERROR: shared_memory_is_all_processed - something went wrong "
+            "while trying to "
+            "get the first element from the shared memory.\n");
+    perror("shmat");
+    return -1;
+  }
+  struct sembuf p = P, v = V;
   semop(key.semid, &p, 1);
-  int result = func(my_item);
-  semop(key.semid, &v, 1);
 
-  return result;
+  int cur = head[0].next;
+  while (cur != 0 && cur != NULL_ITEM) {
+    if (head[cur].size > 0) {
+      semop(key.semid, &v, 1);
+      return FALSE;
+    }
+    cur = head[cur].next;
+  }
+
+  semop(key.semid, &v, 1);
+  return TRUE;
 }
 
 int shared_memory_delete(shm_key key) {
