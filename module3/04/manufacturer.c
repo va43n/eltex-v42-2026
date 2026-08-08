@@ -25,7 +25,8 @@ int do_manufacturer_activity() {
   while (!is_signal) {
     for (int i = 0; i < MANUFACTURER_CHUNKS && !is_full; i++) {
       my_item = generate_item();
-      if (shared_memory_write(key, my_item) == FAILURE) {
+      if (shared_memory_write(key, my_item, manufacturer_fill_item) ==
+          FAILURE) {
         is_full = TRUE;
       }
     }
@@ -49,6 +50,15 @@ int do_manufacturer_activity() {
 
     sleep(MANUFACTURER_SLEEP_TIME);
   }
+
+  return SUCCESS;
+}
+
+int manufacturer_fill_item(item* my_item, unsigned int index) {
+  for (int i = 0; i < ARRAY_SIZE; i++) {
+    my_item->array[i] = rand();
+  }
+  my_item->next = (index + 1) % SHARED_MEMORY_SIZE;
 
   return SUCCESS;
 }

@@ -23,6 +23,7 @@ int start_corresponding_mode(char mode);
 
 // manufacturer.c
 int do_manufacturer_activity();
+int manufacturer_fill_item(item *my_item, unsigned int index);
 
 // consumer.c
 int do_consumer_activity();

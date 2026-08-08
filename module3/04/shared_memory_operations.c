@@ -32,6 +32,20 @@ int shared_memory_create(shm_key* key) {
   key->shmid = shmid;
   printf("Shared memory shmid is: %d\n", shmid);
 
+  int semid = semget(key, 1, 0666 | IPC_CREAT);
+  if (semid == -1) {
+    fprintf(stderr,
+            "ERROR: shared_memory_create - something went wrong while trying "
+            "to create the semaphore.\n");
+    perror("semget");
+    return FAILURE;
+  }
+  key->semid = semid;
+  printf("Semaphore semid is: %d\n", shmid);
+  union semun arg;
+  arg.val = 0;
+  semctl(key->semid, 0, SETVAL, arg);
+
   item* head = (item*)shmat(key->shmid, NULL, 0);
   if (head == (item*)(-1)) {
     fprintf(stderr,
@@ -43,6 +57,8 @@ int shared_memory_create(shm_key* key) {
   for (int i = 0; i < SHARED_MEMORY_SIZE; i++) {
     head[0].next = NULL_ITEM;
   }
+  struct sembuf v = V;
+  semop(key->semid, &v, 1);
 
   return SUCCESS;
 }
@@ -70,7 +86,8 @@ int shared_memory_connect(shm_key* key) {
   return SUCCESS;
 }
 
-int shared_memory_write(shm_key key, item my_item) {
+int shared_memory_write(shm_key key, item my_item,
+                        int (*func)(item*, unsigned int)) {
   item* head = (item*)shmat(key.shmid, NULL, 0);
   int index;
   if (head == (item*)(-1)) {
@@ -81,6 +98,9 @@ int shared_memory_write(shm_key key, item my_item) {
     return FAILURE;
   }
 
+  struct sembuf p = P;
+  struct sembuf v = V;
+
   index = 0;
   while (index != NULL_ITEM) {
     index = head[index].next;
@@ -90,10 +110,9 @@ int shared_memory_write(shm_key key, item my_item) {
     }
   }
 
-  for (int i = 0; i < ARRAY_SIZE; i++) {
-    head[index].array[i] = rand();
-  }
-  head[index].next = (index + 1) % SHARED_MEMORY_SIZE;
+  semop(key.semid, &p, 1);
+  int result = func(&(head[index]), index);
+  semop(key.semid, &v, 1);
 
   return SUCCESS;
 }
@@ -121,13 +140,28 @@ int shared_memory_read(shm_key key, item* my_item) {
   return SUCCESS;
 }
 
+int shared_memory_process(shm_key key, item* my_item, int (*func)(item*)) {
+  struct sembuf p = P;
+  struct sembuf v = V;
+
+  semop(key.semid, &p, 1);
+  int result = func(my_item);
+  semop(key.semid, &v, 1);
+
+  return result;
+}
+
 int shared_memory_delete(shm_key key) {
+  struct sembuf p = P;
+
+  semop(key.semid, &p, 1);
   if (shmctl(key.shmid, IPC_RMID, NULL) < 0) {
     fprintf(stderr,
             "ERROR: shared_memory_delete - cannot delete shared memory.\n");
     perror("shmctl");
     return FAILURE;
   }
+  semctl(key.semid, 0, IPC_RMID);
 
   return SUCCESS;
 }

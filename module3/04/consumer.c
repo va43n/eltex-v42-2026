@@ -28,7 +28,8 @@ int do_consumer_activity() {
       printf("All of the items are already processed...\n");
       break;
     }
-    if (consumer_process_item(my_item) == FAILURE) return FAILURE;
+    if (shared_memory_process(key, my_item, consumer_process_item) == FAILURE)
+      return FAILURE;
     is_item_found = FALSE;
     sleep(CONSUMER_SLEEP_TIME);
   }
