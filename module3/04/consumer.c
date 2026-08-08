@@ -27,7 +27,7 @@ int do_consumer_activity() {
     if (sec > 0) is_signal = TRUE;
   }
 
-  return SUCCESS;
+  return shared_memory_disconnect(key);
 }
 
 int consumer_process_item(item *my_item) {

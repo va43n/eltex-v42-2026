@@ -178,6 +178,13 @@ int shared_memory_is_all_processed(shm_key key) {
   return TRUE;
 }
 
+int shared_memory_disconnect(shm_key key) {
+  printf("Disconnecting from shared memory %d and semaphore %d...\n", key.shmid,
+         key.semid);
+
+  return SUCCESS;
+}
+
 int shared_memory_delete(shm_key key) {
   struct sembuf p = P;
 

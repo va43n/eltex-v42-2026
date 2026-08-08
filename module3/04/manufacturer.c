@@ -45,6 +45,7 @@ int do_manufacturer_activity() {
     if (sec > 0) is_signal = TRUE;
   }
 
+  shared_memory_disconnect(key);
   if (shared_memory_delete(key) == FAILURE) return FAILURE;
 
   return SUCCESS;
