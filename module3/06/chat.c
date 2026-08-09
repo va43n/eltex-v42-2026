@@ -1,19 +1,20 @@
 #include "group_chat.h"
 
 int handle_group_chat() {
-  if (socket_connect() == FAILURE) {
+  my_socket s;
+
+  if (socket_connect(&s) == FAILURE) {
     fprintf(stderr, "ERROR: handle_group_chat (socket_connect)\n");
     return FAILURE;
   }
 
-  int read;
-
   fd_set rfds, rfds_start;
-  int maxfd = (read > STDIN_FILENO ? read : STDIN_FILENO) + 1;
+  int maxfd = (s.s > STDIN_FILENO ? s.s : STDIN_FILENO) + 1;
   FD_ZERO(&rfds);
   FD_SET(STDIN_FILENO, &rfds_start);
-  FD_SET(read, &rfds_start);
+  FD_SET(s.s, &rfds_start);
 
+  printf("The chat is started...\n");
   while (!is_signal) {
     rfds = rfds_start;
 
@@ -23,22 +24,21 @@ int handle_group_chat() {
         is_signal = 1;
         continue;
       }
-      fprintf(stderr,
-              "ERROR: handle_group_chat (select).\n");
+      fprintf(stderr, "ERROR: handle_group_chat (select).\n");
       perror("select");
       break;
     }
 
     if (FD_ISSET(STDIN_FILENO, &rfds)) {
-      if (socket_send() == FAILURE) break;
+      if (socket_send(s) == FAILURE) break;
     }
 
-    if (FD_ISSET(read, &rfds)) {
-      if (socket_receive() == FAILURE) break;
+    if (FD_ISSET(s.s, &rfds)) {
+      if (socket_receive(s) == FAILURE) break;
     }
   }
 
-  if (socket_disconnect() == FAILURE) {
+  if (socket_disconnect(s) == FAILURE) {
     fprintf(stderr, "ERROR: handle_group_chat (socket_disconnect)\n");
     return FAILURE;
   }
