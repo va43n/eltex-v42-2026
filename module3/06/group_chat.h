@@ -6,7 +6,10 @@
 #define SUCCESS 111
 #define FAILURE -111
 
-// parser.c
-
 // chat.c
 int handle_group_chat();
+int send_welcome_message(my_socket s);
+int send_goodbye_message(my_socket s);
+
+// signal_handler.c
+void handle_SIGINT(int sig);

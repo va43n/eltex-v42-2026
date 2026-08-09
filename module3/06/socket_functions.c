@@ -54,24 +54,30 @@ int socket_disconnect(my_socket s) {
   return SUCCESS;
 }
 
-int socket_send(my_socket s) {
-  char buffer[BUFFER_SIZE];
+int socket_send(my_socket s, char *buffer, size_t len) {
+  if (len == 0) {
+    char real_buffer[BUFFER_SIZE];
 
-  if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {
-    if (errno == EINTR) {
-      is_signal = TRUE;
+    if (fgets(real_buffer, BUFFER_SIZE, stdin) == NULL) {
+      if (errno == EINTR) {
+        is_signal = TRUE;
+        return FAILURE;
+      }
+      fprintf(stderr,
+              "ERROR: socket_send - cannot build message for sending.\n");
       return FAILURE;
     }
-    fprintf(stderr, "ERROR: socket_send - cannot build message for sending.\n");
-    return FAILURE;
+
+    printf("\033[A\033[K");
+
+    size_t real_len = strlen(real_buffer);
+    if (real_len == 1 && real_buffer[0] == '\n') return SUCCESS;
+
+    len = real_len;
+    buffer = real_buffer;
   }
 
-  printf("\033[A\033[K");
-
-  size_t len = strlen(buffer);
-  if (len == 1 && buffer[0] == '\n') return SUCCESS;
-
-  if (sendto(s.s, buffer, BUFFER_SIZE, 0, (struct sockaddr *)&s.broadcast_addr,
+  if (sendto(s.s, buffer, len, 0, (struct sockaddr *)&s.broadcast_addr,
              sizeof(s.broadcast_addr)) < 0) {
     fprintf(stderr, "ERROR: socket_send - cannot send message.\n");
     perror("sendto");
@@ -83,6 +89,7 @@ int socket_send(my_socket s) {
 
 int socket_receive(my_socket s) {
   char buffer[BUFFER_SIZE];
+  memset(buffer, 0, BUFFER_SIZE);
   socklen_t addr_len = sizeof(s.recv_addr);
   int n = recvfrom(s.s, buffer, BUFFER_SIZE, 0, (struct sockaddr *)&s.recv_addr,
                    &addr_len);

@@ -1,6 +1,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,5 +31,5 @@ typedef struct {
 int socket_connect(my_socket* s);
 int socket_disconnect(my_socket s);
 
-int socket_send(my_socket s);
+int socket_send(my_socket s, char* buffer, size_t len);
 int socket_receive(my_socket s);

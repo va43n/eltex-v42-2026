@@ -14,7 +14,13 @@ int handle_group_chat() {
   FD_SET(STDIN_FILENO, &rfds_start);
   FD_SET(s.s, &rfds_start);
 
-  printf("The chat is started...\n");
+  if (send_welcome_message(s) == FAILURE) {
+    fprintf(stderr, "ERROR: handle_group_chat (send_welcome_message)\n");
+    return FAILURE;
+  }
+
+  signal(SIGINT, handle_SIGINT);
+
   while (!is_signal) {
     rfds = rfds_start;
 
@@ -30,12 +36,17 @@ int handle_group_chat() {
     }
 
     if (FD_ISSET(STDIN_FILENO, &rfds)) {
-      if (socket_send(s) == FAILURE) break;
+      if (socket_send(s, NULL, 0) == FAILURE) break;
     }
 
     if (FD_ISSET(s.s, &rfds)) {
       if (socket_receive(s) == FAILURE) break;
     }
+  }
+
+  if (send_goodbye_message(s) == FAILURE) {
+    fprintf(stderr, "ERROR: handle_group_chat (send_goodbye_message)\n");
+    return FAILURE;
   }
 
   if (socket_disconnect(s) == FAILURE) {
@@ -44,4 +55,16 @@ int handle_group_chat() {
   }
 
   return SUCCESS;
+}
+
+int send_welcome_message(my_socket s) {
+  char buffer[BUFFER_SIZE];
+  strcpy(buffer, "New user is joined...\n");
+  return socket_send(s, buffer, BUFFER_SIZE);
+}
+
+int send_goodbye_message(my_socket s) {
+  char buffer[BUFFER_SIZE];
+  strcpy(buffer, "User is disconnected...\n");
+  return socket_send(s, buffer, BUFFER_SIZE);
 }
