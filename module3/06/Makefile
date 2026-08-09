@@ -2,10 +2,10 @@ CC = gcc
 CLANG_FORMAT = clang-format
 CFLAGS = -Wall -Wextra -Werror -std=gnu11
 
-SRC = chat.c
+SRC = chat.c socket_functions.c signal_handler.c
 OBJ = $(SRC:.c=.o)
 
-MANUAL_TEST_SRC = main.c socket_functions.c signal_handler.c
+MANUAL_TEST_SRC = main.c
 MANUAL_TEST_TARGET = man_test_exe
 
 all: manual_testing
