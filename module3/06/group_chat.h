@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <unistd.h>
+#include "socket_functions.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -12,4 +9,4 @@
 // parser.c
 
 // chat.c
-int connect_to_group_chat();
+int handle_group_chat();

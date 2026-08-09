@@ -3,7 +3,7 @@
 int main() {
   setbuf(stdout, NULL);
 
-  if (connect_to_group_chat() == SUCCESS) {
+  if (handle_group_chat() == SUCCESS) {
     printf("Disconnected\n");
   } else {
     printf("Something went wrong in this group chat session...\n");
