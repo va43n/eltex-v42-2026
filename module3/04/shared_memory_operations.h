@@ -47,5 +47,6 @@ int shared_memory_write(shm_key key, int (*func)(item*));
 int shared_memory_get_and_process(shm_key key, int (*func)(item*));
 int shared_memory_is_all_processed(shm_key key);
 int shared_memory_delete(shm_key key);
+int shared_memory_disconnect(shm_key key);
 
 #endif
