@@ -14,18 +14,71 @@ int socket_connect(my_socket *s, char *address) {
     herror("gethostbyname");
     return FAILURE;
   }
-  struct in_addr *addr = (struct in_addr *)server->h_addr_list[0];
 
   memset(&(s->server_addr), 0, sizeof(s->server_addr));
   s->server_addr.sin_family = AF_INET;
   s->server_addr.sin_port = htons(PORT);
-  s->server_addr.sin_addr.s_addr = addr;
+  memcpy(&(s->server_addr.sin_addr.s_addr), server->h_addr_list[0],
+         server->h_length);
 
   if (connect(s->s, (struct sockaddr *)&(s->server_addr),
               sizeof(s->server_addr)) < 0) {
-    fprintf(stderr, "ERROR: socket_connect - cannot coonect to a server.\n");
+    fprintf(stderr, "ERROR: socket_connect - cannot connect to a server.\n");
     perror("connect");
     return FAILURE;
+  }
+
+  return SUCCESS;
+}
+
+int socket_listen(my_socket *s) {
+  if ((s->s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    fprintf(stderr, "ERROR: socket_listen - cannot create a socket.\n");
+    perror("socket");
+    return FAILURE;
+  }
+
+  memset(&(s->server_addr), 0, sizeof(s->server_addr));
+  s->server_addr.sin_family = AF_INET;
+  s->server_addr.sin_port = htons(PORT);
+  s->server_addr.sin_addr.s_addr = INADDR_ANY;
+
+  if (bind(s->s, (struct sockaddr *)&(s->server_addr), sizeof(s->server_addr)) <
+      0) {
+    fprintf(stderr, "ERROR: socket_listen - cannot create a server.\n");
+    perror("connect");
+    return FAILURE;
+  }
+
+  listen(s->s, SERVER_USERS);
+
+  return SUCCESS;
+}
+
+int socket_accept(my_socket s, char **address, int *client_fd) {
+  struct sockaddr_in cli_addr;
+  socklen_t clilen = sizeof(struct sockaddr_in);
+  *client_fd = accept(s.s, (struct sockaddr *)&(cli_addr), &clilen);
+
+  if (*client_fd < 0) {
+    fprintf(stderr, "ERROR: socket_accept - Cannot accept new client.\n");
+    return FAILURE;
+  }
+
+  struct hostent *host = gethostbyaddr((char *)&cli_addr.sin_addr, 4, AF_INET);
+  if (host == NULL) {
+    fprintf(stderr, "ERROR: socket_accept - unknown client address.\n");
+    herror("gethostbyaddr");
+    return FAILURE;
+  }
+  strcpy(*address, inet_ntoa(cli_addr.sin_addr));
+
+  return SUCCESS;
+}
+
+int socket_close_server(int *client_fds, size_t nfds) {
+  for (size_t i = 0; i < nfds; i++) {
+    close(client_fds[i]);
   }
 
   return SUCCESS;
@@ -37,7 +90,7 @@ int socket_disconnect(my_socket s) {
   return SUCCESS;
 }
 
-int socket_send(my_socket s, char *buffer, size_t len) {
+int socket_send(my_socket s, char *buffer, size_t len, int message_type) {
   if (len == 0) {
     char real_buffer[BUFFER_SIZE];
 
@@ -60,7 +113,11 @@ int socket_send(my_socket s, char *buffer, size_t len) {
     buffer = real_buffer;
   }
 
-  if (send(s.s, buffer, len, 0) < 0) {
+  message msg;
+  strcpy(msg.m, buffer);
+  msg.mode = message_type;
+
+  if (send(s.s, &msg, sizeof(msg), 0) < 0) {
     fprintf(stderr, "ERROR: socket_send - cannot send message.\n");
     perror("send");
     return FAILURE;
@@ -69,18 +126,15 @@ int socket_send(my_socket s, char *buffer, size_t len) {
   return SUCCESS;
 }
 
-int socket_receive(my_socket s) {
-  message msg;
-  int n = recv(s.s, &msg, BUFFER_SIZE, 0);
+int socket_receive(int s, message *msg) {
+  int n = recv(s, msg, sizeof(message), 0);
   if (n < 0) {
     fprintf(
         stderr,
         "ERROR: socket_receive - cannot properly receive someone's message.\n");
-    perror("recvfrom");
+    perror("recv");
     return FAILURE;
   }
-
-  printf("%s> %s", inet_ntoa(msg.addr.sin_addr), msg.m);
 
   return SUCCESS;
 }

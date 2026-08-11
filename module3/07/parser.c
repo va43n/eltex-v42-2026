@@ -1,5 +1,3 @@
-#include <netdb.h>
-
 #include "group_chat.h"
 
 int parse_input(int argc, char* argv[], char* mode, char** address) {

@@ -1,10 +1,12 @@
+#include <sys/select.h>
+
 #include "group_chat.h"
 
 int do_client_activity(char* address) {
   my_socket s;
 
   signal(SIGINT, handle_SIGINT);
-  printf("I'm a client and the server is: %s\n", s.server_addr);
+  printf("I'm a client and the server is: %s\n", address);
 
   if (socket_connect(&s, address) == FAILURE) return FAILURE;
 
@@ -34,11 +36,13 @@ int do_client_activity(char* address) {
     }
 
     if (FD_ISSET(STDIN_FILENO, &rfds)) {
-      if (socket_send(s, NULL, 0) == FAILURE) break;
+      if (socket_send(s, NULL, 0, TEXT) == FAILURE) break;
     }
 
     if (FD_ISSET(s.s, &rfds)) {
-      if (socket_receive(s) == FAILURE) break;
+      message msg;
+      if (socket_receive(s.s, &msg) == FAILURE) break;
+      printf("%s", msg.m);
     }
   }
 
@@ -53,4 +57,16 @@ int do_client_activity(char* address) {
   }
 
   return SUCCESS;
+}
+
+int send_welcome_message(my_socket s) {
+  char buffer[BUFFER_SIZE];
+  strcpy(buffer, "New user is joined...\n");
+  return socket_send(s, buffer, BUFFER_SIZE, CONNECT);
+}
+
+int send_goodbye_message(my_socket s) {
+  char buffer[BUFFER_SIZE];
+  strcpy(buffer, "User is disconnected...\n");
+  return socket_send(s, buffer, BUFFER_SIZE, DISCONNECT);
 }

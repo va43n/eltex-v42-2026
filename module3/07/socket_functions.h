@@ -2,11 +2,9 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/select.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -16,12 +14,16 @@
 #define TRUE 1
 #define FALSE 0
 
+#define CONNECT 35
+#define DISCONNECT 36
 #define FILE 37
 #define TEXT 38
 
+#define SERVER_USERS 5
 #define BUFFER_SIZE 256
+#define IPV4_STR_LENGTH 15
 
-static volatile int is_signal = FALSE;
+extern volatile int is_signal;
 
 typedef struct {
   int s;
@@ -38,8 +40,9 @@ typedef struct {
 
 // socket_functions.c
 int socket_connect(my_socket* s, char* address);
-// int socket_connect(my_socket* s);
+int socket_listen(my_socket* s);
+int socket_accept(my_socket s, char** address, int* client_fd);
 int socket_disconnect(my_socket s);
 
-int socket_send(my_socket s, char* buffer, size_t len);
-int socket_receive(my_socket s);
+int socket_send(my_socket s, char* buffer, size_t len, int message_type);
+int socket_receive(int s, message* msg);

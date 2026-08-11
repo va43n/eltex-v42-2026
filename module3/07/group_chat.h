@@ -1,3 +1,6 @@
+#include <poll.h>
+#include <signal.h>
+
 #include "socket_functions.h"
 
 #define TRUE 1
@@ -27,3 +30,10 @@ int do_client_activity(char* address);
 
 // server.c
 int do_server_activity();
+void add_client(char*** addresses, my_socket** client_fds, struct pollfd** fds,
+                size_t* nfds, size_t* actual_size, char* address,
+                int client_fd);
+void remove_client(char*** addresses, my_socket** client_fds,
+                   struct pollfd** fds, size_t* nfds, size_t index);
+void free_clients(char** addresses, my_socket* client_fds, struct pollfd* fds,
+                  size_t nfds);

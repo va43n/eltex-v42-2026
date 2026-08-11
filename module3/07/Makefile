@@ -2,7 +2,7 @@ CC = gcc
 CLANG_FORMAT = clang-format
 CFLAGS = -Wall -Wextra -Werror -std=gnu11
 
-SRC = chat.c socket_functions.c signal_handler.c parser.c
+SRC = socket_functions.c server.c client.c signal_handler.c parser.c
 OBJ = $(SRC:.c=.o)
 
 MANUAL_TEST_SRC = main.c
