@@ -17,7 +17,13 @@ int send_goodbye_message(my_socket s);
 // signal_handler.c
 void handle_SIGINT(int sig);
 
-//parser.c 
-int parse_input(int argc, char* argv[], char* mode);
+// parser.c
+int parse_input(int argc, char* argv[], char* mode, char** address);
 int parse_flag(char* flag, char* mode);
 int parse_server_address(char* address);
+
+// client.c
+int do_client_activity(char* address);
+
+// server.c
+int do_server_activity();

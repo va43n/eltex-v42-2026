@@ -11,10 +11,10 @@ MANUAL_TEST_TARGET = man_test_exe
 all: manual_testing
 
 %.o: %.c
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 manual_testing: $(OBJ)
-	@$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(OBJ) -o $(MANUAL_TEST_TARGET) -lrt
+	$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(OBJ) -o $(MANUAL_TEST_TARGET) -lrt
 
 format:
 	$(CLANG_FORMAT) -i *.h $(SRC) $(MANUAL_TEST_SRC)

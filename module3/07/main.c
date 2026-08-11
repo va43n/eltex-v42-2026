@@ -3,14 +3,19 @@
 int main(int argc, char* argv[]) {
   setbuf(stdout, NULL);
 
-  char mode;
-  if (parse_input(argc, argv, &mode) == FAILURE) return EXIT_FAILURE;
+  char mode, *address;
+  if (parse_input(argc, argv, &mode, &address) == FAILURE) return EXIT_FAILURE;
 
-  if (handle_group_chat() == SUCCESS) {
+  int result;
+  if (mode == CLIENT)
+    result = do_client_activity(address);
+  else if (mode == SERVER)
+    result = do_server_activity();
+
+  if (result == SUCCESS)
     printf("Disconnected\n");
-  } else {
+  else
     printf("Something went wrong in this group chat session...\n");
-  }
 
   return EXIT_SUCCESS;
 }

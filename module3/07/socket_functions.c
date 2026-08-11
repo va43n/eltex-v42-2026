@@ -1,49 +1,32 @@
 #include "socket_functions.h"
 
-int socket_connect(my_socket *s) {
-  if ((s->s = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+int socket_connect(my_socket *s, char *address) {
+  if ((s->s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     fprintf(stderr, "ERROR: socket_connect - cannot create a socket.\n");
     perror("socket");
     return FAILURE;
   }
 
-  int broadcast = 1;
-  if (setsockopt(s->s, SOL_SOCKET, SO_BROADCAST, &broadcast,
-                 sizeof(broadcast)) < 0) {
+  struct hostent *server = gethostbyname(address);
+  if (server == NULL) {
     fprintf(stderr,
-            "ERROR: socket_connect - cannot add broadcast permissions to "
-            "socket.\n");
-    perror("setsockopt");
-    close(s->s);
+            "ERROR: parse_server_address - cannot parse server address.\n");
+    herror("gethostbyname");
     return FAILURE;
   }
+  struct in_addr *addr = (struct in_addr *)server->h_addr_list[0];
 
-  int reuse = 1;
-  if (setsockopt(s->s, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
-    fprintf(stderr,
-            "ERROR: socket_connect - cannot add reusability to a socket.\n");
-    perror("setsockopt");
+  memset(&(s->server_addr), 0, sizeof(s->server_addr));
+  s->server_addr.sin_family = AF_INET;
+  s->server_addr.sin_port = htons(PORT);
+  s->server_addr.sin_addr.s_addr = addr;
+
+  if (connect(s->s, (struct sockaddr *)&(s->server_addr),
+              sizeof(s->server_addr)) < 0) {
+    fprintf(stderr, "ERROR: socket_connect - cannot coonect to a server.\n");
+    perror("connect");
     return FAILURE;
   }
-
-  memset(&(s->recv_addr), 0, sizeof(s->recv_addr));
-  s->recv_addr.sin_family = AF_INET;
-  s->recv_addr.sin_port = htons(PORT);
-  s->recv_addr.sin_addr.s_addr = INADDR_ANY;
-
-  if (bind(s->s, (struct sockaddr *)&s->recv_addr, sizeof(s->recv_addr)) < 0) {
-    fprintf(
-        stderr,
-        "ERROR: socket_connect - cannot bind the receive address to socket.\n");
-    perror("bind");
-    close(s->s);
-    return FAILURE;
-  }
-
-  memset(&(s->broadcast_addr), 0, sizeof(s->broadcast_addr));
-  s->broadcast_addr.sin_family = AF_INET;
-  s->broadcast_addr.sin_port = htons(PORT);
-  s->broadcast_addr.sin_addr.s_addr = INADDR_BROADCAST;
 
   return SUCCESS;
 }
@@ -77,10 +60,9 @@ int socket_send(my_socket s, char *buffer, size_t len) {
     buffer = real_buffer;
   }
 
-  if (sendto(s.s, buffer, len, 0, (struct sockaddr *)&s.broadcast_addr,
-             sizeof(s.broadcast_addr)) < 0) {
+  if (send(s.s, buffer, len, 0) < 0) {
     fprintf(stderr, "ERROR: socket_send - cannot send message.\n");
-    perror("sendto");
+    perror("send");
     return FAILURE;
   }
 
@@ -88,11 +70,8 @@ int socket_send(my_socket s, char *buffer, size_t len) {
 }
 
 int socket_receive(my_socket s) {
-  char buffer[BUFFER_SIZE];
-  memset(buffer, 0, BUFFER_SIZE);
-  socklen_t addr_len = sizeof(s.recv_addr);
-  int n = recvfrom(s.s, buffer, BUFFER_SIZE, 0, (struct sockaddr *)&s.recv_addr,
-                   &addr_len);
+  message msg;
+  int n = recv(s.s, &msg, BUFFER_SIZE, 0);
   if (n < 0) {
     fprintf(
         stderr,
@@ -101,7 +80,7 @@ int socket_receive(my_socket s) {
     return FAILURE;
   }
 
-  printf("%s> %s", inet_ntoa(s.recv_addr.sin_addr), buffer);
+  printf("%s> %s", inet_ntoa(msg.addr.sin_addr), msg.m);
 
   return SUCCESS;
 }
