@@ -1,0 +1,13 @@
+O IA    172.16.30.0/24 [110/3] via 172.16.0.2, 01:34:47, FastEthernet1/0
+O IA    172.16.31.0/24 [110/3] via 172.16.0.3, 01:34:47, FastEthernet1/0
+O IA    172.16.20.0/24 [110/3] via 172.16.0.3, 01:34:56, FastEthernet1/0
+R       172.16.10.0/24 [120/2] via 172.16.1.2, 00:00:26, FastEthernet0/0
+R       172.16.11.0/24 [120/1] via 172.16.1.2, 00:00:26, FastEthernet0/0
+O IA    172.16.3.8/30 [110/3] via 172.16.0.3, 01:34:47, FastEthernet1/0
+                      [110/3] via 172.16.0.2, 01:34:48, FastEthernet1/0
+R       172.16.1.4/30 [120/1] via 172.16.1.2, 00:00:00, FastEthernet0/0
+O IA    172.16.3.4/30 [110/2] via 172.16.0.3, 01:34:48, FastEthernet1/0
+C       172.16.0.0/24 is directly connected, FastEthernet1/0
+C       172.16.1.0/30 is directly connected, FastEthernet0/0
+O IA    172.16.2.0/30 [110/2] via 172.16.0.3, 01:34:57, FastEthernet1/0
+O IA    172.16.3.0/30 [110/2] via 172.16.0.2, 01:34:57, FastEthernet1/0
