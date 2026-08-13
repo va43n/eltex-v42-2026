@@ -46,4 +46,4 @@ int socket_accept(my_socket s, char** address, int* client_fd);
 int socket_disconnect(my_socket s);
 
 int socket_send(my_socket s, char* buffer, size_t len, int message_type);
-int socket_receive(int s, message* msg);
+int socket_receive(my_socket s, message* msg);

@@ -62,7 +62,7 @@ int do_client_activity(char* address) {
 
     if (FD_ISSET(s.s, &rfds)) {
       message msg;
-      if (socket_receive(s.s, &msg) == FAILURE) break;
+      if (socket_receive(s, &msg) == FAILURE) break;
       printf("%s", msg.m);
     }
   }

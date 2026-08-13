@@ -126,8 +126,8 @@ int socket_send(my_socket s, char *buffer, size_t len, int message_type) {
   return SUCCESS;
 }
 
-int socket_receive(int s, message *msg) {
-  int n = recv(s, msg, sizeof(message), 0);
+int socket_receive(my_socket s, message *msg) {
+  int n = recv(s.s, msg, sizeof(message), 0);
   if (n < 0) {
     fprintf(
         stderr,

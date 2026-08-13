@@ -45,7 +45,7 @@ int do_server_activity() {
     while (i < nfds) {
       if (fds[i].revents & POLLIN) {
         message msg;
-        if (socket_receive(fds[i].fd, &msg) == SUCCESS) {
+        if (socket_receive(client_fds[i - 1], &msg) == SUCCESS) {
           char new_message[BUFFER_SIZE + IPV4_STR_LENGTH + 2];
           snprintf(new_message, BUFFER_SIZE + IPV4_STR_LENGTH + 2, "%s> %s",
                    addresses[i - 1], msg.m);
