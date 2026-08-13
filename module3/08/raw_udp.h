@@ -21,9 +21,11 @@
 
 #define PUT_IN_FILE 'f'
 #define PUT_IN_FILE_MASK 0b100
+#define FILENAME_SIZE 64
 
 #define FILTER_06 '6'
 #define FILTER_06_MASK 0b010
+#define FILTER_06_PORT 12345
 
 #define FILTER_DNS 'd'
 #define FILTER_DNS_MASK 0b001

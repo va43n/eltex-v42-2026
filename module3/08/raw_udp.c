@@ -58,12 +58,16 @@ int receive_data(int fd, time_t start, int mask) {
   unsigned int ihl = ip->ihl * 4;
   struct udphdr* udp = (struct udphdr*)(buffer + ihl);
 
+  if (mask & FILTER_06_MASK && (ntohs(udp->source) != FILTER_06_PORT ||
+                                ntohs(udp->dest) != FILTER_06_PORT))
+    return SUCCESS;
+
   time_t end;
   time(&end);
 
   FILE* file = stdout;
-  if (mask & PUT_IN_FILE) {
-    char file_name[64];
+  if (mask & PUT_IN_FILE_MASK) {
+    char file_name[FILENAME_SIZE];
     sprintf(file_name, "%ld_%ld.udp", packet_number, (size_t)end);
     file = fopen(file_name, "w");
   }
@@ -101,7 +105,10 @@ int receive_data(int fd, time_t start, int mask) {
     print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
   }
 
-  if (!(mask & PUT_IN_FILE)) printf("\n\n");
+  if (!(mask & PUT_IN_FILE_MASK))
+    printf("\n\n");
+  else
+    fclose(file);
 
   packet_number++;
 
