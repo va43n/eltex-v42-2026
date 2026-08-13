@@ -68,8 +68,8 @@ int do_server_activity() {
                      addresses[i - 1], msg.m);
             printf("Client[%ld] (%s, %d) said: %s", i, addresses[i - 1],
                    client_fds[i - 1].s, msg.m);
-            for (size_t i = 1; i < nfds; i++) {
-              if (socket_send(client_fds[i - 1], new_message,
+            for (size_t j = 1; j < nfds; j++) {
+              if (socket_send(client_fds[j - 1], new_message,
                               strlen(new_message), TEXT, NULL) == FAILURE) {
                 socket_disconnect(listen_socket);
                 free_clients(addresses, client_fds, fds, nfds);

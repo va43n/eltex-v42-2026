@@ -65,12 +65,6 @@ int socket_accept(my_socket s, char **address, int *client_fd) {
     return FAILURE;
   }
 
-  struct hostent *host = gethostbyaddr((char *)&cli_addr.sin_addr, 4, AF_INET);
-  if (host == NULL) {
-    fprintf(stderr, "ERROR: socket_accept - unknown client address.\n");
-    herror("gethostbyaddr");
-    return FAILURE;
-  }
   strcpy(*address, inet_ntoa(cli_addr.sin_addr));
 
   return SUCCESS;
@@ -105,7 +99,8 @@ int socket_send(my_socket s, char *buffer, size_t len, int message_type,
   }
 
   message msg;
-  strcpy(msg.m, buffer);
+  memset(&msg, 0, sizeof(msg));
+  memcpy(msg.m, buffer, len);
   if (file_name) strcpy(msg.file_name, file_name);
   msg.mode = message_type;
   msg.data_len = len;
@@ -120,15 +115,22 @@ int socket_send(my_socket s, char *buffer, size_t len, int message_type,
 }
 
 int socket_receive(my_socket s, message *msg) {
-  int n = recv(s.s, msg, sizeof(message), 0);
-  if (n < 0) {
-    fprintf(
-        stderr,
-        "ERROR: socket_receive - cannot properly receive someone's message.\n");
-    perror("recv");
-    return FAILURE;
+  unsigned int total = 0;
+  int n;
+  while (total < sizeof(message)) {
+    n = recv(s.s, ((char *)msg) + total, sizeof(message) - total, 0);
+    if (n <= 0) {
+      if (n == 0) {
+        msg->mode = DISCONNECT;
+        return SUCCESS;
+      }
+      fprintf(stderr,
+              "ERROR: socket_receive - cannot properly receive someone's "
+              "message.\n");
+      perror("recv");
+      return FAILURE;
+    }
+    total += n;
   }
-  if (n == 0) msg->mode = DISCONNECT;
-
   return SUCCESS;
 }
