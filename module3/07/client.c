@@ -5,7 +5,14 @@
 int do_client_activity(char* address) {
   my_socket s;
 
-  signal(SIGINT, handle_SIGINT);
+  struct sigaction sa;
+  sa.sa_handler = handle_any_signal;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = SA_RESTART;
+
+  sigaction(SIGINT, &sa, NULL);
+  sigaction(SIGTSTP, &sa, NULL);
+
   printf("I'm a client and the server is: %s\n", address);
 
   if (socket_connect(&s, address) == FAILURE) return FAILURE;
@@ -21,13 +28,27 @@ int do_client_activity(char* address) {
     return FAILURE;
   }
 
-  while (!is_signal) {
+  int waiting_for_file_name = FALSE;
+
+  while (is_signal != SIGINT) {
+    if (is_signal == SIGTSTP) {
+      if (waiting_for_file_name == TRUE) {
+        printf("File sending is stopped\n");
+        waiting_for_file_name = FALSE;
+      }
+      else {
+        printf("Enter file name: ");
+        waiting_for_file_name = TRUE;
+      }
+      is_signal = FALSE;
+    }
+
     rfds = rfds_start;
 
     int ret = select(maxfd, &rfds, NULL, NULL, NULL);
     if (ret == -1) {
       if (errno == EINTR) {
-        is_signal = 1;
+        // is_signal = SIGINT;
         continue;
       }
       fprintf(stderr, "ERROR: do_client_activity (select).\n");

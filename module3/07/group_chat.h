@@ -18,6 +18,7 @@ int send_welcome_message(my_socket s);
 int send_goodbye_message(my_socket s);
 
 // signal_handler.c
+void handle_any_signal(int sig);
 void handle_SIGINT(int sig);
 
 // parser.c

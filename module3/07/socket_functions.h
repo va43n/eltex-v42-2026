@@ -24,6 +24,7 @@
 #define IPV4_STR_LENGTH 15
 
 extern volatile int is_signal;
+extern volatile int is_sending_file;
 
 typedef struct {
   int s;
