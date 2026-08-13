@@ -14,6 +14,7 @@ int search_for_udp(int mask) {
 
   time_t start;
   time(&start);
+  printf("Packet receiving is started...\n");
   while (is_signal == FALSE) {
     if (receive_data(fd, start, mask) == FAILURE) return FAILURE;
   }

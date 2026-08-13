@@ -4,14 +4,8 @@ int parse_input(int argc, char* argv[], int* mask) {
   *mask = 0;
   if (argc == 1) return SUCCESS;
 
-  if (argc != 2) {
-    fprintf(stderr,
-            "ERROR: parse_input - input should contain either 0 or 1 "
-            "parameter: set of flags.\n");
-    return FAILURE;
-  }
-
-  if (parse_flag(argv[1], mask) == FAILURE) return FAILURE;
+  for (int i = 1; i < argc; i++)
+    if (parse_flag(argv[i], mask) == FAILURE) return FAILURE;
 
   return SUCCESS;
 }
