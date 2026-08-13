@@ -1,6 +1,6 @@
 #include "raw_udp.h"
 
-int search_for_udp() {
+int search_for_udp(int mask) {
   int fd;
 
   struct sigaction sa;
@@ -15,7 +15,7 @@ int search_for_udp() {
   time_t start;
   time(&start);
   while (is_signal == FALSE) {
-    if (receive_data(fd, start) == FAILURE) return FAILURE;
+    if (receive_data(fd, start, mask) == FAILURE) return FAILURE;
   }
 
   return SUCCESS;
@@ -31,7 +31,9 @@ int create_raw_socket(int* fd) {
   return SUCCESS;
 }
 
-int receive_data(int fd, time_t start) {
+int receive_data(int fd, time_t start, int mask) {
+  static size_t packet_number = 1;
+
   unsigned char buffer[BUFFER_SIZE];
   struct sockaddr_in recv_addr;
   socklen_t addr_len = sizeof(recv_addr);
@@ -58,25 +60,35 @@ int receive_data(int fd, time_t start) {
 
   time_t end;
   time(&end);
-  char ip_buf[15];
-  printf("Received after %.0f seconds\n", difftime(end, start));
-  printf("%s:%d -> %s:%d\n", print_ip(ip_buf, ntohl(ip->saddr)), ntohs(udp->source), print_ip(ip_buf, ntohl(ip->daddr)), ntohs(udp->dest));
 
-  print_bytes_char(buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 4, &bytes);
-  print_bytes_char(buffer, &cur_pos, 4, &bytes);
+  FILE* file = stdout;
+  if (mask & PUT_IN_FILE) {
+    char file_name[64];
+    sprintf(file_name, "%ld_%ld.udp", packet_number, (size_t)end);
+    file = fopen(file_name, "w");
+  }
 
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
+  char ip_buf[IPV4_LENGTH];
+  fprintf(file, "Received after %.0f seconds\n", difftime(end, start));
+  fprintf(file, "%s:%d -> %s:%d\n", create_ip_string(ip_buf, ntohl(ip->saddr)),
+          ntohs(udp->source), create_ip_string(ip_buf, ntohl(ip->daddr)),
+          ntohs(udp->dest));
+
+  print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 4, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 4, &bytes);
+
+  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
 
   unsigned int udp_len = ntohs(udp->len),
                udp_data = udp_len - sizeof(struct udphdr);
@@ -86,38 +98,41 @@ int receive_data(int fd, time_t start) {
 
   cur_pos = ihl + sizeof(struct udphdr);
   for (size_t i = 0; i < max_data_len; i++) {
-    print_bytes_char(buffer, &cur_pos, 1, &bytes);
+    print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
   }
 
-  printf("\n\n");
+  if (!(mask & PUT_IN_FILE)) printf("\n\n");
+
+  packet_number++;
 
   return SUCCESS;
 }
 
-void print_bytes_char(unsigned char* buffer, size_t* start_pos,
+void print_bytes_char(FILE* file, unsigned char* buffer, size_t* start_pos,
                       size_t number_of_bytes, int* bytes) {
   for (size_t i = *start_pos; i < *start_pos + number_of_bytes; i++) {
     int num = buffer[i] - '\0';
-    printf("%02x ", num);
+    fprintf(file, "%02x ", num);
 
     (*bytes)++;
-    check_number_of_bytes_in_line(bytes);
+    check_number_of_bytes_in_line(file, bytes);
   }
   *start_pos += number_of_bytes;
 }
 
-void check_number_of_bytes_in_line(int* bytes) {
+void check_number_of_bytes_in_line(FILE* file, int* bytes) {
   if (*bytes == 8)
-    printf(" ");
+    fprintf(file, " ");
   else if (*bytes == 16) {
-    printf("\n");
+    fprintf(file, "\n");
     *bytes = 0;
   }
 }
 
-char* print_ip(char *ip, int ip_int) {
-  memset(ip, 0, 15);
-  sprintf(ip, "%u.%u.%u.%u", (ip_int >> 24) & 0xFF, (ip_int >> 16) & 0xFF, (ip_int >> 8) & 0xFF, ip_int & 0xFF);
+char* create_ip_string(char* ip, int ip_int) {
+  memset(ip, 0, IPV4_LENGTH);
+  sprintf(ip, "%u.%u.%u.%u", (ip_int >> 24) & 0xFF, (ip_int >> 16) & 0xFF,
+          (ip_int >> 8) & 0xFF, ip_int & 0xFF);
 
   return ip;
 }

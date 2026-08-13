@@ -2,7 +2,7 @@ CC = gcc
 CLANG_FORMAT = clang-format
 CFLAGS = -Wall -Wextra -Werror -std=gnu11
 
-SRC = raw_udp.c signal_handler.c
+SRC = raw_udp.c signal_handler.c parser.c
 OBJ = $(SRC:.c=.o)
 
 MANUAL_TEST_SRC = main.c
@@ -29,7 +29,7 @@ clean:
 	@rm -rf $(OBJ) \
 			$(MANUAL_TEST_TARGET) \
 			*.o \
-			*.raw
+			*.udp
 
 .PHONY: all \
 		manual_testing \
