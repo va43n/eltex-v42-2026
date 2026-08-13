@@ -12,8 +12,10 @@ int search_for_udp() {
 
   if (create_raw_socket(&fd) == FAILURE) return FAILURE;
 
+  time_t start;
+  time(&start);
   while (is_signal == FALSE) {
-    if (receive_data(fd) == FAILURE) return FAILURE;
+    if (receive_data(fd, start) == FAILURE) return FAILURE;
   }
 
   return SUCCESS;
@@ -29,7 +31,7 @@ int create_raw_socket(int* fd) {
   return SUCCESS;
 }
 
-int receive_data(int fd) {
+int receive_data(int fd, time_t start) {
   unsigned char buffer[BUFFER_SIZE];
   struct sockaddr_in recv_addr;
   socklen_t addr_len = sizeof(recv_addr);
@@ -50,26 +52,32 @@ int receive_data(int fd) {
   int bytes = 0;
   size_t cur_pos = 0;
 
-  print_bytes_char(buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 4, &bytes);
-  print_bytes_char(buffer, &cur_pos, 4, &bytes);
-
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(buffer, &cur_pos, 2, &bytes);
-
   struct iphdr* ip = (struct iphdr*)buffer;
   unsigned int ihl = ip->ihl * 4;
-
   struct udphdr* udp = (struct udphdr*)(buffer + ihl);
+
+  time_t end;
+  time(&end);
+  char ip_buf[15];
+  printf("Received after %.0f seconds\n", difftime(end, start));
+  printf("%s:%d -> %s:%d\n", print_ip(ip_buf, ntohl(ip->saddr)), ntohs(udp->source), print_ip(ip_buf, ntohl(ip->daddr)), ntohs(udp->dest));
+
+  print_bytes_char(buffer, &cur_pos, 1, &bytes);
+  print_bytes_char(buffer, &cur_pos, 1, &bytes);
+  print_bytes_char(buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(buffer, &cur_pos, 1, &bytes);
+  print_bytes_char(buffer, &cur_pos, 1, &bytes);
+  print_bytes_char(buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(buffer, &cur_pos, 4, &bytes);
+  print_bytes_char(buffer, &cur_pos, 4, &bytes);
+
+  print_bytes_char(buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(buffer, &cur_pos, 2, &bytes);
+  print_bytes_char(buffer, &cur_pos, 2, &bytes);
+
   unsigned int udp_len = ntohs(udp->len),
                udp_data = udp_len - sizeof(struct udphdr);
   size_t max_data_len = n - sizeof(struct udphdr) > udp_data
@@ -105,4 +113,11 @@ void check_number_of_bytes_in_line(int* bytes) {
     printf("\n");
     *bytes = 0;
   }
+}
+
+char* print_ip(char *ip, int ip_int) {
+  memset(ip, 0, 15);
+  sprintf(ip, "%u.%u.%u.%u", (ip_int >> 24) & 0xFF, (ip_int >> 16) & 0xFF, (ip_int >> 8) & 0xFF, ip_int & 0xFF);
+
+  return ip;
 }
