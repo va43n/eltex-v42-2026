@@ -15,7 +15,6 @@
 #define FAILURE -111
 
 #define BUFFER_SIZE 1024
-#define BYTE 8
 
 static volatile int is_signal = FALSE;
 
@@ -23,8 +22,9 @@ static volatile int is_signal = FALSE;
 int search_for_udp();
 int create_raw_socket(int* fd);
 int receive_data(int fd);
-void print_bytes(int value, int number_of_bits, int* bytes);
 void check_number_of_bytes_in_line(int* bytes);
+void print_bytes_char(unsigned char* buffer, size_t* start_pos,
+                      size_t number_of_bytes, int* bytes);
 
 // signal_handler.c
 void handle_SIGINT(int sig);
