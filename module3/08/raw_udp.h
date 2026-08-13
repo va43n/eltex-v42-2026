@@ -29,6 +29,7 @@
 
 #define FILTER_DNS 'd'
 #define FILTER_DNS_MASK 0b001
+#define FILTER_DNS_PORT 53
 
 #define IPV4_LENGTH 15
 

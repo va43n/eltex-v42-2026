@@ -62,6 +62,10 @@ int receive_data(int fd, time_t start, int mask) {
                                 ntohs(udp->dest) != FILTER_06_PORT))
     return SUCCESS;
 
+  if (mask & FILTER_DNS_MASK && (ntohs(udp->source) != FILTER_DNS_PORT &&
+                                 ntohs(udp->dest) != FILTER_DNS_PORT))
+    return SUCCESS;
+
   time_t end;
   time(&end);
 
@@ -78,29 +82,9 @@ int receive_data(int fd, time_t start, int mask) {
           ntohs(udp->source), create_ip_string(ip_buf, ntohl(ip->daddr)),
           ntohs(udp->dest));
 
-  print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 4, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 4, &bytes);
+  int total_length = ntohs(ip->tot_len);
+  size_t max_data_len = n > total_length ? total_length : n;
 
-  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
-  print_bytes_char(file, buffer, &cur_pos, 2, &bytes);
-
-  unsigned int udp_len = ntohs(udp->len),
-               udp_data = udp_len - sizeof(struct udphdr);
-  size_t max_data_len = n - sizeof(struct udphdr) > udp_data
-                            ? udp_data
-                            : n - sizeof(struct udphdr);
-
-  cur_pos = ihl + sizeof(struct udphdr);
   for (size_t i = 0; i < max_data_len; i++) {
     print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
   }
