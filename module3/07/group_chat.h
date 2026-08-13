@@ -1,21 +1,11 @@
 #include <poll.h>
 #include <signal.h>
 
+#include "constants.h"
 #include "socket_functions.h"
-
-#define TRUE 1
-#define FALSE 0
-
-#define SUCCESS 111
-#define FAILURE -111
 
 #define SERVER 's'
 #define CLIENT 'c'
-
-// chat.c
-int handle_group_chat();
-int send_welcome_message(my_socket s);
-int send_goodbye_message(my_socket s);
 
 // signal_handler.c
 void handle_any_signal(int sig);
@@ -28,6 +18,10 @@ int parse_server_address(char* address);
 
 // client.c
 int do_client_activity(char* address);
+int send_welcome_message(my_socket s);
+int send_goodbye_message(my_socket s);
+int send_part_of_file(my_socket s, char* file_name, ssize_t* bytes,
+                      int* is_file_ended, int* sending_the_file);
 
 // server.c
 int do_server_activity();

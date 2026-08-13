@@ -46,17 +46,35 @@ int do_server_activity() {
       if (fds[i].revents & POLLIN) {
         message msg;
         if (socket_receive(client_fds[i - 1], &msg) == SUCCESS) {
-          char new_message[BUFFER_SIZE + IPV4_STR_LENGTH + 2];
-          snprintf(new_message, BUFFER_SIZE + IPV4_STR_LENGTH + 2, "%s> %s",
-                   addresses[i - 1], msg.m);
-          printf("Client[%ld] (%s, %d) said: %s", i, addresses[i - 1],
-                 client_fds[i - 1].s, msg.m);
-          for (size_t i = 1; i < nfds; i++) {
-            if (socket_send(client_fds[i - 1], new_message, strlen(new_message),
-                            TEXT) == FAILURE) {
-              socket_disconnect(listen_socket);
-              free_clients(addresses, client_fds, fds, nfds);
-              return FAILURE;
+          if (msg.mode == FILE) {
+            char old_file_name[BUFFER_SIZE];
+            strcpy(old_file_name, msg.file_name);
+            snprintf(msg.file_name, BUFFER_SIZE + FD_LENGTH + 1, "%s.%d",
+                     old_file_name, client_fds[i - 1].s);
+            printf("Client[%ld] (%s, %d) sent new part of file.\n", i,
+                   addresses[i - 1], client_fds[i - 1].s);
+            for (size_t j = 1; j < nfds; j++) {
+              if (i == j) continue;
+              if (socket_send(client_fds[j - 1], msg.m, msg.data_len, FILE,
+                              msg.file_name) == FAILURE) {
+                socket_disconnect(listen_socket);
+                free_clients(addresses, client_fds, fds, nfds);
+                return FAILURE;
+              }
+            }
+          } else {
+            char new_message[BUFFER_SIZE + IPV4_STR_LENGTH + 2];
+            snprintf(new_message, BUFFER_SIZE + IPV4_STR_LENGTH + 2, "%s> %s",
+                     addresses[i - 1], msg.m);
+            printf("Client[%ld] (%s, %d) said: %s", i, addresses[i - 1],
+                   client_fds[i - 1].s, msg.m);
+            for (size_t i = 1; i < nfds; i++) {
+              if (socket_send(client_fds[i - 1], new_message,
+                              strlen(new_message), TEXT, NULL) == FAILURE) {
+                socket_disconnect(listen_socket);
+                free_clients(addresses, client_fds, fds, nfds);
+                return FAILURE;
+              }
             }
           }
         }

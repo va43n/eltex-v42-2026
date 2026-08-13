@@ -90,21 +90,12 @@ int socket_disconnect(my_socket s) {
   return SUCCESS;
 }
 
-int socket_send(my_socket s, char *buffer, size_t len, int message_type) {
+int socket_send(my_socket s, char *buffer, size_t len, int message_type,
+                char *file_name) {
   if (len == 0) {
     char real_buffer[BUFFER_SIZE];
 
-    if (fgets(real_buffer, BUFFER_SIZE, stdin) == NULL) {
-      if (errno == EINTR) {
-        is_signal = TRUE;
-        return FAILURE;
-      }
-      fprintf(stderr,
-              "ERROR: socket_send - cannot build message for sending.\n");
-      return FAILURE;
-    }
-
-    printf("\033[A\033[K");
+    if (read_user_input(real_buffer) == FAILURE) return FAILURE;
 
     size_t real_len = strlen(real_buffer);
     if (real_len == 1 && real_buffer[0] == '\n') return SUCCESS;
@@ -115,7 +106,9 @@ int socket_send(my_socket s, char *buffer, size_t len, int message_type) {
 
   message msg;
   strcpy(msg.m, buffer);
+  if (file_name) strcpy(msg.file_name, file_name);
   msg.mode = message_type;
+  msg.data_len = len;
 
   if (send(s.s, &msg, sizeof(msg), 0) < 0) {
     fprintf(stderr, "ERROR: socket_send - cannot send message.\n");
@@ -135,6 +128,7 @@ int socket_receive(my_socket s, message *msg) {
     perror("recv");
     return FAILURE;
   }
+  if (n == 0) msg->mode = DISCONNECT;
 
   return SUCCESS;
 }

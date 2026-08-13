@@ -1,6 +1,5 @@
 #include <arpa/inet.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,11 +7,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define SUCCESS 111
-#define FAILURE -111
-
-#define TRUE 1
-#define FALSE 0
+#include "constants.h"
+#include "file_operations.h"
 
 #define CONNECT 35
 #define DISCONNECT 36
@@ -20,8 +16,8 @@
 #define TEXT 38
 
 #define SERVER_USERS 5
-#define BUFFER_SIZE 256
 #define IPV4_STR_LENGTH 15
+#define FD_LENGTH 9
 
 extern volatile int is_signal;
 extern volatile int is_sending_file;
@@ -33,7 +29,9 @@ typedef struct {
 
 typedef struct {
   int mode;
+  size_t data_len;
   char m[BUFFER_SIZE];
+  char file_name[BUFFER_SIZE];
   struct sockaddr_in addr;
 } message;
 
@@ -45,5 +43,6 @@ int socket_listen(my_socket* s);
 int socket_accept(my_socket s, char** address, int* client_fd);
 int socket_disconnect(my_socket s);
 
-int socket_send(my_socket s, char* buffer, size_t len, int message_type);
+int socket_send(my_socket s, char* buffer, size_t len, int message_type,
+                char* file_name);
 int socket_receive(my_socket s, message* msg);
