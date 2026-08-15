@@ -7,12 +7,10 @@ int create_socket(int *fd) {
     return FAILURE;
   }
 
-  int broadcast = 1;
-  if (setsockopt(*fd, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) <
-      0) {
-    fprintf(stderr,
-            "ERROR: socket_connect - cannot add broadcast permissions to "
-            "socket.\n");
+  int val = 1;
+  if (setsockopt(*fd, IPPROTO_IP, IP_HDRINCL, &val, sizeof(val)) < 0) {
+    fprintf(stderr, "ERROR: socket_connect - cannot add permissions to "
+                    "socket.\n");
     perror("setsockopt");
     close(*fd);
     return FAILURE;
@@ -21,13 +19,16 @@ int create_socket(int *fd) {
   return SUCCESS;
 }
 
-int receive_data(int fd, unsigned int source_address,
-                 unsigned int destination_address) {
+int receive_data(int fd, char *data, char *source_address,
+                 char *destination_address, int *source_port,
+                 int *destination_port) {
   message msg;
-  struct sockaddr_in recv_addr;
-  socklen_t addr_len = sizeof(recv_addr);
-  int n = recvfrom(fd, &msg, sizeof(msg), 0, (struct sockaddr *)&recv_addr,
-                   &addr_len);
+  memset(&msg, 0, sizeof(msg));
+  memset(data, 0, BUFFER_SIZE);
+
+  socklen_t socklen;
+  int n = recvfrom(fd, &(msg.buffer), BUFFER_SIZE, 0,
+                   (struct sockaddr *)&(msg.addr), &(socklen));
   if (n < 0) {
     if (errno == EINTR) {
       fprintf(stderr, "ERROR: receive_data - interrupted by signal.\n");
@@ -40,68 +41,87 @@ int receive_data(int fd, unsigned int source_address,
     return FAILURE;
   }
 
-  // int bytes = 0;
-  // size_t cur_pos = 0;
-
-  // printf("Source port: %d\n", msg.source_port);
-
   struct iphdr *ip = (struct iphdr *)msg.buffer;
   unsigned int ihl = ip->ihl * 4;
   struct udphdr *udp = (struct udphdr *)(msg.buffer + ihl);
 
   FILE *file = stdout;
 
+  unsigned int source_address_int = inet_addr(source_address),
+               destination_address_int = inet_addr(destination_address);
   char ip_buf[IPV4_LENGTH];
-  fprintf(file, "%s:%d -> %s:%d (expected %s -> %s)\n",
-          create_ip_string(ip_buf, ntohl(ip->saddr)), ntohs(udp->source),
-          create_ip_string(ip_buf, ntohl(ip->daddr)), ntohs(udp->dest),
-          create_ip_string(ip_buf, source_address),
-          create_ip_string(ip_buf, destination_address));
 
-  if ((ntohl(ip->saddr) != source_address && source_address != 0) ||
-      (ntohl(ip->daddr) != destination_address && destination_address != 0))
-    return SUCCESS;
+  if ((ip->saddr != source_address_int && source_address_int != 0))
+    return EMPTY;
+  if ((ip->daddr != destination_address_int && destination_address_int != 0))
+    return EMPTY;
+  if ((ntohs(udp->dest) != *destination_port && *destination_port != 0))
+    return EMPTY;
+  if ((ntohs(udp->source) != *source_port && *source_port != 0))
+    return EMPTY;
 
   fprintf(file, "RECEIVED!!!!!\n");
 
-  // int total_length = ntohs(ip->tot_len);
-  // size_t max_data_len = n > total_length ? total_length : n;
+  fprintf(file, "%s:%d -> %s:%d (expected %s -> %s)\n",
+          create_ip_string(ip_buf, ntohl(ip->saddr)), ntohs(udp->source),
+          create_ip_string(ip_buf, ntohl(ip->daddr)), ntohs(udp->dest),
+          source_address, destination_address);
 
-  // for (size_t i = 0; i < max_data_len; i++) {
-  //   print_bytes_char(file, buffer, &cur_pos, 1, &bytes);
-  // }
+  strcpy(data, msg.buffer + sizeof(struct iphdr) + sizeof(struct udphdr));
+  strcpy(source_address, create_ip_string(ip_buf, ntohl(ip->saddr)));
+  strcpy(destination_address, create_ip_string(ip_buf, ntohl(ip->daddr)));
+  *source_port = ntohs(udp->source);
+  *destination_port = ntohs(udp->dest);
 
   return SUCCESS;
 }
 
-int send_data(int fd, int destination_port, int source_port) {
+int get_input(char *buffer, size_t *len) {
+  if (*len == 0) {
+    memset(buffer, 0, BUFFER_SIZE);
+
+    if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {
+      if (errno == EINTR) {
+        is_signal = TRUE;
+        return FAILURE;
+      }
+      fprintf(stderr, "ERROR: send_data - cannot build message for sending.\n");
+      return FAILURE;
+    }
+
+    printf("\033[A\033[K");
+  }
+  size_t real_len = strlen(buffer);
+  if (real_len == 1 && buffer[0] == '\n')
+    return EMPTY;
+
+  *len = real_len;
+  if (buffer[*len - 1] == '\n')
+    buffer[*len - 1] = '\0';
+
+  return SUCCESS;
+}
+
+int send_data(int fd, char *data, size_t len, char *source_address,
+              char *destination_address, int source_port,
+              int destination_port) {
   message msg;
   memset(&msg, 0, sizeof(msg));
 
-  if (fgets(msg.buffer, BUFFER_SIZE, stdin) == NULL) {
-    if (errno == EINTR) {
-      is_signal = TRUE;
-      return FAILURE;
-    }
-    fprintf(stderr, "ERROR: send_data - cannot build message for sending.\n");
+  if (data)
+    strcpy(msg.buffer, data);
+
+  int res = get_input(msg.buffer, &len);
+  if (res == FAILURE)
     return FAILURE;
-  }
-  msg.source_port = source_port;
-
-  printf("\033[A\033[K");
-
-  size_t real_len = strlen(msg.buffer);
-  if (real_len == 1 && msg.buffer[0] == '\n')
+  if (res == EMPTY)
     return SUCCESS;
 
-  struct sockaddr_in addr;
-  memset(&(addr), 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(destination_port);
-  addr.sin_addr.s_addr = INADDR_BROADCAST;
+  msg = build_message(msg.buffer, source_address, destination_address,
+                      source_port, destination_port);
 
-  if (sendto(fd, &msg, sizeof(msg), 0, (struct sockaddr *)&addr, sizeof(addr)) <
-      0) {
+  if (sendto(fd, &(msg.buffer), msg.buffer_len, 0,
+             (struct sockaddr *)&(msg.addr), msg.addr_len) < 0) {
     fprintf(stderr, "ERROR: send_data - cannot send message.\n");
     perror("sendto");
     return FAILURE;
@@ -116,4 +136,41 @@ char *create_ip_string(char *ip, int ip_int) {
           (ip_int >> 8) & 0xFF, ip_int & 0xFF);
 
   return ip;
+}
+
+message build_message(char *message_text, char *source_address,
+                      char *destination_address, int source_port,
+                      int destination_port) {
+  message msg;
+
+  size_t message_len = strlen(message_text), ip_len = sizeof(struct iphdr),
+         udp_len = sizeof(struct udphdr);
+  msg.buffer_len = ip_len + udp_len + message_len;
+
+  struct iphdr *ip = (struct iphdr *)msg.buffer;
+  memset(ip, 0, ip_len);
+  ip->version = 4;
+  ip->ihl = 5;
+  ip->tot_len = htons(msg.buffer_len);
+  ip->id = htons(source_port);
+  ip->ttl = 64;
+  ip->protocol = IPPROTO_UDP;
+  ip->saddr = inet_addr(source_address);
+  ip->daddr = inet_addr(destination_address);
+
+  struct udphdr *udp = (struct udphdr *)(msg.buffer + ip_len);
+  memset(udp, 0, udp_len);
+  udp->source = htons(source_port);
+  udp->dest = htons(destination_port);
+  udp->len = htons(udp_len + message_len);
+
+  memcpy(msg.buffer + ip_len + udp_len, message_text, message_len);
+
+  msg.addr_len = sizeof(msg.addr);
+  memset(&(msg.addr), 0, msg.addr_len);
+  msg.addr.sin_family = AF_INET;
+  msg.addr.sin_port = udp->dest;
+  msg.addr.sin_addr.s_addr = ip->daddr;
+
+  return msg;
 }

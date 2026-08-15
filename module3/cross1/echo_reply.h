@@ -19,6 +19,7 @@
 
 #define SUCCESS 111
 #define FAILURE -111
+#define EMPTY -110
 
 #define BUFFER_SIZE 1024
 #define IPV4_LENGTH INET_ADDRSTRLEN
@@ -33,32 +34,39 @@
 static volatile int is_signal = FALSE;
 
 typedef struct {
-  int source_port;
   char buffer[BUFFER_SIZE];
+  struct sockaddr_in addr;
+  size_t buffer_len;
+  size_t addr_len;
 } message;
 
 // parser.c
-int parse_input(int argc, char *argv[], char *mode,
-                unsigned int *destination_address, unsigned int *source_address,
-                int *port);
+int parse_input(int argc, char *argv[], char *mode, char *source_address,
+                char *destination_address, int *port);
 int parse_flag(char *flag, char *mode);
-int parse_address_from_str(char *address, unsigned int *address_int);
-int get_source_address(unsigned int *address);
+int check_address(char *address);
+int get_source_address(char *address);
 int parse_port(int *port_int, char *port);
 
 // socket_operations.c
 int create_socket(int *fd);
-int receive_data(int fd, unsigned int destination_address,
-                 unsigned int source_address);
-int send_data(int fd, int destination_port, int source_port);
+int receive_data(int fd, char *data, char *source_address,
+                 char *destination_address, int *source_port,
+                 int *destination_port);
+int send_data(int fd, char *data, size_t len, char *source_address,
+              char *destination_address, int source_port, int destination_port);
 char *create_ip_string(char *ip, int ip_int);
+message build_message(char *message_text, char *source_address,
+                      char *destination_address, int source_port,
+                      int destination_port);
+int get_input(char *buffer, size_t *len);
 
 // signal_handler.c
 void handle_SIGINT(int sig);
 
 // server.c
-int do_server_activity(unsigned int source_address);
+int do_server_activity(char *source_address);
 
 // client.c
-int do_client_activity(unsigned int destination_address,
-                       unsigned int source_address, int port);
+int do_client_activity(char *destination_address, char *source_address,
+                       int port);

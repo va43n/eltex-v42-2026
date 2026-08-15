@@ -4,15 +4,15 @@ int main(int argc, char *argv[]) {
   setbuf(stdout, NULL);
 
   char mode;
-  unsigned int destination_address, source_address;
+  char source_address[IPV4_LENGTH], destination_address[IPV4_LENGTH];
   int port;
-  if (parse_input(argc, argv, &mode, &destination_address, &source_address,
+  if (parse_input(argc, argv, &mode, source_address, destination_address,
                   &port) == FAILURE)
     return FAILURE;
 
   int result;
   if (mode == CLIENT)
-    result = do_client_activity(destination_address, source_address, port);
+    result = do_client_activity(source_address, destination_address, port);
   else if (mode == SERVER)
     result = do_server_activity(source_address);
 

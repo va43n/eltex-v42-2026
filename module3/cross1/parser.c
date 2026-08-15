@@ -1,8 +1,7 @@
 #include "echo_reply.h"
 
-int parse_input(int argc, char *argv[], char *mode,
-                unsigned int *destination_address, unsigned int *source_address,
-                int *port) {
+int parse_input(int argc, char *argv[], char *mode, char *source_address,
+                char *destination_address, int *port) {
   if (argc != 2 && argc != 4) {
     fprintf(
         stderr,
@@ -22,8 +21,9 @@ int parse_input(int argc, char *argv[], char *mode,
               "flag and server address.\n");
       return FAILURE;
     }
-    if (parse_address_from_str(argv[2], destination_address) == FAILURE)
+    if (check_address(argv[2]) == FAILURE)
       return FAILURE;
+    strcpy(destination_address, argv[2]);
     if (parse_port(port, argv[3]) == FAILURE)
       return FAILURE;
   }
@@ -47,22 +47,13 @@ int parse_flag(char *flag, char *mode) {
   return SUCCESS;
 }
 
-int parse_address_from_str(char *address, unsigned int *address_int) {
+int check_address(char *address) {
   struct hostent *server = gethostbyname(address);
   if (server == NULL) {
     fprintf(stderr,
             "ERROR: parse_address_from_str - cannot parse server address.\n");
     herror("gethostbyname");
     return FAILURE;
-  }
-
-  *address_int = 0;
-  char *token = strtok(address, ".");
-  *address_int |= atoi(token);
-  for (int i = 1; i < 4; i++) {
-    token = strtok(NULL, ".");
-    *address_int <<= 8;
-    *address_int |= atoi(token);
   }
 
   return SUCCESS;
@@ -83,10 +74,9 @@ int parse_port(int *port_int, char *port) {
   return SUCCESS;
 }
 
-int get_source_address(unsigned int *address) {
+int get_source_address(char *address) {
   struct ifaddrs *interfaces = NULL;
   struct ifaddrs *ifa = NULL;
-  char ip_buffer[INET_ADDRSTRLEN];
 
   if (getifaddrs(&interfaces) == -1) {
     fprintf(stderr,
@@ -101,14 +91,12 @@ int get_source_address(unsigned int *address) {
 
     if (ifa->ifa_addr->sa_family == AF_INET) {
       struct sockaddr_in *addr = (struct sockaddr_in *)ifa->ifa_addr;
-      inet_ntop(AF_INET, &(addr->sin_addr), ip_buffer, sizeof(ip_buffer));
-      if (strcmp(ip_buffer, LOCALHOST_STR) == 0)
+      inet_ntop(AF_INET, &(addr->sin_addr), address, IPV4_LENGTH);
+      if (check_address(address) == FAILURE)
+        continue;
+      if (strcmp(address, LOCALHOST_STR) == 0)
         continue;
 
-      unsigned int addr_int;
-      if (parse_address_from_str(ip_buffer, &addr_int) == FAILURE)
-        return FAILURE;
-      *address = addr_int;
       break;
     }
   }
