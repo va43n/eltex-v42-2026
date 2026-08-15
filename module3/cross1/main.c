@@ -12,9 +12,10 @@ int main(int argc, char *argv[]) {
 
   int result;
   if (mode == CLIENT)
-    result = do_client_activity(source_address, destination_address, port);
+    result = do_client_activity(source_address, destination_address, port,
+                                SERVER_PORT);
   else if (mode == SERVER)
-    result = do_server_activity(source_address);
+    result = do_server_activity(source_address, SERVER_PORT);
 
   if (result == SUCCESS)
     printf("Disconnected\n");

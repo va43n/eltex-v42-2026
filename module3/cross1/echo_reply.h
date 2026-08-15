@@ -25,6 +25,7 @@
 #define IPV4_LENGTH INET_ADDRSTRLEN
 
 #define LOCALHOST_STR "127.0.0.1"
+#define ANY_ADDRESS_STR "0.0.0.0"
 
 #define SERVER 's'
 #define SERVER_PORT 9876
@@ -60,13 +61,14 @@ message build_message(char *message_text, char *source_address,
                       char *destination_address, int source_port,
                       int destination_port);
 int get_input(char *buffer, size_t *len);
+int close_socket(int fd);
 
 // signal_handler.c
 void handle_SIGINT(int sig);
 
 // server.c
-int do_server_activity(char *source_address);
+int do_server_activity(char *server_address, int server_port);
 
 // client.c
-int do_client_activity(char *destination_address, char *source_address,
-                       int port);
+int do_client_activity(char *client_address, char *server_address,
+                       int client_port, int server_port);

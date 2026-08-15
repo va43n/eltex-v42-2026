@@ -45,8 +45,6 @@ int receive_data(int fd, char *data, char *source_address,
   unsigned int ihl = ip->ihl * 4;
   struct udphdr *udp = (struct udphdr *)(msg.buffer + ihl);
 
-  FILE *file = stdout;
-
   unsigned int source_address_int = inet_addr(source_address),
                destination_address_int = inet_addr(destination_address);
   char ip_buf[IPV4_LENGTH];
@@ -59,13 +57,6 @@ int receive_data(int fd, char *data, char *source_address,
     return EMPTY;
   if ((ntohs(udp->source) != *source_port && *source_port != 0))
     return EMPTY;
-
-  fprintf(file, "RECEIVED!!!!!\n");
-
-  fprintf(file, "%s:%d -> %s:%d (expected %s -> %s)\n",
-          create_ip_string(ip_buf, ntohl(ip->saddr)), ntohs(udp->source),
-          create_ip_string(ip_buf, ntohl(ip->daddr)), ntohs(udp->dest),
-          source_address, destination_address);
 
   strcpy(data, msg.buffer + sizeof(struct iphdr) + sizeof(struct udphdr));
   strcpy(source_address, create_ip_string(ip_buf, ntohl(ip->saddr)));
@@ -173,4 +164,14 @@ message build_message(char *message_text, char *source_address,
   msg.addr.sin_addr.s_addr = ip->daddr;
 
   return msg;
+}
+
+int close_socket(int fd) {
+  if (close(fd) < 0) {
+    fprintf(stderr, "ERROR: close_socket - cannot close the socket.\n");
+    perror("close");
+    return FAILURE;
+  }
+
+  return SUCCESS;
 }
