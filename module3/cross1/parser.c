@@ -1,7 +1,7 @@
 #include "echo_reply.h"
 
 int parse_input(int argc, char *argv[], char *mode, char *source_address,
-                char *destination_address, int *port) {
+                char *destination_address, uint16_t *port) {
   if (argc != 2 && argc != 4) {
     fprintf(
         stderr,
@@ -59,9 +59,9 @@ int check_address(char *address) {
   return SUCCESS;
 }
 
-int parse_port(int *port_int, char *port) {
+int parse_port(uint16_t *port_int, char *port) {
   *port_int = atoi(port);
-  if (*port_int < 1024 || *port_int > 65535) {
+  if (*port_int < 1024) {
     fprintf(stderr, "ERROR: parse_port - port is not valid.\n");
     return FAILURE;
   }

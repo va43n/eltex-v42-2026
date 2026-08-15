@@ -43,23 +43,24 @@ typedef struct {
 
 // parser.c
 int parse_input(int argc, char *argv[], char *mode, char *source_address,
-                char *destination_address, int *port);
+                char *destination_address, uint16_t *source_port);
 int parse_flag(char *flag, char *mode);
 int check_address(char *address);
 int get_source_address(char *address);
-int parse_port(int *port_int, char *port);
+int parse_port(uint16_t *port_int, char *port);
 
 // socket_operations.c
 int create_socket(int *fd);
 int receive_data(int fd, char *data, char *source_address,
-                 char *destination_address, int *source_port,
-                 int *destination_port);
+                 char *destination_address, uint16_t *source_port,
+                 uint16_t *destination_port);
 int send_data(int fd, char *data, size_t len, char *source_address,
-              char *destination_address, int source_port, int destination_port);
-char *create_ip_string(char *ip, int ip_int);
+              char *destination_address, uint16_t source_port,
+              uint16_t destination_port);
+char *create_ip_string(char *ip, uint32_t ip_int);
 message build_message(char *message_text, char *source_address,
-                      char *destination_address, int source_port,
-                      int destination_port);
+                      char *destination_address, uint16_t source_port,
+                      uint16_t destination_port);
 int get_input(char *buffer, size_t *len);
 int close_socket(int fd);
 
@@ -67,8 +68,8 @@ int close_socket(int fd);
 void handle_SIGINT(int sig);
 
 // server.c
-int do_server_activity(char *server_address, int server_port);
+int do_server_activity(char *server_address, uint16_t server_port);
 
 // client.c
 int do_client_activity(char *client_address, char *server_address,
-                       int client_port, int server_port);
+                       uint16_t client_port, uint16_t server_port);

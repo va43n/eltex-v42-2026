@@ -20,8 +20,8 @@ int create_socket(int *fd) {
 }
 
 int receive_data(int fd, char *data, char *source_address,
-                 char *destination_address, int *source_port,
-                 int *destination_port) {
+                 char *destination_address, uint16_t *source_port,
+                 uint16_t *destination_port) {
   message msg;
   memset(&msg, 0, sizeof(msg));
   memset(data, 0, BUFFER_SIZE);
@@ -45,8 +45,8 @@ int receive_data(int fd, char *data, char *source_address,
   unsigned int ihl = ip->ihl * 4;
   struct udphdr *udp = (struct udphdr *)(msg.buffer + ihl);
 
-  unsigned int source_address_int = inet_addr(source_address),
-               destination_address_int = inet_addr(destination_address);
+  uint32_t source_address_int = inet_addr(source_address),
+           destination_address_int = inet_addr(destination_address);
   char ip_buf[IPV4_LENGTH];
 
   if ((ip->saddr != source_address_int && source_address_int != 0))
@@ -94,8 +94,8 @@ int get_input(char *buffer, size_t *len) {
 }
 
 int send_data(int fd, char *data, size_t len, char *source_address,
-              char *destination_address, int source_port,
-              int destination_port) {
+              char *destination_address, uint16_t source_port,
+              uint16_t destination_port) {
   message msg;
   memset(&msg, 0, sizeof(msg));
 
@@ -121,7 +121,7 @@ int send_data(int fd, char *data, size_t len, char *source_address,
   return SUCCESS;
 }
 
-char *create_ip_string(char *ip, int ip_int) {
+char *create_ip_string(char *ip, uint32_t ip_int) {
   memset(ip, 0, IPV4_LENGTH);
   sprintf(ip, "%u.%u.%u.%u", (ip_int >> 24) & 0xFF, (ip_int >> 16) & 0xFF,
           (ip_int >> 8) & 0xFF, ip_int & 0xFF);
@@ -130,8 +130,8 @@ char *create_ip_string(char *ip, int ip_int) {
 }
 
 message build_message(char *message_text, char *source_address,
-                      char *destination_address, int source_port,
-                      int destination_port) {
+                      char *destination_address, uint16_t source_port,
+                      uint16_t destination_port) {
   message msg;
 
   size_t message_len = strlen(message_text), ip_len = sizeof(struct iphdr),
