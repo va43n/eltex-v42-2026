@@ -22,7 +22,6 @@
 #define EMPTY -110
 
 #define BUFFER_SIZE 1024
-#define IPV4_LENGTH INET_ADDRSTRLEN
 
 #define LOCALHOST_STR "127.0.0.1"
 #define ANY_ADDRESS_STR "0.0.0.0"
@@ -63,8 +62,13 @@ message build_message(char *message_text, char *source_address,
                       uint16_t destination_port);
 int get_input(char *buffer, size_t *len);
 int close_socket(int fd);
+int filter_udp_packets(struct iphdr *ip, struct udphdr *udp,
+                       char *source_address, char *destination_address,
+                       uint16_t source_port, uint16_t destination_port);
 
 // signal_handler.c
+void setup_signal_handler(void (*func)(int), int *signals,
+                          size_t number_of_signals);
 void handle_SIGINT(int sig);
 
 // server.c
@@ -73,3 +77,4 @@ int do_server_activity(char *server_address, uint16_t server_port);
 // client.c
 int do_client_activity(char *client_address, char *server_address,
                        uint16_t client_port, uint16_t server_port);
+int wait_for_something_to_select(fd_set *fds, int max_fd);

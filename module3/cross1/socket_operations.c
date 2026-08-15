@@ -31,8 +31,7 @@ int receive_data(int fd, char *data, char *source_address,
                    (struct sockaddr *)&(msg.addr), &(socklen));
   if (n < 0) {
     if (errno == EINTR) {
-      fprintf(stderr, "ERROR: receive_data - interrupted by signal.\n");
-      is_signal = TRUE;
+      fprintf(stderr, "receive_data - interrupted by signal.\n");
       return FAILURE;
     }
     fprintf(stderr,
@@ -45,24 +44,42 @@ int receive_data(int fd, char *data, char *source_address,
   unsigned int ihl = ip->ihl * 4;
   struct udphdr *udp = (struct udphdr *)(msg.buffer + ihl);
 
+  if (filter_udp_packets(ip, udp, source_address, destination_address,
+                         *source_port, *destination_port) == EMPTY)
+    return EMPTY;
+
+  char ip_buf[INET_ADDRSTRLEN];
+  strcpy(data, msg.buffer + ihl + sizeof(struct udphdr));
+  strcpy(source_address, create_ip_string(ip_buf, ntohl(ip->saddr)));
+  strcpy(destination_address, create_ip_string(ip_buf, ntohl(ip->daddr)));
+  *source_port = ntohs(udp->source);
+  *destination_port = ntohs(udp->dest);
+
+  return SUCCESS;
+}
+
+char *create_ip_string(char *ip, uint32_t ip_int) {
+  memset(ip, 0, INET_ADDRSTRLEN);
+  sprintf(ip, "%u.%u.%u.%u", (ip_int >> 24) & 0xFF, (ip_int >> 16) & 0xFF,
+          (ip_int >> 8) & 0xFF, ip_int & 0xFF);
+
+  return ip;
+}
+
+int filter_udp_packets(struct iphdr *ip, struct udphdr *udp,
+                       char *source_address, char *destination_address,
+                       uint16_t source_port, uint16_t destination_port) {
   uint32_t source_address_int = inet_addr(source_address),
            destination_address_int = inet_addr(destination_address);
-  char ip_buf[IPV4_LENGTH];
 
   if ((ip->saddr != source_address_int && source_address_int != 0))
     return EMPTY;
   if ((ip->daddr != destination_address_int && destination_address_int != 0))
     return EMPTY;
-  if ((ntohs(udp->dest) != *destination_port && *destination_port != 0))
+  if ((ntohs(udp->source) != source_port && source_port != 0))
     return EMPTY;
-  if ((ntohs(udp->source) != *source_port && *source_port != 0))
+  if ((ntohs(udp->dest) != destination_port && destination_port != 0))
     return EMPTY;
-
-  strcpy(data, msg.buffer + sizeof(struct iphdr) + sizeof(struct udphdr));
-  strcpy(source_address, create_ip_string(ip_buf, ntohl(ip->saddr)));
-  strcpy(destination_address, create_ip_string(ip_buf, ntohl(ip->daddr)));
-  *source_port = ntohs(udp->source);
-  *destination_port = ntohs(udp->dest);
 
   return SUCCESS;
 }
@@ -73,10 +90,10 @@ int get_input(char *buffer, size_t *len) {
 
     if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {
       if (errno == EINTR) {
-        is_signal = TRUE;
+        fprintf(stderr, "get_input - interrupted by signal.\n");
         return FAILURE;
       }
-      fprintf(stderr, "ERROR: send_data - cannot build message for sending.\n");
+      fprintf(stderr, "ERROR: get_input - cannot build message for sending.\n");
       return FAILURE;
     }
 
@@ -121,25 +138,17 @@ int send_data(int fd, char *data, size_t len, char *source_address,
   return SUCCESS;
 }
 
-char *create_ip_string(char *ip, uint32_t ip_int) {
-  memset(ip, 0, IPV4_LENGTH);
-  sprintf(ip, "%u.%u.%u.%u", (ip_int >> 24) & 0xFF, (ip_int >> 16) & 0xFF,
-          (ip_int >> 8) & 0xFF, ip_int & 0xFF);
-
-  return ip;
-}
-
 message build_message(char *message_text, char *source_address,
                       char *destination_address, uint16_t source_port,
                       uint16_t destination_port) {
   message msg;
+  memset(&msg, 0, sizeof(msg));
 
   size_t message_len = strlen(message_text), ip_len = sizeof(struct iphdr),
          udp_len = sizeof(struct udphdr);
   msg.buffer_len = ip_len + udp_len + message_len;
 
   struct iphdr *ip = (struct iphdr *)msg.buffer;
-  memset(ip, 0, ip_len);
   ip->version = 4;
   ip->ihl = 5;
   ip->tot_len = htons(msg.buffer_len);
@@ -150,7 +159,6 @@ message build_message(char *message_text, char *source_address,
   ip->daddr = inet_addr(destination_address);
 
   struct udphdr *udp = (struct udphdr *)(msg.buffer + ip_len);
-  memset(udp, 0, udp_len);
   udp->source = htons(source_port);
   udp->dest = htons(destination_port);
   udp->len = htons(udp_len + message_len);
@@ -158,7 +166,6 @@ message build_message(char *message_text, char *source_address,
   memcpy(msg.buffer + ip_len + udp_len, message_text, message_len);
 
   msg.addr_len = sizeof(msg.addr);
-  memset(&(msg.addr), 0, msg.addr_len);
   msg.addr.sin_family = AF_INET;
   msg.addr.sin_port = udp->dest;
   msg.addr.sin_addr.s_addr = ip->daddr;

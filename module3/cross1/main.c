@@ -4,7 +4,7 @@ int main(int argc, char *argv[]) {
   setbuf(stdout, NULL);
 
   char mode;
-  char source_address[IPV4_LENGTH], destination_address[IPV4_LENGTH];
+  char source_address[INET_ADDRSTRLEN], destination_address[INET_ADDRSTRLEN];
   uint16_t port;
   if (parse_input(argc, argv, &mode, source_address, destination_address,
                   &port) == FAILURE)
@@ -18,9 +18,9 @@ int main(int argc, char *argv[]) {
     result = do_server_activity(source_address, SERVER_PORT);
 
   if (result == SUCCESS)
-    printf("Disconnected\n");
+    printf("Disconnected succesfully\n");
   else
-    printf("Something went wrong in this group chat session...\n");
+    printf("Something went wrong in this session...\n");
 
   return 0;
 }
