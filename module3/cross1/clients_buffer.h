@@ -1,17 +1,9 @@
 #include <arpa/inet.h>
-#include <fcntl.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
-#define TRUE 1
-#define FALSE 0
-
-#define SUCCESS 111
-#define FAILURE -111
-#define EMPTY -110
-
-#define BUFFER_SIZE 1024
+#include "lib/constants.h"
 
 typedef struct {
   char address[INET_ADDRSTRLEN];

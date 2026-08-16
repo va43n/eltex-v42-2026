@@ -12,7 +12,7 @@ int do_server_activity(char *server_address, uint16_t server_port) {
     return FAILURE;
 
   int fd;
-  if (create_socket(&fd) == FAILURE)
+  if (raw_socket_create(&fd) == FAILURE)
     return FAILURE;
 
   char data[BUFFER_SIZE];
@@ -26,7 +26,7 @@ int do_server_activity(char *server_address, uint16_t server_port) {
     strcpy(client_address, ANY_ADDRESS_STR);
     mode = '\0';
 
-    int res = receive_data(fd, data, &mode, client_address, server_address,
+    int res = raw_socket_receive_data(fd, data, &mode, client_address, server_address,
                            &client_port, &server_port);
     if (res == FAILURE)
       break;
@@ -46,7 +46,7 @@ int do_server_activity(char *server_address, uint16_t server_port) {
                cb.cb[pos].message_counter);
         build_server_response(data, cb.cb[pos].message_counter);
 
-        if (send_data(fd, data, strlen(data), MESSAGE_TYPE_TEXT, server_address,
+        if (raw_socket_send_data(fd, data, strlen(data), MESSAGE_TYPE_TEXT, server_address,
                       client_address, server_port, client_port) == FAILURE)
           return FAILURE;
       } else if (mode == MESSAGE_TYPE_DISCONNECT) {
@@ -61,7 +61,7 @@ int do_server_activity(char *server_address, uint16_t server_port) {
 
   free_clients_buffer(cb);
 
-  return close_socket(fd);
+  return raw_socket_close(fd);
 }
 
 void build_server_response(char *data, size_t message_counter) {

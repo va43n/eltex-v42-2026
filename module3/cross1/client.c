@@ -9,7 +9,7 @@ int do_client_activity(char *client_address, char *server_address,
   setup_signal_handler(handle_SIGINT, signals, 1);
 
   int fd;
-  if (create_socket(&fd) == FAILURE)
+  if (raw_socket_create(&fd) == FAILURE)
     return FAILURE;
 
   fd_set fds, fds_start;
@@ -27,13 +27,13 @@ int do_client_activity(char *client_address, char *server_address,
       break;
 
     if (FD_ISSET(STDIN_FILENO, &fds)) {
-      if (send_data(fd, NULL, 0, MESSAGE_TYPE_TEXT, client_address,
+      if (raw_socket_send_data(fd, NULL, 0, MESSAGE_TYPE_TEXT, client_address,
                     server_address, client_port, server_port) == FAILURE)
         break;
     }
 
     if (FD_ISSET(fd, &fds)) {
-      int res = receive_data(fd, data, &message_type, server_address,
+      int res = raw_socket_receive_data(fd, data, &message_type, server_address,
                              client_address, &server_port, &client_port);
       if (res == FAILURE)
         break;
@@ -43,10 +43,10 @@ int do_client_activity(char *client_address, char *server_address,
     }
   }
 
-  send_data(fd, "i'm leaving", 12, MESSAGE_TYPE_DISCONNECT, client_address,
+  raw_socket_send_data(fd, "i'm leaving", 12, MESSAGE_TYPE_DISCONNECT, client_address,
             server_address, client_port, server_port);
 
-  return close_socket(fd);
+  return raw_socket_close(fd);
 }
 
 int wait_for_something_to_select(fd_set *fds, int max_fd) {
