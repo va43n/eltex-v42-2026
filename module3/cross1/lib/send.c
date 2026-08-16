@@ -84,15 +84,15 @@ message _raw_socket_build_message(const char *const message_text,
   ip->daddr = inet_addr(destination_address);
 
   struct udphdr *udp = (struct udphdr *)(msg.buffer + ip_len);
-  udp->source = htons(source_port);
-  udp->dest = htons(destination_port);
-  udp->len = htons(udp_len + message_len);
+  udp->uh_sport = htons(source_port);
+  udp->uh_dport = htons(destination_port);
+  udp->uh_ulen = htons(udp_len + message_len);
 
   memcpy(msg.buffer + ip_len + udp_len, message_text, message_len);
 
   msg.addr_len = sizeof(msg.addr);
   msg.addr.sin_family = AF_INET;
-  msg.addr.sin_port = udp->dest;
+  msg.addr.sin_port = udp->uh_dport;
   msg.addr.sin_addr.s_addr = ip->daddr;
 
   return msg;

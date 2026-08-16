@@ -36,8 +36,8 @@ int raw_socket_receive_data(int fd, char *data, char *message_type,
          _raw_socket_create_ip_string(ip_buf, ntohl(ip->saddr)));
   strcpy(destination_address,
          _raw_socket_create_ip_string(ip_buf, ntohl(ip->daddr)));
-  *source_port = ntohs(udp->source);
-  *destination_port = ntohs(udp->dest);
+  *source_port = ntohs(udp->uh_sport);
+  *destination_port = ntohs(udp->uh_dport);
 
   *message_type = (char)(ntohs(ip->id) & 0xFF);
 
@@ -64,9 +64,9 @@ int _raw_socket_filter_packets(const struct iphdr *const ip,
     return EMPTY;
   if ((ip->daddr != destination_address_int && destination_address_int != 0))
     return EMPTY;
-  if ((ntohs(udp->source) != source_port && source_port != 0))
+  if ((ntohs(udp->uh_sport) != source_port && source_port != 0))
     return EMPTY;
-  if ((ntohs(udp->dest) != destination_port && destination_port != 0))
+  if ((ntohs(udp->uh_dport) != destination_port && destination_port != 0))
     return EMPTY;
 
   return SUCCESS;
