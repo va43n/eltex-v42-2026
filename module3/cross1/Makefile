@@ -34,9 +34,9 @@ $(SOCK_LIB_NAME): $(SOCK_LIB_OBJ)
 	ar rcs $@ $^
 
 format:
-	$(CLANG_FORMAT) -i *.h $(SRC) $(MANUAL_TEST_SRC)
+	$(CLANG_FORMAT) -i *.h lib/*.h $(SRC) $(SOCK_LIB_SRC) $(MANUAL_TEST_SRC)
 
-check_styles:
+check:
 	cppcheck --enable=all --suppress=missingIncludeSystem .
 
 valgrind: manual_testing

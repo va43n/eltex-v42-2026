@@ -35,7 +35,7 @@ int parse_input(int argc, char *argv[], char *mode, char *source_address,
   return SUCCESS;
 }
 
-int parse_flag(char *flag, char *mode) {
+int parse_flag(const char *const flag, char *mode) {
   if (strlen(flag) != 2 || flag[0] != '-' ||
       (flag[1] != CLIENT && flag[1] != SERVER)) {
     fprintf(stderr,
@@ -49,8 +49,8 @@ int parse_flag(char *flag, char *mode) {
   return SUCCESS;
 }
 
-int check_address(char *address) {
-  struct hostent *server = gethostbyname(address);
+int check_address(const char *const address) {
+  const struct hostent *const server = gethostbyname(address);
   if (server == NULL) {
     fprintf(stderr,
             "ERROR: parse_address_from_str - cannot parse server address.\n");
@@ -61,7 +61,7 @@ int check_address(char *address) {
   return SUCCESS;
 }
 
-int parse_port(uint16_t *port_int, char *port) {
+int parse_port(uint16_t *port_int, const char *const port) {
   *port_int = atoi(port);
   if (*port_int < 1024) {
     fprintf(stderr, "ERROR: parse_port - port is not valid.\n");

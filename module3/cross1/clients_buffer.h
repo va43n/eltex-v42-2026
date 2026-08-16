@@ -1,7 +1,7 @@
 #include <arpa/inet.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "lib/constants.h"
 
@@ -20,7 +20,7 @@ typedef struct {
 #define START_BUFFER_SIZE 2
 
 int create_clients_buffer(clients_buffer *cb);
-client create_client(char *address, uint16_t port,
+client create_client(const char *const address, uint16_t port,
                      unsigned int message_counter);
 int add_client_to_buffer(clients_buffer *cb, client c);
 int find_client_in_buffer(clients_buffer cb, client c, size_t *pos);

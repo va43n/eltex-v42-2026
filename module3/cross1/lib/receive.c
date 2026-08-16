@@ -1,8 +1,8 @@
 #include "raw_socket_operations.h"
 
-int raw_socket_receive_data(int fd, char *data, char *message_type, char *source_address,
-                 char *destination_address, uint16_t *source_port,
-                 uint16_t *destination_port) {
+int raw_socket_receive_data(int fd, char *data, char *message_type,
+                            char *source_address, char *destination_address,
+                            uint16_t *source_port, uint16_t *destination_port) {
   message msg;
   memset(&msg, 0, sizeof(msg));
   memset(data, 0, BUFFER_SIZE);
@@ -15,8 +15,8 @@ int raw_socket_receive_data(int fd, char *data, char *message_type, char *source
       fprintf(stderr, "raw_socket_receive_data - interrupted by signal.\n");
       return FAILURE;
     }
-    fprintf(stderr,
-            "ERROR: raw_socket_receive_data - cannot properly receive some data.\n");
+    fprintf(stderr, "ERROR: raw_socket_receive_data - cannot properly receive "
+                    "some data.\n");
     perror("recvfrom");
     return FAILURE;
   }
@@ -27,13 +27,15 @@ int raw_socket_receive_data(int fd, char *data, char *message_type, char *source
   unsigned int uhl = sizeof(struct udphdr);
 
   if (_raw_socket_filter_packets(ip, udp, source_address, destination_address,
-                         *source_port, *destination_port) == EMPTY)
+                                 *source_port, *destination_port) == EMPTY)
     return EMPTY;
 
   char ip_buf[INET_ADDRSTRLEN];
   strcpy(data, msg.buffer + ihl + uhl);
-  strcpy(source_address, _raw_socket_create_ip_string(ip_buf, ntohl(ip->saddr)));
-  strcpy(destination_address, _raw_socket_create_ip_string(ip_buf, ntohl(ip->daddr)));
+  strcpy(source_address,
+         _raw_socket_create_ip_string(ip_buf, ntohl(ip->saddr)));
+  strcpy(destination_address,
+         _raw_socket_create_ip_string(ip_buf, ntohl(ip->daddr)));
   *source_port = ntohs(udp->source);
   *destination_port = ntohs(udp->dest);
 
@@ -50,9 +52,11 @@ char *_raw_socket_create_ip_string(char *ip, uint32_t ip_int) {
   return ip;
 }
 
-int _raw_socket_filter_packets(struct iphdr *ip, struct udphdr *udp,
-                       char *source_address, char *destination_address,
-                       uint16_t source_port, uint16_t destination_port) {
+int _raw_socket_filter_packets(const struct iphdr *const ip,
+                               const struct udphdr *const udp,
+                               char *source_address, char *destination_address,
+                               uint16_t source_port,
+                               uint16_t destination_port) {
   uint32_t source_address_int = inet_addr(source_address),
            destination_address_int = inet_addr(destination_address);
 

@@ -26,8 +26,9 @@ int do_server_activity(char *server_address, uint16_t server_port) {
     strcpy(client_address, ANY_ADDRESS_STR);
     mode = '\0';
 
-    int res = raw_socket_receive_data(fd, data, &mode, client_address, server_address,
-                           &client_port, &server_port);
+    int res =
+        raw_socket_receive_data(fd, data, &mode, client_address, server_address,
+                                &client_port, &server_port);
     if (res == FAILURE)
       break;
     else if (res == SUCCESS) {
@@ -42,16 +43,17 @@ int do_server_activity(char *server_address, uint16_t server_port) {
         } else
           increment_one_of_the_clients(cb, pos);
 
-        printf("%s:%d> '%s' (message #%d)\n", client_address, client_port, data,
+        printf("%s:%u> '%s' (message #%u)\n", client_address, client_port, data,
                cb.cb[pos].message_counter);
         build_server_response(data, cb.cb[pos].message_counter);
 
-        if (raw_socket_send_data(fd, data, strlen(data), MESSAGE_TYPE_TEXT, server_address,
-                      client_address, server_port, client_port) == FAILURE)
+        if (raw_socket_send_data(fd, data, strlen(data), MESSAGE_TYPE_TEXT,
+                                 server_address, client_address, server_port,
+                                 client_port) == FAILURE)
           return FAILURE;
       } else if (mode == MESSAGE_TYPE_DISCONNECT) {
         if (find_res != FAILURE) {
-          printf("%s:%d is leaving...\n", cb.cb[pos].address, cb.cb[pos].port);
+          printf("%s:%u is leaving...\n", cb.cb[pos].address, cb.cb[pos].port);
           if (remove_client_from_buffer(cb, pos) == FAILURE)
             break;
         }
@@ -79,6 +81,6 @@ void build_server_response(char *data, size_t message_counter) {
   char new_data[BUFFER_SIZE];
   memset(new_data, 0, BUFFER_SIZE);
 
-  sprintf(new_data, "%*s %ld", (int)len, data, message_counter);
+  sprintf(new_data, "%*s %zu", (int)len, data, message_counter);
   strcpy(data, new_data);
 }

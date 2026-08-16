@@ -27,19 +27,23 @@ typedef struct {
 } message;
 
 int raw_socket_create(int *fd);
-int raw_socket_receive_data(int fd, char *data, char *message_type, char *source_address,
-                 char *destination_address, uint16_t *source_port,
-                 uint16_t *destination_port);
-int raw_socket_send_data(int fd, char *data, size_t len, char message_type,
-              char *source_address, char *destination_address,
-              uint16_t source_port, uint16_t destination_port);
+int raw_socket_receive_data(int fd, char *data, char *message_type,
+                            char *source_address, char *destination_address,
+                            uint16_t *source_port, uint16_t *destination_port);
+int raw_socket_send_data(int fd, const char *const data, size_t len,
+                         char message_type, char *source_address,
+                         char *destination_address, uint16_t source_port,
+                         uint16_t destination_port);
 int raw_socket_close(int fd);
 
 int _raw_socket_get_input(char *buffer, size_t *len);
 char *_raw_socket_create_ip_string(char *ip, uint32_t ip_int);
-message _raw_socket_build_message(char *message_text, char message_type,
-                      char *source_address, char *destination_address,
-                      uint16_t source_port, uint16_t destination_port);
-int _raw_socket_filter_packets(struct iphdr *ip, struct udphdr *udp,
-                       char *source_address, char *destination_address,
-                       uint16_t source_port, uint16_t destination_port);
+message _raw_socket_build_message(const char *const message_text,
+                                  char message_type, char *source_address,
+                                  char *destination_address,
+                                  uint16_t source_port,
+                                  uint16_t destination_port);
+int _raw_socket_filter_packets(const struct iphdr *const ip,
+                               const struct udphdr *const udp,
+                               char *source_address, char *destination_address,
+                               uint16_t source_port, uint16_t destination_port);

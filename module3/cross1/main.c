@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
                   &port) == FAILURE)
     return FAILURE;
 
-  int result;
+  int result = 0;
   if (mode == CLIENT)
     result = do_client_activity(source_address, destination_address, port,
                                 SERVER_PORT);

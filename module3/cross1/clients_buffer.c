@@ -12,7 +12,7 @@ int create_clients_buffer(clients_buffer *cb) {
   return SUCCESS;
 }
 
-client create_client(char *address, uint16_t port,
+client create_client(const char *const address, uint16_t port,
                      unsigned int message_counter) {
   client c;
   strcpy(c.address, address);

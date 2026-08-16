@@ -14,10 +14,10 @@ static volatile int is_signal = FALSE;
 // parser.c
 int parse_input(int argc, char *argv[], char *mode, char *source_address,
                 char *destination_address, uint16_t *source_port);
-int parse_flag(char *flag, char *mode);
-int check_address(char *address);
+int parse_flag(const char *const flag, char *mode);
+int check_address(const char *const address);
 int get_source_address(char *address);
-int parse_port(uint16_t *port_int, char *port);
+int parse_port(uint16_t *port_int, const char *const port);
 
 // signal_handler.c
 void setup_signal_handler(void (*func)(int), int *signals,

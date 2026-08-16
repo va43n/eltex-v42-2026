@@ -28,13 +28,15 @@ int do_client_activity(char *client_address, char *server_address,
 
     if (FD_ISSET(STDIN_FILENO, &fds)) {
       if (raw_socket_send_data(fd, NULL, 0, MESSAGE_TYPE_TEXT, client_address,
-                    server_address, client_port, server_port) == FAILURE)
+                               server_address, client_port,
+                               server_port) == FAILURE)
         break;
     }
 
     if (FD_ISSET(fd, &fds)) {
-      int res = raw_socket_receive_data(fd, data, &message_type, server_address,
-                             client_address, &server_port, &client_port);
+      int res =
+          raw_socket_receive_data(fd, data, &message_type, server_address,
+                                  client_address, &server_port, &client_port);
       if (res == FAILURE)
         break;
       else if (res == SUCCESS) {
@@ -43,8 +45,9 @@ int do_client_activity(char *client_address, char *server_address,
     }
   }
 
-  raw_socket_send_data(fd, "i'm leaving", 12, MESSAGE_TYPE_DISCONNECT, client_address,
-            server_address, client_port, server_port);
+  raw_socket_send_data(fd, "i'm leaving", 12, MESSAGE_TYPE_DISCONNECT,
+                       client_address, server_address, client_port,
+                       server_port);
 
   return raw_socket_close(fd);
 }
