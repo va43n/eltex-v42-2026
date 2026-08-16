@@ -25,7 +25,7 @@ sudo ./echo_reply.out -s # Сервер
 ```
 или
 ```bash
-sudo ./echo_reply.out -с <server IP> <client port> # Сервер
+sudo ./echo_reply.out -с <server IP> <client port> # Клиент
 ```
 При запуске программы пользователь может выбрать один из двух режимов:  
 - -s — программа запускается в роли сервера, прослушивающая все UDP пакеты в поисках пакета с destination address = IP-адрес сервера и destination port = 9876 (заданный в программе порт сервера);  
