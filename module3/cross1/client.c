@@ -18,6 +18,7 @@ int do_client_activity(char *client_address, char *server_address,
   FD_SET(STDIN_FILENO, &fds_start);
   FD_SET(fd, &fds_start);
 
+  char message_type;
   char data[BUFFER_SIZE];
   printf("Send message:\n");
   while (is_signal == FALSE) {
@@ -26,14 +27,14 @@ int do_client_activity(char *client_address, char *server_address,
       break;
 
     if (FD_ISSET(STDIN_FILENO, &fds)) {
-      if (send_data(fd, NULL, 0, client_address, server_address, client_port,
-                    server_port) == FAILURE)
+      if (send_data(fd, NULL, 0, MESSAGE_TYPE_TEXT, client_address,
+                    server_address, client_port, server_port) == FAILURE)
         break;
     }
 
     if (FD_ISSET(fd, &fds)) {
-      int res = receive_data(fd, data, server_address, client_address,
-                             &server_port, &client_port);
+      int res = receive_data(fd, data, &message_type, server_address,
+                             client_address, &server_port, &client_port);
       if (res == FAILURE)
         break;
       else if (res == SUCCESS) {
@@ -41,6 +42,9 @@ int do_client_activity(char *client_address, char *server_address,
       }
     }
   }
+
+  send_data(fd, "i'm leaving", 12, MESSAGE_TYPE_DISCONNECT, client_address,
+            server_address, client_port, server_port);
 
   return close_socket(fd);
 }

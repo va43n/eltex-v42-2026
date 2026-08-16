@@ -18,33 +18,44 @@ int do_server_activity(char *server_address, uint16_t server_port) {
   char data[BUFFER_SIZE];
   uint16_t client_port;
   char client_address[INET_ADDRSTRLEN];
+  char mode;
 
   printf("Packet receiving is started...\n");
   while (is_signal == FALSE) {
     client_port = 0;
     strcpy(client_address, ANY_ADDRESS_STR);
+    mode = '\0';
 
-    int res = receive_data(fd, data, client_address, server_address,
+    int res = receive_data(fd, data, &mode, client_address, server_address,
                            &client_port, &server_port);
     if (res == FAILURE)
       break;
     else if (res == SUCCESS) {
       size_t pos;
       client c = create_client(client_address, client_port, 1);
-      if (find_client_in_buffer(cb, c, &pos) == FAILURE) {
-        if (add_client_to_buffer(&cb, c) == FAILURE)
+      int find_res = find_client_in_buffer(cb, c, &pos);
+      if (mode == MESSAGE_TYPE_TEXT) {
+        if (find_res == FAILURE) {
+          if (add_client_to_buffer(&cb, c) == FAILURE)
+            return FAILURE;
+          pos = cb.len - 1;
+        } else
+          increment_one_of_the_clients(cb, pos);
+
+        printf("%s:%d> '%s' (message #%d)\n", client_address, client_port, data,
+               cb.cb[pos].message_counter);
+        build_server_response(data, cb.cb[pos].message_counter);
+
+        if (send_data(fd, data, strlen(data), MESSAGE_TYPE_TEXT, server_address,
+                      client_address, server_port, client_port) == FAILURE)
           return FAILURE;
-        pos = cb.len - 1;
-      } else
-        increment_one_of_the_clients(cb, pos);
-
-      printf("%s:%d> '%s' (message #%d)\n", client_address, client_port, data,
-             cb.cb[pos].message_counter);
-      build_server_response(data, cb.cb[pos].message_counter);
-
-      if (send_data(fd, data, strlen(data), server_address, client_address,
-                    server_port, client_port) == FAILURE)
-        return FAILURE;
+      } else if (mode == MESSAGE_TYPE_DISCONNECT) {
+        if (find_res != FAILURE) {
+          printf("%s:%d is leaving...\n", cb.cb[pos].address, cb.cb[pos].port);
+          if (remove_client_from_buffer(cb, pos) == FAILURE)
+            break;
+        }
+      }
     }
   }
 

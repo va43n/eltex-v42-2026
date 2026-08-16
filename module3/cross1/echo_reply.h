@@ -31,6 +31,9 @@
 
 #define CLIENT 'c'
 
+#define MESSAGE_TYPE_TEXT 'T'
+#define MESSAGE_TYPE_DISCONNECT 'D'
+
 static volatile int is_signal = FALSE;
 
 typedef struct {
@@ -50,16 +53,16 @@ int parse_port(uint16_t *port_int, char *port);
 
 // socket_operations.c
 int create_socket(int *fd);
-int receive_data(int fd, char *data, char *source_address,
+int receive_data(int fd, char *data, char *message_type, char *source_address,
                  char *destination_address, uint16_t *source_port,
                  uint16_t *destination_port);
-int send_data(int fd, char *data, size_t len, char *source_address,
-              char *destination_address, uint16_t source_port,
-              uint16_t destination_port);
+int send_data(int fd, char *data, size_t len, char message_type,
+              char *source_address, char *destination_address,
+              uint16_t source_port, uint16_t destination_port);
 char *create_ip_string(char *ip, uint32_t ip_int);
-message build_message(char *message_text, char *source_address,
-                      char *destination_address, uint16_t source_port,
-                      uint16_t destination_port);
+message build_message(char *message_text, char message_type,
+                      char *source_address, char *destination_address,
+                      uint16_t source_port, uint16_t destination_port);
 int get_input(char *buffer, size_t *len);
 int close_socket(int fd);
 int filter_udp_packets(struct iphdr *ip, struct udphdr *udp,

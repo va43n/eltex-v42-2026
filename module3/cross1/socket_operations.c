@@ -19,14 +19,14 @@ int create_socket(int *fd) {
   return SUCCESS;
 }
 
-int receive_data(int fd, char *data, char *source_address,
+int receive_data(int fd, char *data, char *message_type, char *source_address,
                  char *destination_address, uint16_t *source_port,
                  uint16_t *destination_port) {
   message msg;
   memset(&msg, 0, sizeof(msg));
   memset(data, 0, BUFFER_SIZE);
 
-  socklen_t socklen;
+  socklen_t socklen = sizeof(msg.addr);
   int n = recvfrom(fd, &(msg.buffer), BUFFER_SIZE, 0,
                    (struct sockaddr *)&(msg.addr), &(socklen));
   if (n < 0) {
@@ -43,17 +43,20 @@ int receive_data(int fd, char *data, char *source_address,
   struct iphdr *ip = (struct iphdr *)msg.buffer;
   unsigned int ihl = ip->ihl * 4;
   struct udphdr *udp = (struct udphdr *)(msg.buffer + ihl);
+  unsigned int uhl = sizeof(struct udphdr);
 
   if (filter_udp_packets(ip, udp, source_address, destination_address,
                          *source_port, *destination_port) == EMPTY)
     return EMPTY;
 
   char ip_buf[INET_ADDRSTRLEN];
-  strcpy(data, msg.buffer + ihl + sizeof(struct udphdr));
+  strcpy(data, msg.buffer + ihl + uhl);
   strcpy(source_address, create_ip_string(ip_buf, ntohl(ip->saddr)));
   strcpy(destination_address, create_ip_string(ip_buf, ntohl(ip->daddr)));
   *source_port = ntohs(udp->source);
   *destination_port = ntohs(udp->dest);
+
+  *message_type = (char)(ntohs(ip->id) & 0xFF);
 
   return SUCCESS;
 }
@@ -110,9 +113,9 @@ int get_input(char *buffer, size_t *len) {
   return SUCCESS;
 }
 
-int send_data(int fd, char *data, size_t len, char *source_address,
-              char *destination_address, uint16_t source_port,
-              uint16_t destination_port) {
+int send_data(int fd, char *data, size_t len, char message_type,
+              char *source_address, char *destination_address,
+              uint16_t source_port, uint16_t destination_port) {
   message msg;
   memset(&msg, 0, sizeof(msg));
 
@@ -125,8 +128,8 @@ int send_data(int fd, char *data, size_t len, char *source_address,
   if (res == EMPTY)
     return SUCCESS;
 
-  msg = build_message(msg.buffer, source_address, destination_address,
-                      source_port, destination_port);
+  msg = build_message(msg.buffer, message_type, source_address,
+                      destination_address, source_port, destination_port);
 
   if (sendto(fd, &(msg.buffer), msg.buffer_len, 0,
              (struct sockaddr *)&(msg.addr), msg.addr_len) < 0) {
@@ -138,9 +141,9 @@ int send_data(int fd, char *data, size_t len, char *source_address,
   return SUCCESS;
 }
 
-message build_message(char *message_text, char *source_address,
-                      char *destination_address, uint16_t source_port,
-                      uint16_t destination_port) {
+message build_message(char *message_text, char message_type,
+                      char *source_address, char *destination_address,
+                      uint16_t source_port, uint16_t destination_port) {
   message msg;
   memset(&msg, 0, sizeof(msg));
 
@@ -152,7 +155,10 @@ message build_message(char *message_text, char *source_address,
   ip->version = 4;
   ip->ihl = 5;
   ip->tot_len = htons(msg.buffer_len);
-  ip->id = htons(source_port);
+
+  uint16_t message_id = message_type - '\0';
+  ip->id = htons(message_id);
+
   ip->ttl = 64;
   ip->protocol = IPPROTO_UDP;
   ip->saddr = inet_addr(source_address);
