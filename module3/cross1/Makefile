@@ -25,16 +25,17 @@ all: manual_testing
 	$(CC) $(CFLAGS) -c $< -o $@
 
 manual_testing: $(OBJ) $(SOCK_LIB_NAME)
-								$(CC) $(CFLAGS) \
-								$(MANUAL_TEST_SRC) \
-								$(OBJ) $(SOCK_LIB_NAME) \
-								-o $(MANUAL_TEST_TARGET)
+	$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(OBJ) $(SOCK_LIB_NAME) -o $(MANUAL_TEST_TARGET)
 
 $(SOCK_LIB_NAME): $(SOCK_LIB_OBJ)
 	ar rcs $@ $^
 
 format:
-	$(CLANG_FORMAT) -i *.h lib/*.h $(SRC) $(SOCK_LIB_SRC) $(MANUAL_TEST_SRC)
+	$(CLANG_FORMAT) -i *.h \
+										 lib/*.h \
+										 $(SRC) \
+										 $(SOCK_LIB_SRC) \
+										 $(MANUAL_TEST_SRC)
 
 check:
 	cppcheck --enable=all --suppress=missingIncludeSystem .
