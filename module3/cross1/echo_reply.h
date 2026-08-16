@@ -73,6 +73,7 @@ void handle_SIGINT(int sig);
 
 // server.c
 int do_server_activity(char *server_address, uint16_t server_port);
+void build_server_response(char *data, size_t message_counter);
 
 // client.c
 int do_client_activity(char *client_address, char *server_address,
