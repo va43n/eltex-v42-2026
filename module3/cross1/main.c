@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   else if (mode == SERVER)
     result = do_server_activity(source_address, SERVER_PORT);
 
-  if (result == SUCCESS)
+  if (result != FAILURE)
     printf("Disconnected succesfully\n");
   else
     printf("Something went wrong in this session...\n");

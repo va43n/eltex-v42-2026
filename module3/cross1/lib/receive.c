@@ -13,7 +13,7 @@ int raw_socket_receive_data(int fd, char *data, char *message_type,
   if (n < 0) {
     if (errno == EINTR) {
       fprintf(stderr, "raw_socket_receive_data - interrupted by signal.\n");
-      return FAILURE;
+      return INTERRUPTION;
     }
     fprintf(stderr, "ERROR: raw_socket_receive_data - cannot properly receive "
                     "some data.\n");

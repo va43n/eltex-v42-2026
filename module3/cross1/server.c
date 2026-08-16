@@ -15,6 +15,8 @@ int do_server_activity(char *server_address, uint16_t server_port) {
   if (raw_socket_create(&fd) == FAILURE)
     return FAILURE;
 
+  int result = SUCCESS;
+
   char data[BUFFER_SIZE];
   uint16_t client_port;
   char client_address[INET_ADDRSTRLEN];
@@ -26,19 +28,17 @@ int do_server_activity(char *server_address, uint16_t server_port) {
     strcpy(client_address, ANY_ADDRESS_STR);
     mode = '\0';
 
-    int res =
+    result =
         raw_socket_receive_data(fd, data, &mode, client_address, server_address,
                                 &client_port, &server_port);
-    if (res == FAILURE)
-      break;
-    else if (res == SUCCESS) {
+    if (result == SUCCESS) {
       size_t pos;
       client c = create_client(client_address, client_port, 1);
       int find_res = find_client_in_buffer(cb, c, &pos);
       if (mode == MESSAGE_TYPE_TEXT) {
         if (find_res == FAILURE) {
-          if (add_client_to_buffer(&cb, c) == FAILURE)
-            return FAILURE;
+          if ((result = add_client_to_buffer(&cb, c)) != SUCCESS)
+            break;
           pos = cb.len - 1;
         } else
           increment_one_of_the_clients(cb, pos);
@@ -47,23 +47,25 @@ int do_server_activity(char *server_address, uint16_t server_port) {
                cb.cb[pos].message_counter);
         build_server_response(data, cb.cb[pos].message_counter);
 
-        if (raw_socket_send_data(fd, data, strlen(data), MESSAGE_TYPE_TEXT,
-                                 server_address, client_address, server_port,
-                                 client_port) == FAILURE)
-          return FAILURE;
+        if ((result = raw_socket_send_data(
+                 fd, data, strlen(data), MESSAGE_TYPE_TEXT, server_address,
+                 client_address, server_port, client_port)) != SUCCESS)
+          break;
       } else if (mode == MESSAGE_TYPE_DISCONNECT) {
         if (find_res != FAILURE) {
           printf("%s:%u is leaving...\n", cb.cb[pos].address, cb.cb[pos].port);
-          if (remove_client_from_buffer(cb, pos) == FAILURE)
+          if ((result = remove_client_from_buffer(cb, pos)) == FAILURE)
             break;
         }
       }
-    }
+    } else if (result != EMPTY)
+      break;
   }
 
   free_clients_buffer(cb);
+  raw_socket_close(fd);
 
-  return raw_socket_close(fd);
+  return result;
 }
 
 void build_server_response(char *data, size_t message_counter) {

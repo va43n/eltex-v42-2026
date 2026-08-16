@@ -37,7 +37,7 @@ int _raw_socket_get_input(char *buffer, size_t *len) {
     if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {
       if (errno == EINTR) {
         fprintf(stderr, "_raw_socket_get_input - interrupted by signal.\n");
-        return FAILURE;
+        return INTERRUPTION;
       }
       fprintf(
           stderr,
@@ -45,7 +45,7 @@ int _raw_socket_get_input(char *buffer, size_t *len) {
       return FAILURE;
     }
 
-    printf("\033[A\033[K");
+    // printf("\033[A\033[K");
   }
   size_t real_len = strlen(buffer);
   if (real_len == 1 && buffer[0] == '\n')

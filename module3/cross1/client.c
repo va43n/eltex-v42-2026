@@ -12,6 +12,8 @@ int do_client_activity(char *client_address, char *server_address,
   if (raw_socket_create(&fd) == FAILURE)
     return FAILURE;
 
+  int result = SUCCESS;
+
   fd_set fds, fds_start;
   int max_fd = (fd > STDIN_FILENO ? fd : STDIN_FILENO) + 1;
   FD_ZERO(&fds);
@@ -23,25 +25,24 @@ int do_client_activity(char *client_address, char *server_address,
   printf("Send message:\n");
   while (is_signal == FALSE) {
     fds = fds_start;
-    if (wait_for_something_to_select(&fds, max_fd) == FAILURE)
+    if ((result = wait_for_something_to_select(&fds, max_fd)) != SUCCESS)
       break;
 
     if (FD_ISSET(STDIN_FILENO, &fds)) {
-      if (raw_socket_send_data(fd, NULL, 0, MESSAGE_TYPE_TEXT, client_address,
-                               server_address, client_port,
-                               server_port) == FAILURE)
+      if ((result = raw_socket_send_data(fd, NULL, 0, MESSAGE_TYPE_TEXT,
+                                         client_address, server_address,
+                                         client_port, server_port)) == FAILURE)
         break;
     }
 
     if (FD_ISSET(fd, &fds)) {
-      int res =
+      result =
           raw_socket_receive_data(fd, data, &message_type, server_address,
                                   client_address, &server_port, &client_port);
-      if (res == FAILURE)
-        break;
-      else if (res == SUCCESS) {
+      if (result == SUCCESS) {
         printf("%s\n", data);
-      }
+      } else if (result != EMPTY)
+        break;
     }
   }
 
@@ -49,7 +50,9 @@ int do_client_activity(char *client_address, char *server_address,
                        client_address, server_address, client_port,
                        server_port);
 
-  return raw_socket_close(fd);
+  raw_socket_close(fd);
+
+  return result;
 }
 
 int wait_for_something_to_select(fd_set *fds, int max_fd) {
@@ -58,7 +61,7 @@ int wait_for_something_to_select(fd_set *fds, int max_fd) {
     if (errno == EINTR) {
       fprintf(stderr,
               "wait_for_something_to_select - interrupted by signal.\n");
-      return FAILURE;
+      return INTERRUPTION;
     }
     fprintf(stderr, "ERROR: wait_for_something_to_select (select).\n");
     perror("select");
