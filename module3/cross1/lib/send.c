@@ -7,14 +7,11 @@ int raw_socket_send_data(int fd, const char *const data, size_t len,
   message msg;
   memset(&msg, 0, sizeof(msg));
 
-  if (data)
-    strcpy(msg.buffer, data);
+  if (data) strcpy(msg.buffer, data);
 
   int res = _raw_socket_get_input(msg.buffer, &len);
-  if (res == FAILURE)
-    return FAILURE;
-  if (res == EMPTY)
-    return SUCCESS;
+  if (res == FAILURE) return FAILURE;
+  if (res == EMPTY) return SUCCESS;
 
   msg = _raw_socket_build_message(msg.buffer, message_type, source_address,
                                   destination_address, source_port,
@@ -48,12 +45,10 @@ int _raw_socket_get_input(char *buffer, size_t *len) {
     // printf("\033[A\033[K");
   }
   size_t real_len = strlen(buffer);
-  if (real_len == 1 && buffer[0] == '\n')
-    return EMPTY;
+  if (real_len == 1 && buffer[0] == '\n') return EMPTY;
 
   *len = real_len;
-  if (buffer[*len - 1] == '\n')
-    buffer[*len - 1] = '\0';
+  if (buffer[*len - 1] == '\n') buffer[*len - 1] = '\0';
 
   return SUCCESS;
 }

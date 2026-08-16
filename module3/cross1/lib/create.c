@@ -9,8 +9,9 @@ int raw_socket_create(int *fd) {
 
   int val = 1;
   if (setsockopt(*fd, IPPROTO_IP, IP_HDRINCL, &val, sizeof(val)) < 0) {
-    fprintf(stderr, "ERROR: socket_connect - cannot add permissions to "
-                    "socket.\n");
+    fprintf(stderr,
+            "ERROR: socket_connect - cannot add permissions to "
+            "socket.\n");
     perror("setsockopt");
     close(*fd);
     return FAILURE;

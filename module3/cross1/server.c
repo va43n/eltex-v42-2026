@@ -8,12 +8,10 @@ int do_server_activity(char *server_address, uint16_t server_port) {
   setup_signal_handler(handle_SIGINT, signals, 1);
 
   clients_buffer cb;
-  if (create_clients_buffer(&cb) == FAILURE)
-    return FAILURE;
+  if (create_clients_buffer(&cb) == FAILURE) return FAILURE;
 
   int fd;
-  if (raw_socket_create(&fd) == FAILURE)
-    return FAILURE;
+  if (raw_socket_create(&fd) == FAILURE) return FAILURE;
 
   int result = SUCCESS;
 
@@ -37,8 +35,7 @@ int do_server_activity(char *server_address, uint16_t server_port) {
       int find_res = find_client_in_buffer(cb, c, &pos);
       if (mode == MESSAGE_TYPE_TEXT) {
         if (find_res == FAILURE) {
-          if ((result = add_client_to_buffer(&cb, c)) != SUCCESS)
-            break;
+          if ((result = add_client_to_buffer(&cb, c)) != SUCCESS) break;
           pos = cb.len - 1;
         } else
           increment_one_of_the_clients(cb, pos);
@@ -54,8 +51,7 @@ int do_server_activity(char *server_address, uint16_t server_port) {
       } else if (mode == MESSAGE_TYPE_DISCONNECT) {
         if (find_res != FAILURE) {
           printf("%s:%u is leaving...\n", cb.cb[pos].address, cb.cb[pos].port);
-          if ((result = remove_client_from_buffer(cb, pos)) == FAILURE)
-            break;
+          if ((result = remove_client_from_buffer(cb, pos)) == FAILURE) break;
         }
       }
     } else if (result != EMPTY)

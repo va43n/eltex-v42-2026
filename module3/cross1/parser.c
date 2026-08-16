@@ -12,8 +12,7 @@ int parse_input(int argc, char *argv[], char *mode, char *source_address,
     return FAILURE;
   }
 
-  if (parse_flag(argv[1], mode) == FAILURE)
-    return FAILURE;
+  if (parse_flag(argv[1], mode) == FAILURE) return FAILURE;
   if (*mode == CLIENT) {
     if (argc != 4) {
       fprintf(stderr,
@@ -22,15 +21,12 @@ int parse_input(int argc, char *argv[], char *mode, char *source_address,
       return FAILURE;
     }
 
-    if (check_address(argv[2]) == FAILURE)
-      return FAILURE;
+    if (check_address(argv[2]) == FAILURE) return FAILURE;
     strcpy(destination_address, argv[2]);
 
-    if (parse_port(port, argv[3]) == FAILURE)
-      return FAILURE;
+    if (parse_port(port, argv[3]) == FAILURE) return FAILURE;
   }
-  if (get_source_address(source_address) == FAILURE)
-    return FAILURE;
+  if (get_source_address(source_address) == FAILURE) return FAILURE;
 
   return SUCCESS;
 }
@@ -87,16 +83,13 @@ int get_source_address(char *address) {
   }
 
   for (ifa = interfaces; ifa != NULL; ifa = ifa->ifa_next) {
-    if (ifa->ifa_addr == NULL)
-      continue;
+    if (ifa->ifa_addr == NULL) continue;
 
     if (ifa->ifa_addr->sa_family == AF_INET) {
       struct sockaddr_in *addr = (struct sockaddr_in *)ifa->ifa_addr;
       inet_ntop(AF_INET, &(addr->sin_addr), address, INET_ADDRSTRLEN);
-      if (check_address(address) == FAILURE)
-        continue;
-      if (strcmp(address, LOCALHOST_STR) == 0)
-        continue;
+      if (check_address(address) == FAILURE) continue;
+      if (strcmp(address, LOCALHOST_STR) == 0) continue;
       break;
     }
   }

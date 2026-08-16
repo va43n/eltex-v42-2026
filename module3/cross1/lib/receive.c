@@ -15,8 +15,9 @@ int raw_socket_receive_data(int fd, char *data, char *message_type,
       fprintf(stderr, "raw_socket_receive_data - interrupted by signal.\n");
       return INTERRUPTION;
     }
-    fprintf(stderr, "ERROR: raw_socket_receive_data - cannot properly receive "
-                    "some data.\n");
+    fprintf(stderr,
+            "ERROR: raw_socket_receive_data - cannot properly receive "
+            "some data.\n");
     perror("recvfrom");
     return FAILURE;
   }
@@ -64,8 +65,7 @@ int _raw_socket_filter_packets(const struct iphdr *const ip,
     return EMPTY;
   if ((ip->daddr != destination_address_int && destination_address_int != 0))
     return EMPTY;
-  if ((ntohs(udp->uh_sport) != source_port && source_port != 0))
-    return EMPTY;
+  if ((ntohs(udp->uh_sport) != source_port && source_port != 0)) return EMPTY;
   if ((ntohs(udp->uh_dport) != destination_port && destination_port != 0))
     return EMPTY;
 

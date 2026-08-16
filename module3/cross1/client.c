@@ -9,8 +9,7 @@ int do_client_activity(char *client_address, char *server_address,
   setup_signal_handler(handle_SIGINT, signals, 1);
 
   int fd;
-  if (raw_socket_create(&fd) == FAILURE)
-    return FAILURE;
+  if (raw_socket_create(&fd) == FAILURE) return FAILURE;
 
   int result = SUCCESS;
 
@@ -25,8 +24,7 @@ int do_client_activity(char *client_address, char *server_address,
   printf("Send message:\n");
   while (is_signal == FALSE) {
     fds = fds_start;
-    if ((result = wait_for_something_to_select(&fds, max_fd)) != SUCCESS)
-      break;
+    if ((result = wait_for_something_to_select(&fds, max_fd)) != SUCCESS) break;
 
     if (FD_ISSET(STDIN_FILENO, &fds)) {
       if ((result = raw_socket_send_data(fd, NULL, 0, MESSAGE_TYPE_TEXT,
