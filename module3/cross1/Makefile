@@ -25,10 +25,10 @@ all: manual_testing
 	$(CC) $(CFLAGS) -c $< -o $@
 
 manual_testing: $(OBJ) $(SOCK_LIB_NAME)
-	$(CC) $(CFLAGS) \
-	$(MANUAL_TEST_SRC) \
-	$(OBJ) $(SOCK_LIB_NAME) \
-	-o $(MANUAL_TEST_TARGET)
+								$(CC) $(CFLAGS) \
+								$(MANUAL_TEST_SRC) \
+								$(OBJ) $(SOCK_LIB_NAME) \
+								-o $(MANUAL_TEST_TARGET)
 
 $(SOCK_LIB_NAME): $(SOCK_LIB_OBJ)
 	ar rcs $@ $^
@@ -39,8 +39,8 @@ format:
 check:
 	cppcheck --enable=all --suppress=missingIncludeSystem .
 
-valgrind: manual_testing
-	valgrind --tool=memcheck --leak-check=yes --quiet ./$(MANUAL_TEST_TARGET)
+valgrind:
+	valgrind --tool=memcheck --leak-check=yes ./$(MANUAL_TEST_TARGET) $(INPUT)
 
 clean:
 	@rm -rf $(OBJ) \
@@ -51,8 +51,8 @@ clean:
 					*.out
 
 .PHONY: all \
-		manual_testing \
-		clean \
-		format \
-		check_styles \
-		valgrind
+				manual_testing \
+				clean \
+				format \
+				check_styles \
+				valgrind

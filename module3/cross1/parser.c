@@ -101,5 +101,7 @@ int get_source_address(char *address) {
     }
   }
 
+  freeifaddrs(interfaces);
+
   return SUCCESS;
 }
