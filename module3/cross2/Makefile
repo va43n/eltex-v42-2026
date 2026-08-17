@@ -6,28 +6,23 @@ CFLAGS = -Wall -Wextra -Werror -std=gnu11
 # LIB_OBJ = $(LIB_SRC:.c=.o)
 # LIB_NAME = 
 
-SRC = # add later
+SRC = command_handler.c user_input_operations.c
 OBJ = $(SRC:.c=.o)
 
 MANUAL_TEST_SRC = main.c
-MANUAL_TEST_TARGET = header.out
+MANUAL_TEST_TARGET = taxi.out
 
 all: manual_testing
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-manual_testing: $(OBJ) $(LIB_NAME)
-	$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(OBJ) $(LIB_NAME) -o $(MANUAL_TEST_TARGET)
-
-$(LIB_NAME): $(LIB_OBJ)
-	ar rcs $@ $^
+manual_testing: $(OBJ)
+	$(CC) $(CFLAGS) $(MANUAL_TEST_SRC) $(OBJ) -o $(MANUAL_TEST_TARGET)
 
 format:
 	$(CLANG_FORMAT) -i *.h \
-										 lib/*.h \
 										 $(SRC) \
-										 $(LIB_SRC) \
 										 $(MANUAL_TEST_SRC)
 
 check:
@@ -38,9 +33,7 @@ valgrind:
 
 clean:
 	@rm -rf $(OBJ) \
-					$(LIB_OBJ) \
 					$(MANUAL_TEST_TARGET) \
-					$(LIB_NAME) \
 					*.o \
 					*.out
 

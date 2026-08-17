@@ -1,7 +1,9 @@
-#include "header.h"
+#include "taxi.h"
 
-int main(int argc, char *argv[]) {
-  
+int main() {
+  while (TRUE) {
+    if (perform_command() == FAILURE) break;
+  }
 
   return 0;
 }
