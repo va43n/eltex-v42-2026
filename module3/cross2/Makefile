@@ -6,7 +6,7 @@ CFLAGS = -Wall -Wextra -Werror -std=gnu11
 # LIB_OBJ = $(LIB_SRC:.c=.o)
 # LIB_NAME = 
 
-SRC = command_handler.c user_input_operations.c
+SRC = command_handler.c user_input_operations.c pids_array_operations.c
 OBJ = $(SRC:.c=.o)
 
 MANUAL_TEST_SRC = main.c

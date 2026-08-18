@@ -1,15 +1,11 @@
 #include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 
-#define TRUE 1
-#define FALSE 0
+#include "constants.h"
+#include "pids_array.h"
 
-#define SUCCESS 111
-#define INTERRUPTION 110
-#define FAILURE -111
-
-#define BUFFER_SIZE 1024
 #define MAX_TOKENS_NUMBER 3
 
 #define CREATE_DRIVER "create_driver"
@@ -35,10 +31,13 @@ void tokenize_input(char* buffer, int* number_of_tokens,
                     char tokens[][BUFFER_SIZE]);
 
 // command_handler.c
-int perform_command();
+int perform_command(pids* p);
 int define_command(char* command, int* pos);
-int create_driver(int argc, char argv[][BUFFER_SIZE]);
-int send_task(int argc, char argv[][BUFFER_SIZE]);
-int get_status(int argc, char argv[][BUFFER_SIZE]);
-int get_drivers(int argc, char argv[][BUFFER_SIZE]);
+int create_driver(pids* p, int argc, char argv[][BUFFER_SIZE]);
+int send_task(pids* p, int argc, char argv[][BUFFER_SIZE]);
+int get_status(pids* p, int argc, char argv[][BUFFER_SIZE]);
+int get_drivers(pids* p, int argc, char argv[][BUFFER_SIZE]);
 int parse_str_to_uint(char* str, unsigned int* number);
+int stop_everything(pids p);
+
+void do_clild_process_activity();

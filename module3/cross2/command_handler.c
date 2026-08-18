@@ -1,7 +1,7 @@
 #include "taxi.h"
 
-int perform_command() {
-  int (*commands[])(int, char[][BUFFER_SIZE]) = COMMANDS_ARRAY;
+int perform_command(pids* p) {
+  int (*commands[])(pids*, int, char[][BUFFER_SIZE]) = COMMANDS_ARRAY;
   char input_buffer[BUFFER_SIZE];
   char tokens[MAX_TOKENS_NUMBER][BUFFER_SIZE];
   int number_of_tokens = MAX_TOKENS_NUMBER, command_position;
@@ -10,7 +10,7 @@ int perform_command() {
   tokenize_input(input_buffer, &number_of_tokens, tokens);
   if (define_command(tokens[0], &command_position) == FAILURE) return FAILURE;
 
-  return commands[command_position](number_of_tokens, tokens);
+  return commands[command_position](p, number_of_tokens, tokens);
 }
 
 int define_command(char* command, int* pos) {
@@ -31,7 +31,7 @@ int define_command(char* command, int* pos) {
   return SUCCESS;
 }
 
-int create_driver(int argc, char argv[][BUFFER_SIZE]) {
+int create_driver(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   if (argc != 1) {
     fprintf(
         stderr,
@@ -40,11 +40,20 @@ int create_driver(int argc, char argv[][BUFFER_SIZE]) {
   }
 
   printf("%s: Creating the driver...\n", argv[0]);
+  pid_t pid = fork();
+  if (pid == 0) {
+    printf("I'm a child!!!!!\n");
+    do_clild_process_activity();
+  } else {
+    printf("I'm a parent!\n");
+
+    if (add_pid_to_array(p, pid) == FAILURE) return FAILURE;
+  }
 
   return SUCCESS;
 }
 
-int send_task(int argc, char argv[][BUFFER_SIZE]) {
+int send_task(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   if (argc != 3) {
     fprintf(stderr,
             "ERROR: send_task - there should be 2 parameters in the "
@@ -59,10 +68,17 @@ int send_task(int argc, char argv[][BUFFER_SIZE]) {
   printf("%s: Sending task to driver (%u) that takes (%u) seconds...\n",
          argv[0], pid, task_timer);
 
+  size_t pos;
+  if (find_pid_in_array(*p, pid, &pos) == FAILURE) {
+    printf("Driver (%u) is not found...\n", pid);
+  } else {
+    printf("Driver (%u) found in the position %zu.\n", pid, pos);
+  }
+
   return SUCCESS;
 }
 
-int get_status(int argc, char argv[][BUFFER_SIZE]) {
+int get_status(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   if (argc != 2) {
     fprintf(stderr,
             "ERROR: get_status - there should be 1 parameter in the "
@@ -75,10 +91,17 @@ int get_status(int argc, char argv[][BUFFER_SIZE]) {
 
   printf("%s: Getting status from driver (%u)...\n", argv[0], pid);
 
+  size_t pos;
+  if (find_pid_in_array(*p, pid, &pos) == FAILURE) {
+    printf("Driver (%u) is not found...\n", pid);
+  } else {
+    printf("Driver (%u) found in the position %zu.\n", pid, pos);
+  }
+
   return SUCCESS;
 }
 
-int get_drivers(int argc, char argv[][BUFFER_SIZE]) {
+int get_drivers(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   if (argc != 1) {
     fprintf(
         stderr,
@@ -87,6 +110,10 @@ int get_drivers(int argc, char argv[][BUFFER_SIZE]) {
   }
 
   printf("%s: Getting the drivers...\n", argv[0]);
+
+  for (size_t i = 0; i < p->len; i++) {
+    printf("%zu. Driver (%u)\n", i, p->pids[i]);
+  }
 
   return SUCCESS;
 }
@@ -105,4 +132,12 @@ int parse_str_to_uint(char* str, unsigned int* number) {
   }
 
   return SUCCESS;
+}
+
+void do_clild_process_activity() {
+  while (TRUE) {
+    sleep(1);
+  }
+
+  _exit(EXIT_SUCCESS);
 }
