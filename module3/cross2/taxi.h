@@ -5,6 +5,7 @@
 
 #include "constants.h"
 #include "pids_array.h"
+#include "signal_handler.h"
 
 #define MAX_TOKENS_NUMBER 3
 

@@ -5,8 +5,6 @@
 
 #define MAX_EVENTS 2
 
-int is_signal = FALSE;
-
 void do_child_process_activity(pid_t parent) {
   char buffer[BUFFER_SIZE];
   mqd_t rd, wr;
@@ -31,6 +29,8 @@ void do_child_process_activity(pid_t parent) {
   ev.data.fd = rd;
   epoll_ctl(epollfd, EPOLL_CTL_ADD, rd, &ev);
 
+  int signals[] = {SIGINT};
+  setup_signal_handler(handle_signal, signals, 1);
   while (!is_signal) {
     int nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 
@@ -67,13 +67,12 @@ void do_child_process_activity(pid_t parent) {
         uint64_t expr;
         ssize_t s = read(tfd, &expr, sizeof(expr));
         if (s == sizeof(expr)) {
-          printf("%u is available again\n", pid);
+          printf("(%u) is available again\n\n", pid);
         }
       }
     }
   }
 
-  printf("I'm stopping.\n");
   close(epollfd);
   close(tfd);
   close(rd);

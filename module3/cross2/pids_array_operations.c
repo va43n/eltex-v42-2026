@@ -46,7 +46,7 @@ int find_pid_in_array(pids p, pid_t pid, size_t *pos) {
 }
 
 int remove_pid_from_array(pids p, size_t pos) {
-  kill(p.pids[pos], SIGKILL);
+  kill(p.pids[pos], SIGINT);
   for (size_t i = pos + 1; i < p.len; i++) {
     p.pids[i - 1] = p.pids[i];
     p.mqs[i - 1][0] = p.mqs[i][0];
@@ -58,7 +58,7 @@ int remove_pid_from_array(pids p, size_t pos) {
 
 int free_pids_array(pids p) {
   for (size_t i = 0; i < p.len; i++) {
-    kill(p.pids[i], SIGKILL);
+    kill(p.pids[i], SIGINT);
     queue_disconnect(p.mqs[i][0]);
     queue_disconnect(p.mqs[i][1]);
     queue_delete(p.parent, p.pids[i]);

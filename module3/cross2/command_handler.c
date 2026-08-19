@@ -6,9 +6,11 @@ int perform_command(pids* p) {
   char tokens[MAX_TOKENS_NUMBER][BUFFER_SIZE];
   int number_of_tokens = MAX_TOKENS_NUMBER, command_position;
 
-  if (get_input(input_buffer) == FAILURE) return FAILURE;
+  int res = get_input(input_buffer);
+  if (res == FAILURE || res == INTERRUPTION) return res;
   tokenize_input(input_buffer, &number_of_tokens, tokens);
-  if (define_command(tokens[0], &command_position) == FAILURE) return FAILURE;
+  if (define_command(tokens[0], &command_position) == FAILURE)
+    return WRONG_COMMAND;
 
   return commands[command_position](p, number_of_tokens, tokens);
 }
