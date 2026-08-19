@@ -1,7 +1,7 @@
 #include "taxi.h"
 
 int perform_command(pids* p) {
-  int (*commands[])(pids*, int, char[][BUFFER_SIZE]) = COMMANDS_ARRAY;
+  int (*commands[])(pids*, int, const char[][BUFFER_SIZE]) = COMMANDS_ARRAY;
   char input_buffer[BUFFER_SIZE];
   char tokens[MAX_TOKENS_NUMBER][BUFFER_SIZE];
   int number_of_tokens = MAX_TOKENS_NUMBER, command_position;
@@ -15,7 +15,7 @@ int perform_command(pids* p) {
   return commands[command_position](p, number_of_tokens, tokens);
 }
 
-int define_command(char* command, int* pos) {
+int define_command(const char* command, int* pos) {
   if (strcmp(command, CREATE_DRIVER) == 0)
     *pos = CREATE_DRIVER_POS;
   else if (strcmp(command, SEND_TASK) == 0)
@@ -33,12 +33,12 @@ int define_command(char* command, int* pos) {
   return SUCCESS;
 }
 
-int create_driver(pids* p, int argc, char argv[][BUFFER_SIZE]) {
+int create_driver(pids* p, int argc, const char argv[][BUFFER_SIZE]) {
   if (argc != 1) {
     fprintf(
         stderr,
         "ERROR: create_driver - this command doesn't imply any parameters.\n");
-    return FAILURE;
+    return WRONG_COMMAND;
   }
 
   printf("%s: Creating the driver...\n", argv[0]);
@@ -59,17 +59,17 @@ int create_driver(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   return SUCCESS;
 }
 
-int send_task(pids* p, int argc, char argv[][BUFFER_SIZE]) {
+int send_task(pids* p, int argc, const char argv[][BUFFER_SIZE]) {
   if (argc != 3) {
     fprintf(stderr,
             "ERROR: send_task - there should be 2 parameters in the "
             "input:\n\tdriver's pid (uint32_t)\n\ttask timer (uint32_t)\n");
-    return FAILURE;
+    return WRONG_COMMAND;
   }
 
   unsigned int child, task_timer;
-  if (parse_str_to_uint(argv[1], &child) == FAILURE) return FAILURE;
-  if (parse_str_to_uint(argv[2], &task_timer) == FAILURE) return FAILURE;
+  if (parse_str_to_uint(argv[1], &child) == FAILURE) return WRONG_COMMAND;
+  if (parse_str_to_uint(argv[2], &task_timer) == FAILURE) return WRONG_COMMAND;
 
   printf("%s: Sending task that takes (%u) seconds to driver (%u)...\n",
          argv[0], task_timer, child);
@@ -90,16 +90,16 @@ int send_task(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   return SUCCESS;
 }
 
-int get_status(pids* p, int argc, char argv[][BUFFER_SIZE]) {
+int get_status(pids* p, int argc, const char argv[][BUFFER_SIZE]) {
   if (argc != 2) {
     fprintf(stderr,
             "ERROR: get_status - there should be 1 parameter in the "
             "input:\n\tdriver's pid (uint32_t)\n");
-    return FAILURE;
+    return WRONG_COMMAND;
   }
 
   unsigned int child;
-  parse_str_to_uint(argv[1], &child);
+  if (parse_str_to_uint(argv[1], &child) == FAILURE) return WRONG_COMMAND;
 
   printf("%s: Getting status from driver (%u)...\n", argv[0], child);
 
@@ -119,12 +119,12 @@ int get_status(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   return SUCCESS;
 }
 
-int get_drivers(pids* p, int argc, char argv[][BUFFER_SIZE]) {
+int get_drivers(pids* p, int argc, const char argv[][BUFFER_SIZE]) {
   if (argc != 1) {
     fprintf(
         stderr,
         "ERROR: get_drivers - this command doesn't imply any parameters.\n");
-    return FAILURE;
+    return WRONG_COMMAND;
   }
 
   printf("%s: Getting the drivers...\n", argv[0]);
@@ -141,22 +141,6 @@ int get_drivers(pids* p, int argc, char argv[][BUFFER_SIZE]) {
     printf("%s\n", msg);
   }
   printf("\n");
-
-  return SUCCESS;
-}
-
-int parse_str_to_uint(char* str, unsigned int* number) {
-  int result = sscanf(str, "%u", number);
-
-  if (result == 0) {
-    fprintf(stderr, "ERROR: parse_str_to_uint - %s in not a uint.\n", str);
-    return FAILURE;
-  }
-  if (str[0] == '-') {
-    fprintf(stderr, "ERROR: parse_str_to_uint - %s is a negative number.\n",
-            str);
-    return FAILURE;
-  }
 
   return SUCCESS;
 }

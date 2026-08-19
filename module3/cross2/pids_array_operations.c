@@ -45,16 +45,16 @@ int find_pid_in_array(pids p, pid_t pid, size_t *pos) {
   return FAILURE;
 }
 
-int remove_pid_from_array(pids p, size_t pos) {
-  kill(p.pids[pos], SIGINT);
-  for (size_t i = pos + 1; i < p.len; i++) {
-    p.pids[i - 1] = p.pids[i];
-    p.mqs[i - 1][0] = p.mqs[i][0];
-    p.mqs[i - 1][1] = p.mqs[i][1];
-  }
+// int remove_pid_from_array(pids p, size_t pos) {
+//   kill(p.pids[pos], SIGINT);
+//   for (size_t i = pos + 1; i < p.len; i++) {
+//     p.pids[i - 1] = p.pids[i];
+//     p.mqs[i - 1][0] = p.mqs[i][0];
+//     p.mqs[i - 1][1] = p.mqs[i][1];
+//   }
 
-  return SUCCESS;
-}
+//   return SUCCESS;
+// }
 
 int free_pids_array(pids p) {
   for (size_t i = 0; i < p.len; i++) {

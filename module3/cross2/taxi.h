@@ -30,15 +30,15 @@
 int get_input(char* buffer);
 void tokenize_input(char* buffer, int* number_of_tokens,
                     char tokens[][BUFFER_SIZE]);
+int parse_str_to_uint(const char* str, unsigned int* number);
 
 // command_handler.c
 int perform_command(pids* p);
-int define_command(char* command, int* pos);
-int create_driver(pids* p, int argc, char argv[][BUFFER_SIZE]);
-int send_task(pids* p, int argc, char argv[][BUFFER_SIZE]);
-int get_status(pids* p, int argc, char argv[][BUFFER_SIZE]);
-int get_drivers(pids* p, int argc, char argv[][BUFFER_SIZE]);
-int parse_str_to_uint(char* str, unsigned int* number);
+int define_command(const char* command, int* pos);
+int create_driver(pids* p, int argc, const char argv[][BUFFER_SIZE]);
+int send_task(pids* p, int argc, const char argv[][BUFFER_SIZE]);
+int get_status(pids* p, int argc, const char argv[][BUFFER_SIZE]);
+int get_drivers(pids* p, int argc, const char argv[][BUFFER_SIZE]);
 
 // child_process.c
 void do_child_process_activity(pid_t parent);

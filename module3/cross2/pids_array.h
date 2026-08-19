@@ -18,5 +18,5 @@ typedef struct {
 int create_pids_array(pids *p, pid_t ppid);
 int add_pid_to_array(pids *p, pid_t pid, mqd_t mq1, mqd_t mq2);
 int find_pid_in_array(pids p, pid_t pid, size_t *pos);
-int remove_pid_from_array(pids p, size_t pos);
+// int remove_pid_from_array(pids p, size_t pos);
 int free_pids_array(pids p);
