@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "constants.h"
 #include "pids_array.h"
