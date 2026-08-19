@@ -38,6 +38,6 @@ int send_task(pids* p, int argc, char argv[][BUFFER_SIZE]);
 int get_status(pids* p, int argc, char argv[][BUFFER_SIZE]);
 int get_drivers(pids* p, int argc, char argv[][BUFFER_SIZE]);
 int parse_str_to_uint(char* str, unsigned int* number);
-int stop_everything(pids p);
 
-void do_clild_process_activity();
+// child_process.c
+void do_child_process_activity(pid_t parent);

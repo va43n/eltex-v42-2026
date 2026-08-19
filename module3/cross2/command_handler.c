@@ -40,14 +40,18 @@ int create_driver(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   }
 
   printf("%s: Creating the driver...\n", argv[0]);
-  pid_t pid = fork();
-  if (pid == 0) {
-    printf("I'm a child!!!!!\n");
-    do_clild_process_activity();
-  } else {
-    printf("I'm a parent!\n");
 
-    if (add_pid_to_array(p, pid) == FAILURE) return FAILURE;
+  pid_t child = fork();
+  if (child == 0) {
+    do_child_process_activity(p->parent);
+  } else {
+    mqd_t mq;
+    queue_create(p->parent, child);
+    queue_connect(&mq, p->parent, child);
+    printf("The driver is created with pid (%u) and available in queue (%d)\n",
+           child, mq);
+
+    if (add_pid_to_array(p, child, mq) == FAILURE) return FAILURE;
   }
 
   return SUCCESS;
@@ -61,18 +65,26 @@ int send_task(pids* p, int argc, char argv[][BUFFER_SIZE]) {
     return FAILURE;
   }
 
-  unsigned int pid, task_timer;
-  if (parse_str_to_uint(argv[1], &pid) == FAILURE) return FAILURE;
+  unsigned int child, task_timer;
+  if (parse_str_to_uint(argv[1], &child) == FAILURE) return FAILURE;
   if (parse_str_to_uint(argv[2], &task_timer) == FAILURE) return FAILURE;
 
-  printf("%s: Sending task to driver (%u) that takes (%u) seconds...\n",
-         argv[0], pid, task_timer);
+  printf(
+      "%s: Sending task to driver (%u) that takes (%u) seconds from (%u)...\n",
+      argv[0], child, task_timer, p->parent);
 
   size_t pos;
-  if (find_pid_in_array(*p, pid, &pos) == FAILURE) {
-    printf("Driver (%u) is not found...\n", pid);
+  if (find_pid_in_array(*p, child, &pos) == FAILURE) {
+    printf("Driver (%u) is not found...\n", child);
   } else {
-    printf("Driver (%u) found in the position %zu.\n", pid, pos);
+    printf("Driver (%u) found in the position %zu.\n", child, pos + 1);
+    unsigned int priority;
+    char msg[BUFFER_SIZE];
+    strcpy(msg, argv[2]);
+    queue_send_message(p->mqs[pos], msg, 10);
+    queue_recv_message(p->mqs[pos], msg, &priority);
+
+    printf("%s\n", msg);
   }
 
   return SUCCESS;
@@ -86,16 +98,24 @@ int get_status(pids* p, int argc, char argv[][BUFFER_SIZE]) {
     return FAILURE;
   }
 
-  unsigned int pid;
-  parse_str_to_uint(argv[1], &pid);
+  unsigned int child;
+  parse_str_to_uint(argv[1], &child);
 
-  printf("%s: Getting status from driver (%u)...\n", argv[0], pid);
+  printf("%s: Getting status from driver (%u) from (%u)...\n", argv[0], child,
+         p->parent);
 
   size_t pos;
-  if (find_pid_in_array(*p, pid, &pos) == FAILURE) {
-    printf("Driver (%u) is not found...\n", pid);
+  if (find_pid_in_array(*p, child, &pos) == FAILURE) {
+    printf("Driver (%u) is not found...\n", child);
   } else {
-    printf("Driver (%u) found in the position %zu.\n", pid, pos);
+    printf("Driver (%u) found in the position %zu.\n", child, pos + 1);
+    unsigned int priority;
+    char msg[BUFFER_SIZE];
+    strcpy(msg, "0");
+    queue_send_message(p->mqs[pos], msg, 10);
+    queue_recv_message(p->mqs[pos], msg, &priority);
+
+    printf("%s\n", msg);
   }
 
   return SUCCESS;
@@ -109,10 +129,18 @@ int get_drivers(pids* p, int argc, char argv[][BUFFER_SIZE]) {
     return FAILURE;
   }
 
-  printf("%s: Getting the drivers...\n", argv[0]);
+  printf("%s: Getting the drivers from (%u)...\n", argv[0], p->parent);
 
   for (size_t i = 0; i < p->len; i++) {
-    printf("%zu. Driver (%u)\n", i, p->pids[i]);
+    printf("%zu. Driver (%u)\n", i + 1, p->pids[i]);
+
+    unsigned int priority;
+    char msg[BUFFER_SIZE];
+    strcpy(msg, "0");
+    queue_send_message(p->mqs[i], msg, 10);
+    queue_recv_message(p->mqs[i], msg, &priority);
+
+    printf("%s\n", msg);
   }
 
   return SUCCESS;
@@ -132,12 +160,4 @@ int parse_str_to_uint(char* str, unsigned int* number) {
   }
 
   return SUCCESS;
-}
-
-void do_clild_process_activity() {
-  while (TRUE) {
-    sleep(1);
-  }
-
-  _exit(EXIT_SUCCESS);
 }
