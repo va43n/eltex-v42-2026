@@ -41,3 +41,6 @@ int parse_str_to_uint(char* str, unsigned int* number);
 
 // child_process.c
 void do_child_process_activity(pid_t parent);
+int create_timer(int* tfd);
+int start_timer(int tfd, unsigned int seconds);
+int check_timer(int tfd, double* time_remaining);

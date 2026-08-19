@@ -49,7 +49,7 @@ int create_driver(pids* p, int argc, char argv[][BUFFER_SIZE]) {
     queue_create(p->parent, child);
     queue_connect(&mq1, p->parent, child, 1, O_RDONLY);
     queue_connect(&mq2, p->parent, child, 2, O_WRONLY);
-    printf("The driver is created with pid (%u)\n", child);
+    printf("The driver is created with pid (%u)\n\n", child);
 
     if (add_pid_to_array(p, child, mq1, mq2) == FAILURE) return FAILURE;
   }
@@ -69,22 +69,20 @@ int send_task(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   if (parse_str_to_uint(argv[1], &child) == FAILURE) return FAILURE;
   if (parse_str_to_uint(argv[2], &task_timer) == FAILURE) return FAILURE;
 
-  printf(
-      "%s: Sending task to driver (%u) that takes (%u) seconds from (%u)...\n",
-      argv[0], child, task_timer, p->parent);
+  printf("%s: Sending task that takes (%u) seconds to driver (%u)...\n",
+         argv[0], task_timer, child);
 
   size_t pos;
   if (find_pid_in_array(*p, child, &pos) == FAILURE) {
     printf("Driver (%u) is not found...\n", child);
   } else {
-    printf("Driver (%u) found in the position %zu.\n", child, pos + 1);
     unsigned int priority;
     char msg[BUFFER_SIZE];
     strcpy(msg, argv[2]);
     queue_send_message(p->mqs[pos][1], msg, PARENT_PRIORITY);
     queue_recv_message(p->mqs[pos][0], msg, &priority);
 
-    printf("%s\n", msg);
+    printf("%s\n\n", msg);
   }
 
   return SUCCESS;
@@ -101,21 +99,19 @@ int get_status(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   unsigned int child;
   parse_str_to_uint(argv[1], &child);
 
-  printf("%s: Getting status from driver (%u) from (%u)...\n", argv[0], child,
-         p->parent);
+  printf("%s: Getting status from driver (%u)...\n", argv[0], child);
 
   size_t pos;
   if (find_pid_in_array(*p, child, &pos) == FAILURE) {
     printf("Driver (%u) is not found...\n", child);
   } else {
-    printf("Driver (%u) found in the position %zu.\n", child, pos + 1);
     unsigned int priority;
     char msg[BUFFER_SIZE];
     strcpy(msg, "0");
     queue_send_message(p->mqs[pos][1], msg, PARENT_PRIORITY);
     queue_recv_message(p->mqs[pos][0], msg, &priority);
 
-    printf("%s\n", msg);
+    printf("%s\n\n", msg);
   }
 
   return SUCCESS;
@@ -129,7 +125,7 @@ int get_drivers(pids* p, int argc, char argv[][BUFFER_SIZE]) {
     return FAILURE;
   }
 
-  printf("%s: Getting the drivers from (%u)...\n", argv[0], p->parent);
+  printf("%s: Getting the drivers...\n", argv[0]);
 
   for (size_t i = 0; i < p->len; i++) {
     printf("%zu. Driver (%u) ", i + 1, p->pids[i]);
@@ -142,6 +138,7 @@ int get_drivers(pids* p, int argc, char argv[][BUFFER_SIZE]) {
 
     printf("%s\n", msg);
   }
+  printf("\n");
 
   return SUCCESS;
 }
