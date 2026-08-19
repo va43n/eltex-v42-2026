@@ -45,13 +45,13 @@ int create_driver(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   if (child == 0) {
     do_child_process_activity(p->parent);
   } else {
-    mqd_t mq;
+    mqd_t mq1, mq2;
     queue_create(p->parent, child);
-    queue_connect(&mq, p->parent, child);
-    printf("The driver is created with pid (%u) and available in queue (%d)\n",
-           child, mq);
+    queue_connect(&mq1, p->parent, child, 1, O_RDONLY);
+    queue_connect(&mq2, p->parent, child, 2, O_WRONLY);
+    printf("The driver is created with pid (%u)\n", child);
 
-    if (add_pid_to_array(p, child, mq) == FAILURE) return FAILURE;
+    if (add_pid_to_array(p, child, mq1, mq2) == FAILURE) return FAILURE;
   }
 
   return SUCCESS;
@@ -81,8 +81,8 @@ int send_task(pids* p, int argc, char argv[][BUFFER_SIZE]) {
     unsigned int priority;
     char msg[BUFFER_SIZE];
     strcpy(msg, argv[2]);
-    queue_send_message(p->mqs[pos], msg, 10);
-    queue_recv_message(p->mqs[pos], msg, &priority);
+    queue_send_message(p->mqs[pos][1], msg, PARENT_PRIORITY);
+    queue_recv_message(p->mqs[pos][0], msg, &priority);
 
     printf("%s\n", msg);
   }
@@ -112,8 +112,8 @@ int get_status(pids* p, int argc, char argv[][BUFFER_SIZE]) {
     unsigned int priority;
     char msg[BUFFER_SIZE];
     strcpy(msg, "0");
-    queue_send_message(p->mqs[pos], msg, 10);
-    queue_recv_message(p->mqs[pos], msg, &priority);
+    queue_send_message(p->mqs[pos][1], msg, PARENT_PRIORITY);
+    queue_recv_message(p->mqs[pos][0], msg, &priority);
 
     printf("%s\n", msg);
   }
@@ -132,13 +132,13 @@ int get_drivers(pids* p, int argc, char argv[][BUFFER_SIZE]) {
   printf("%s: Getting the drivers from (%u)...\n", argv[0], p->parent);
 
   for (size_t i = 0; i < p->len; i++) {
-    printf("%zu. Driver (%u)\n", i + 1, p->pids[i]);
+    printf("%zu. Driver (%u) ", i + 1, p->pids[i]);
 
-    unsigned int priority;
+    unsigned int priority = CHILD_PRIORITY;
     char msg[BUFFER_SIZE];
     strcpy(msg, "0");
-    queue_send_message(p->mqs[i], msg, 10);
-    queue_recv_message(p->mqs[i], msg, &priority);
+    queue_send_message(p->mqs[i][1], msg, PARENT_PRIORITY);
+    queue_recv_message(p->mqs[i][0], msg, &priority);
 
     printf("%s\n", msg);
   }

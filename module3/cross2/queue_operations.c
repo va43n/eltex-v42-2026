@@ -6,19 +6,27 @@
 
 int queue_check_if_created(pid_t ppid, pid_t pid) {
   char buffer[BUFFER_SIZE];
-  _create_actual_queue_name(buffer, ppid, pid);
+  _create_actual_queue_name(buffer, ppid, pid, 1);
 
   mqd_t mq = mq_open(buffer, O_RDONLY);
   if (mq == (mqd_t)-1) {
     return FALSE;
   }
   mq_close(mq);
+
+  _create_actual_queue_name(buffer, ppid, pid, 2);
+  mq = mq_open(buffer, O_RDONLY);
+  if (mq == (mqd_t)-1) {
+    return FALSE;
+  }
+  mq_close(mq);
+
   return TRUE;
 }
 
 int queue_create(pid_t ppid, pid_t pid) {
   char buffer[BUFFER_SIZE];
-  _create_actual_queue_name(buffer, ppid, pid);
+  _create_actual_queue_name(buffer, ppid, pid, 1);
 
   mqd_t mq;
   struct mq_attr queue_attr;
@@ -29,7 +37,16 @@ int queue_create(pid_t ppid, pid_t pid) {
 
   if ((mq = mq_open(buffer, O_CREAT | O_RDWR, 0644, &queue_attr)) ==
       (mqd_t)-1) {
-    fprintf(stderr, "ERROR: queue_create - some error occured.\n");
+    fprintf(stderr, "ERROR: queue_create - some error occured 1.\n");
+    perror("mq_open");
+    return FAILURE;
+  }
+  mq_close(mq);
+
+  _create_actual_queue_name(buffer, ppid, pid, 2);
+  if ((mq = mq_open(buffer, O_CREAT | O_RDWR, 0644, &queue_attr)) ==
+      (mqd_t)-1) {
+    fprintf(stderr, "ERROR: queue_create - some error occured 2.\n");
     perror("mq_open");
     return FAILURE;
   }
@@ -38,10 +55,10 @@ int queue_create(pid_t ppid, pid_t pid) {
   return SUCCESS;
 }
 
-int queue_connect(mqd_t *mq, pid_t ppid, pid_t pid) {
+int queue_connect(mqd_t *mq, pid_t ppid, pid_t pid, int number, int mode) {
   char buffer[BUFFER_SIZE];
-  _create_actual_queue_name(buffer, ppid, pid);
-  *mq = mq_open(buffer, O_RDWR);
+  _create_actual_queue_name(buffer, ppid, pid, number);
+  *mq = mq_open(buffer, mode);
 
   return SUCCESS;
 }
@@ -75,12 +92,19 @@ int queue_disconnect(mqd_t mq) {
 
 int queue_delete(pid_t ppid, pid_t pid) {
   char buffer[BUFFER_SIZE];
-  _create_actual_queue_name(buffer, ppid, pid);
+
+  _create_actual_queue_name(buffer, ppid, pid, 1);
+  mq_unlink(buffer);
+
+  _create_actual_queue_name(buffer, ppid, pid, 2);
   mq_unlink(buffer);
 
   return SUCCESS;
 }
 
-void _create_actual_queue_name(char *buffer, pid_t parent, pid_t child) {
-  snprintf(buffer, BUFFER_SIZE, "%s_%u_%u", QUEUE_NAME, parent, child);
+void _create_actual_queue_name(char *buffer, pid_t parent, pid_t child,
+                               int number) {
+  memset(buffer, 0, BUFFER_SIZE);
+  snprintf(buffer, BUFFER_SIZE, "%s_%u_%u_%d", QUEUE_NAME, parent, child,
+           number);
 }

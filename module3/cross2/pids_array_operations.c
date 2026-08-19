@@ -5,44 +5,31 @@ int create_pids_array(pids *p, pid_t ppid) {
   p->len = 0;
   p->parent = ppid;
   p->pids = (pid_t *)malloc(p->actual_len * sizeof(pid_t));
-  if (p->pids == NULL) {
-    fprintf(stderr, "ERROR: create_pids_array - cannot allocate memory.\n");
-    return FAILURE;
-  }
-  p->mqs = (pid_t *)malloc(p->actual_len * sizeof(pid_t));
-  if (p->mqs == NULL) {
-    fprintf(stderr, "ERROR: create_pids_array - cannot allocate memory.\n");
-    return FAILURE;
+  p->mqs = (mqd_t **)malloc(p->actual_len * sizeof(mqd_t *));
+  for (size_t i = 0; i < p->actual_len; i++) {
+    p->mqs[i] = (mqd_t *)malloc(2 * sizeof(mqd_t));
   }
 
   return SUCCESS;
 }
 
-int add_pid_to_array(pids *p, pid_t pid, mqd_t mq) {
+int add_pid_to_array(pids *p, pid_t pid, mqd_t mq1, mqd_t mq2) {
   p->len++;
   if (p->len > p->actual_len) {
     p->actual_len = p->len + START_BUFFER_SIZE;
-    pid_t *tmp = (pid_t *)realloc(p->pids, p->len * sizeof(pid_t));
-    if (tmp == NULL) {
-      fprintf(stderr,
-              "ERROR: add_pid_to_array - cannot reallocate memory 1.\n");
-      free_pids_array(*p);
-      return FAILURE;
-    }
+    pid_t *tmp = (pid_t *)realloc(p->pids, p->actual_len * sizeof(pid_t));
     p->pids = tmp;
 
-    mqd_t *tmp_2 = (mqd_t *)realloc(p->mqs, p->len * sizeof(mqd_t));
-    if (tmp_2 == NULL) {
-      fprintf(stderr,
-              "ERROR: add_pid_to_array - cannot reallocate memory 2.\n");
-      free_pids_array(*p);
-      return FAILURE;
-    }
+    mqd_t **tmp_2 = (mqd_t **)realloc(p->mqs, p->actual_len * sizeof(mqd_t *));
     p->mqs = tmp_2;
+    for (size_t i = p->len - 1; i < p->actual_len; i++) {
+      p->mqs[i] = (mqd_t *)malloc(2 * sizeof(mqd_t));
+    }
   }
 
   p->pids[p->len - 1] = pid;
-  p->mqs[p->len - 1] = mq;
+  p->mqs[p->len - 1][0] = mq1;
+  p->mqs[p->len - 1][1] = mq2;
 
   return SUCCESS;
 }
@@ -62,7 +49,8 @@ int remove_pid_from_array(pids p, size_t pos) {
   kill(p.pids[pos], SIGKILL);
   for (size_t i = pos + 1; i < p.len; i++) {
     p.pids[i - 1] = p.pids[i];
-    p.mqs[i - 1] = p.mqs[i];
+    p.mqs[i - 1][0] = p.mqs[i][0];
+    p.mqs[i - 1][1] = p.mqs[i][1];
   }
 
   return SUCCESS;
@@ -71,19 +59,16 @@ int remove_pid_from_array(pids p, size_t pos) {
 int free_pids_array(pids p) {
   for (size_t i = 0; i < p.len; i++) {
     kill(p.pids[i], SIGKILL);
-    queue_disconnect(p.mqs[i]);
+    queue_disconnect(p.mqs[i][0]);
+    queue_disconnect(p.mqs[i][1]);
     queue_delete(p.parent, p.pids[i]);
   }
   free(p.pids);
-  if (p.pids == NULL) {
-    fprintf(stderr, "ERROR: free_pids_array - cannot free array 1.\n");
-    return FAILURE;
-  }
 
-  free(p.mqs);
-  if (p.mqs == NULL) {
-    fprintf(stderr, "ERROR: free_pids_array - cannot free array 2.\n");
-    return FAILURE;
+  for (size_t i = 0; i < p.actual_len; i++) {
+    free(p.mqs[i]);
   }
+  free(p.mqs);
+
   return SUCCESS;
 }

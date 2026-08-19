@@ -7,7 +7,7 @@
 
 typedef struct {
   pid_t *pids;
-  mqd_t *mqs;
+  mqd_t **mqs;
   pid_t parent;
   size_t len;
   size_t actual_len;
@@ -16,7 +16,7 @@ typedef struct {
 #define START_BUFFER_SIZE 10
 
 int create_pids_array(pids *p, pid_t ppid);
-int add_pid_to_array(pids *p, pid_t pid, mqd_t mq);
+int add_pid_to_array(pids *p, pid_t pid, mqd_t mq1, mqd_t mq2);
 int find_pid_in_array(pids p, pid_t pid, size_t *pos);
 int remove_pid_from_array(pids p, size_t pos);
 int free_pids_array(pids p);
