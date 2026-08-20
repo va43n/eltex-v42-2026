@@ -15,4 +15,10 @@ report
 
 *.odt*
 
+# module 5
 lextures
+*.mod*
+*.cmd
+*.symvers
+*.order
+*.ko
