@@ -8,5 +8,5 @@
 06 - ✅  
 07 - ✅  
 08 - ✅  
-cross1 - ⏳  
-cross2 - ⏳  
+cross1 - ✅  
+cross2 - ✅  
